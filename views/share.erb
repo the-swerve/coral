@@ -1,0 +1,55 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <title>coral payments</title>
+	<link rel="stylesheet" media="screen,projection" href="/css/bootstrap.css">
+	<link rel="stylesheet" media="screen,projection" href="/css/bootstrap-responsive.css">
+	<link rel="stylesheet" media="screen,projection" href="/css/style.css">
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript" src="/js/jquery.js"></script>
+	<script type="text/javascript" src="/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/js/app.js"></script>
+	<script type="text/javascript" src="/js/share.js"></script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+<div id="share" class="container drop-shadow" style="padding:2em; margin-top:1em;">
+
+	<% if @plan %>
+		<h1><%= @plan.account.name %></h1>
+		<h2><%= @plan.name %></h2>
+		<%= erb :plan_desc %>
+
+		<input id="account-id" type="hidden" value="<%= @plan.account.id %>" />
+		<form method="post" class="" id="signup-form">
+
+			<p id="form-error"></p>
+
+			<label></label>
+			<input type="text" name="name" placeholder="Name" />
+
+			<label></label>
+			<input type="text" name="email" placeholder="Email" />
+
+			<label></label>
+			<input type="password" name="password" placeholder="Password" />
+
+			<div class="">
+				<input id="signup-submit" class="btn" name="commit" type="submit" value="Sign Up" />
+			</div>
+
+		</form>
+
+	<% else %>
+		<p>Plan not found</p>
+	<% end %>
+
+</div>
+
+</body>
+</html>

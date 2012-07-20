@@ -1,0 +1,28 @@
+
+	<ul id="plan-nav" class="nav nav-pills">
+		<li class="dropdown">
+			<a rel="tooltip" title="Select a plan" class="dropdown-toggle" data-toggle="dropdown" href="">
+				<i class="icon-chevron-down"></i> <strong id="dropdown-active">All</strong>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a class="dropdown-item" href="">All</a></li>
+			<% @account.plans.each do |plan| %>
+				<li><a class="dropdown-item" href=""><%= plan.name %></a></li>
+			<% end %>
+			</ul>
+		</li>
+		<li class="hide"><a href=""><i class="icon-pencil"></i> Edit</a></li>
+		<li class><a id="new-plan-button" href=""><i class="icon-plus"></i> New Plan</a></li>
+	</ul>
+
+	<div id="plan-descriptions">
+		<% @account.plans.each do |plan| %>
+			<p class="hide"><span class="hide"><%= plan.name %></span>
+			A recurring charge of <strong>$<%= "%.2f" % plan.amount
+			%></strong> every <strong><%= plan.cycle_length %> <%= plan.cycle_type
+			%></strong> and an initial charge of <strong>$<%= "%.2f" %
+			plan.initial_charge %></strong></p>
+		<% end %>
+	</div>
+
+	<p class="plan-desc"></p>

@@ -1,0 +1,64 @@
+a.logo {
+  display: block;
+  margin: 22px auto;
+  line-height: 0;
+  font-size: 0;
+  color: transparent;
+  background: url("../img/coral.png") no-repeat;
+  width: 196px;
+  height: 126px;
+}
+
+/*
+ * Signing in
+ */
+
+p.greetings {
+	font-size: 1.2em;
+}
+
+p#hi-new {
+	display: none;
+}
+
+a#switch-contexts {
+	font-weight: bold;
+	width: 235px;
+	display: block;
+	margin: 0 auto;
+  padding-top: 0.6em 0;
+}
+
+form#welcome-form {
+	width: 235px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+form#initial-plan {
+	width: 340px;
+	margin-left: auto;
+	margin-right: auto;
+	display: none;
+}	
+
+input.welcome-submit, input#initial-plan-submit {
+  height: 2.7em;
+	width: 100%;
+	font-weight: bold;
+}
+
+input.welcome-fields {
+  height: 2em;
+	width: 96%;
+}
+
+input.initial-plan-amount {
+	width: 5em;
+}
+input.initial-plan-cycle {
+	width: 2em;
+}
+input.initial-plan-name {
+	width: 14em;
+}
