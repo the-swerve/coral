@@ -14,8 +14,7 @@ class Application < Sinatra::Base
 	end
 
 	get '/plans', :auth => :account do
-		json :success => true,
-			:plans => @account.plans.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
+		json @account.plans.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
 	end
 
 	get '/plans/:id', :auth => :account do

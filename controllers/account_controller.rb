@@ -29,6 +29,7 @@ class Application < Sinatra::Base
 	end
 
 	get '/account', :auth => :account do
-		json :success => true, :account => @account.as_hash
+		json @account.as_hash
 	end
+
 end

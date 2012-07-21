@@ -4,7 +4,9 @@ class Application < Sinatra::Base
 
 	# Transactions
 
-	post '/profiles/:profile_id/charges/:charge_id/pay', :auth => :account do
+	@path = '/profiles/:profile_id/charges/:charge_id'
+
+	post @path + '/pay', :auth => :account do
 		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			@charge = @profile.charges.first(:short_id => params['charge_id'].to_i)
@@ -20,7 +22,7 @@ class Application < Sinatra::Base
 		end
 	end
 
-	post '/profiles/:profile_id/charges/:charge_id/void', :auth => :account do
+	post @path + 'void', :auth => :account do
 		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			@charge = @profile.charges.first(:short_id => params['charge_id'].to_i)

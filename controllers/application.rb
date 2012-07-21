@@ -38,8 +38,8 @@ class Application < Sinatra::Base
 	before do
 		puts "\n" + 'Parameters: ' + params.to_s
 		puts request.request_method + ' '+ request.fullpath
-		puts request.cookies['friendofthegrue']
-		toke = request.cookies['friendofthegrue']
+		puts request.cookies['coral.session_token']
+		toke = request.cookies['coral.session_token'] || params['session_token']
 		if toke
 			@account = Account.first(:session_token => toke)
 			@profile_user = Profile.first(:session_token => toke)
@@ -93,7 +93,7 @@ class Application < Sinatra::Base
 	get '/logout' do
 		@account.destroy_session_token if @account
 		@profile_user.destroy_session_token if @profile_user
-		request.cookies.delete 'friendofthegrue'
+		request.cookies.delete 'coral.session_token'
 		redirect '/'
 	end
 

@@ -60,6 +60,7 @@ class Account
 	def as_hash
 		{:name => self.name.to_s,
 		 :email => self.email}
+#	 :plans => self.plans.map(&:as_hash)}
 	end
 
 	private

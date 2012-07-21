@@ -60,7 +60,7 @@ $(document).ready(function() {
 				data: {auth: $('form#welcome-form').serializeObject()},
 				success: function(data) {
 					if(data.success) {
-						$.cookie('friendofthegrue', data.session_token);
+						$.cookie('coral.session_token', data.session_token);
 						window.location = '/';
 					} else {
 						$('p#greetings-message').html('Invalid email or password.');
@@ -91,7 +91,7 @@ $(document).ready(function() {
 				data: $('form#welcome-form').serialize(),
 				success: function(data) {
 					if(data.success) {
-						$.cookie('friendofthegrue', data.session_token);
+						$.cookie('coral.session_token', data.session_token);
 						window.location = '/';
 					} else if (data.error) {
 						$('p#greetings-message').html(data.error);

@@ -8,7 +8,7 @@ DB = Database.new 'dev'
 DB.clear
 
 H = HTTParty
-R = 'http://coral.herokuapp.com'
+R = 'http://localhost:3000'
 
 module Testify 
 

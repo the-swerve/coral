@@ -23,7 +23,7 @@ class AccountTester
 	def creates_account_invalidly
 		@bad_data.each do |bad_data|
 			@req = H.post R + @path,:query => bad_data
-			expecting !@req['success'] && @req['errors']
+			expecting !@req['success'] && @req['error']
 		end
 	end
 
