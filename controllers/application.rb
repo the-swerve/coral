@@ -36,10 +36,21 @@ class Application < Sinatra::Base
 	end
 
 	before do
-		puts "\n" + 'Parameters: ' + params.to_s
+
+		# Backbone.js passes post data as a string in the JSON format rather than
+		# the query format, which sinatra expects. 
+		body = request.body.read.to_s
+		if params.empty? && !body.empty?
+		puts "\nbody: " + body
+			@params = JSON.parse(body)
+		else
+			@params = params
+		end
+
+		puts "\n" + 'Parameters: ' + @params.to_s
 		puts request.request_method + ' '+ request.fullpath
 		puts request.cookies['coral.session_token']
-		toke = request.cookies['coral.session_token'] || params['session_token']
+		toke = request.cookies['coral.session_token'] || @params['session_token']
 		if toke
 			@account = Account.first(:session_token => toke)
 			@profile_user = Profile.first(:session_token => toke)
@@ -65,14 +76,14 @@ class Application < Sinatra::Base
 	end
 
 	post '/' do
-		if params['auth']
-			@account = Account.first(:email => params['auth']['email'])
-			@profile_user = Profile.first(:email => params['auth']['email'])
-			if @account && @account.authenticate(params['auth']['password'])
+		if @params['auth']
+			@account = Account.first(:email => @params['auth']['email'])
+			@profile_user = Profile.first(:email => @params['auth']['email'])
+			if @account && @account.authenticate(@params['auth']['password'])
 				@current_user = @account
 				json :success => true, :session_token => @account.generate_session_token,
 					:role => 'administrator', :account => @account.as_hash
-			elsif @profile_user && @profile_user.authenticate(params['auth']['password'])
+			elsif @profile_user && @profile_user.authenticate(@params['auth']['password'])
 				@current_user = @profile_user
 				json :success => true, :session_token => @profile_user.generate_session_token,
 					:role => 'administrator', :profile => @profile_user.as_hash
@@ -98,7 +109,7 @@ class Application < Sinatra::Base
 	end
 
 	get '/share/:planid' do
-		@plan = Plan.first(:short_id => params[:planid].to_i)
+		@plan = Plan.first(:short_id => @params[:planid].to_i)
 		erb :share
 	end
 

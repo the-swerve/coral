@@ -10,7 +10,7 @@ DB.clear
 H = HTTParty
 R = 'http://localhost:3000'
 
-module Testify 
+module Testify
 
 	def expecting test
 		if test

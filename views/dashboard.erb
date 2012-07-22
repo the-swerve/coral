@@ -26,54 +26,40 @@
 <div id="dashboard" class="container drop-shadow">
 
 
-	<div class="navbar" id="custom_nav">
-		<div class="navbar-inner">
-			<div class="container">
-				<a class="brand" id="logo-teeny" href="/">coral</a>
-				<ul class="nav">
-					<li><a id="settings-button" rel="tooltip" title="Account Settings" href=""><i class="big-cog-icon"></i></a></li>
-					<li><a href="" id="get-help" rel="tooltip" title="Get Help"><i class="big-question-icon"></i></a></li>
-					<li><a id="logout-button" rel="tooltip" title="Logout" href="/logout"><i class="big-power-icon"></i></a></li>
-				</ul>
+	<div id="account">
+		<div class="navbar" id="custom_nav">
+			<div class="navbar-inner">
+				<div class="container">
+					<a class="brand" id="logo-teeny" href="/">coral</a>
+					<ul class="nav">
+						<li>
+							<a id="settings-button" rel="tooltip" title="Account Settings" href="">
+								<i class="big-cog-icon"></i></a>
+						</li>
+						<li>
+							<a href="" id="get-help" rel="tooltip" title="Get Help">
+								<i class="big-question-icon"></i></a>
+							</li>
+						<li>
+							<a id="logout-button" rel="tooltip" title="Logout" href="/logout">
+								<i class="big-power-icon"></i></a>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</div>
+
+		<h2 id="account-name"><%= @account.name %></h2>
+		<%= erb :'forms/settings' %>
 	</div>
 
-	<h2 id="account-name"></h2>
-
 	<div class="tab-pane active" id="revenue"> Chart  </div>
-
-
 
 	<%= erb :plan_nav %>
 	<%= erb :list_profiles %>
 
 <!-- Dialog forms -->
 
-<div class="modal hide" id="settings" title="Account Settings">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
-		<h3>Account Settings</h3>
-	</div>
-	<div class="modal-body">
-
-	<p class="form-error"></p>
-
-		<form method="post" action="/account/update" id="settings-form">
-			<label>Name</label>
-			<input type="text" name="name" value="<%= @account.name %>" />
-			<label>Email Address</label>
-			<input type="text" name="email" value="<%= @account.email %>" />
-		</form>
-		<ul class="nav nav-pills">
-			<li><a href="" class="">Reset Password (in progress)</a></li>
-			<li><a href="" class="">Remove Account (in progress)</a></li>
-		</ul>
-	</div>
-	<div class="modal-footer">
-		<input id="save-account-settings" class="btn" name="commit" type="submit" value="Save" />
-	</div>
-</div>
 
 <div class="modal hide" id="new-plan">
 	<div class="modal-header">
@@ -81,7 +67,7 @@
 		<h3>New Plan</h3>
 	</div>
 	<div class="modal-body">
-		<p class="form-error"></p>
+		<p id="new-plan-error"></p>
 		<form class="form form-inline" method="post" action="/plans" id="new-plan-form">
 			<div>
 				<label>Plan Name</label>
@@ -137,7 +123,7 @@
 	</div>
 </div>
 
-<div id="edit-plan-dialog" title="Settings">
+<div id="edit-plan">
 </div>
 
 <div class="modal hide" id="edit-profile">
@@ -146,7 +132,7 @@
 		<h3>Edit Person</h3>
 	</div>
 	<div class="modal-body">
-		<p class="form-error"></p>
+		<p id="edit-profile-error"></p>
 		<input id="edit-profile-id" type="hidden" value="" />
 		<form method="post" action="/profiles" id="edit-profile-form">
 			<label>Name</label>
@@ -166,7 +152,7 @@
 		<h3>Add Someone</h3>
 	</div>
 	<div class="modal-body">
-		<p class="form-error"></p>
+		<p id="new-profile-error"></p>
 		<form method="post" action="/profiles" id="new-profile-form">
 			<label>Name</label>
 			<input type="text" name="name" />

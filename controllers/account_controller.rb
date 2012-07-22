@@ -3,23 +3,18 @@ require './controllers/application.rb'
 class Application < Sinatra::Base
 
 	post '/account' do
-		@account = Account.new params
-		if @account.save
-			json :success => true, :account => @account.as_hash,
-				:session_token => @account.generate_session_token
-		else
-			json :success => false,
-				:error => @account.errors.to_hash.first.first.to_s +
-					' ' + @account.errors.to_hash.first.second.first.to_s # lol
-		end
+		@account = Account.new @params
+		if @account.save ; json @account.as_hash
+		else ; halt 400, @account.first_error ; end
 	end
 
 	put '/account', :auth => :account do
-		if @account.update_attributes params[:account]
-			json :success => true, :account => @account.as_hash
+		puts 'update params! :: ' + @params.to_s
+		if @account.update_attributes @params
+			puts @account.as_hash
+			json @account.as_hash
 		else
-			json :success => false, :error => @account.errors.to_hash.first.first.to_s + 
-				' ' + @account.errors.to_hash.first.second.first.to_s 
+			halt 400, @account.first_error
 		end
 	end
 

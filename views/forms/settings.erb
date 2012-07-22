@@ -1,0 +1,26 @@
+
+<div class="modal hide" id="settings">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Account Settings</h3>
+	</div>
+	<div class="modal-body">
+
+	<p id="settings-error"></p>
+
+		<form method="post" action="/account/update" id="settings-form">
+			<label>Name</label>
+			<input id="settings-name" type="text" name="name" value="" />
+			<label>Email Address</label>
+			<input id="settings-email" type="text" name="email" value="" />
+		</form>
+		<ul class="nav nav-pills">
+			<li><a class="">Reset Password (in progress)</a></li>
+			<li><a class="">Remove Account (in progress)</a></li>
+		</ul>
+	</div>
+
+	<div class="modal-footer">
+		<input id="settings-submit" class="btn" name="commit" type="submit" value="Save" />
+	</div>
+</div>

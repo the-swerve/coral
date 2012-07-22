@@ -2,10 +2,12 @@
 
 Account = Backbone.Model.extend({
 	url: '/account',
+	idAttribute: 'short_id',
 	initialize: function() {
-		this.bind('change:name',function () {
-			$('#account-name').html(this.get('name'));
-		});
+		this.fetch();
+	},
+	validate: function(attrs) {
+		if(attrs.responseText) return attrs.responseText
 	}
 });
 
@@ -18,34 +20,66 @@ Plans = Backbone.Collection.extend({
 	url: '/plans'
 });
 
-// Initialize our backbone models/collections/views
-var account = new Account();
-var plans = new Plans();
+// Backbone Views
+
+AccountView = Backbone.View.extend({
+	id: 'account',
+	req: false, // Keep track of whether we're currently making a server request.
+	events: {
+		'click #settings-submit': 'save',
+		'click #settings-button': 'renderForm',
+	},
+	initialize: function() {
+		this.model.bind('change', this.render, this);
+	},
+
+	renderForm: function() {
+		this.$('#settings-name').val(this.model.get('name'));
+		this.$('#settings-email').val(this.model.get('email'));
+		return this;
+	},
+
+	read: function() { this.model.fetch() },
+
+	save: function () {
+		if(this.req == false) {
+			var self = this;
+			toggleSubmit('input#settings-submit');
+			this.req = true; // begin PUT request
+			var attrs = this.model.attributes
+			this.model.save($('form#settings-form').serializeObject(), {
+				success: function(model, response) {
+					$('#account-name').html(model.get('name'));
+					toggleSubmit('input#settings-submit');
+					$('div#settings').modal('hide');
+					self.req = false;
+				},
+				error: function(model, response) {
+					$('p#settings-error').html(response.responseText);
+					toggleSubmit('input#settings-submit');
+					self.req = false;
+				}
+			});
+		}
+	},
+});
 
 
-// Populate data with GET requests
-account.fetch();
-plans.fetch();
-// TODO: handle request errors
-
-
-// JQuery flare and pure ui
+// The following is a global that 
+var request_block = false;
 
 // Tooltips
 $(document).ready(function() {
+
+	var account = new Account();
+	var account_view = new AccountView({model: account, el: $('div#account')});
 
 	$('a#get-help').tooltip({placement: 'bottom'});
 	$('a#settings-button').tooltip({placement: 'bottom'});
 	$('a#logout-button').tooltip({placement: 'bottom'});
 
-	// Accuont Settings modal
-	$('a#settings-button').click(function(event) {
-		event.preventDefault();
-		$('p.form-error').html('');
-		$('div#settings').modal('show');
-	});
-
 	// Clickable rows for person profiles
+	// TODO generalize this
 	//$('div#profile-settings-dialog').bootstrap_dialog({title: "Profile Settings", autoOpen: false});
 	$('table.clickable-rows tr').click(function(event) {
 		event.preventDefault();
@@ -56,34 +90,19 @@ $(document).ready(function() {
 		$('div#edit-profile').modal('show');
 	});
 
-	// New person bootstrap_bootstrap_dialog
-	$('a#new-profile-button').click(function(event) {
-		event.preventDefault();
-		$('input#new-profile-plan-name').attr('value',$('span#selected-plan').html());
-		$('p.form-error').html('');
-		$('div#new-profile').modal('show')
-	});
-
-	// New plan dialog
-	$('a#new-plan-button').click(function(event) {
-		event.preventDefault();
-		$('p.form-error').html('');
-		$('div#new-plan').modal('show');
-	});
-
-	// Edit plan dialog
-	$('a#edit-plan-button').click(function(event) {
-		event.preventDefault();
-		$('p.form-error').html('');
-		$('div#edit-plan-dialog').modal('show');
-	});
-
-	// Share plan dialog
-	$('a#share-plan-button').click(function(event) {
-		event.preventDefault();
-		$('p.form-error').html('');
-		$('div#share-plan-dialog').modal('show');
-	});
+	function modalize(prefix) {
+		$('a#' + prefix + '-button').click(function(e) {
+			e.preventDefault();
+			$('p#' + prefix + '-error').html(''); // Make sure form errors are blank
+			$('div#' + prefix).modal('show');
+		});
+	};
+	modalize('settings');
+	modalize('edit-plan');
+	modalize('share-plan');
+	modalize('new-plan');
+	modalize('new-profile');
+	modalize('edit-profile');
 
 });
 

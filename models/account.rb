@@ -20,6 +20,8 @@ class Account
 
 	key :name, String
 
+	key :short_id, Integer
+
 	validates_presence_of :password, :on => :create
 	validates_length_of :password, :minimum => 6, :if => :password
 
@@ -33,10 +35,12 @@ class Account
   # Callbacks
   before_validation :defaults, :on => :create
   before_validation :encrypt_pass
+	after_create :generate_session_token
 # before_save :filter_url
 
   # Simply removes all non-alphanumerics 
   def defaults
+		self.short_id = Account.all.size
   end
 
 	def encrypt_pass
@@ -49,7 +53,7 @@ class Account
 
 	def generate_session_token
 		self.session_token = rand(36**8).to_s(36)
-		self.save!
+		self.save
 		return self.session_token
 	end
 	def destroy_session_token
@@ -59,8 +63,18 @@ class Account
 
 	def as_hash
 		{:name => self.name.to_s,
-		 :email => self.email}
+		 :email => self.email,
+		 :short_id => self.short_id,
+		 :session_token => self.session_token}
 #	 :plans => self.plans.map(&:as_hash)}
+	end
+
+	def first_error
+		## Return the very first error in a readable string
+		# Get the field name of the first error 
+		# then get the message for the field name of the first error
+		self.errors.to_hash.first.first.to_s + 
+			' ' + self.errors.to_hash.first.second.first.to_s 
 	end
 
 	private

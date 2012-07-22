@@ -127,3 +127,7 @@ input#new-plan-cycle-amount {
 input#edit-plan-name {
 	width: 20em;
 }
+
+p#settings-error {
+	color: #944E4E;
+}
