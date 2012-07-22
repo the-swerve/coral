@@ -3,8 +3,6 @@ $(document).ready(function() {
 	var signing_in = false;
 	var creating_account = false;
 
-	$('form#welcome-form').attr('action', api_url + '/signin');
-
 	// Welcome page
 	// Switch sign in/up contexts
 	$('a#switch-contexts').toggle(function(event) {
@@ -23,7 +21,6 @@ $(document).ready(function() {
 				$('input.welcome-submit').fadeIn('fast');
 				$('input.welcome-submit').attr('class', 'btn welcome-submit');
 			});
-			$('form#welcome-form').attr('action', api_url + '/account');
 		}
 	},
 	function() {
@@ -41,7 +38,6 @@ $(document).ready(function() {
 				$('input.welcome-submit').fadeIn('fast');
 				$('input.welcome-submit').attr('class', 'btn welcome-submit');
 			});
-			$('form#welcome-form').attr('action', api_url + '/signin');
 		}
 	});
 
@@ -90,28 +86,13 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: $('form#welcome-form').serialize(),
 				success: function(data) {
-					if(data.success) {
-						$.cookie('coral.session_token', data.session_token);
-						window.location = '/';
-					} else if (data.error) {
-						$('p#greetings-message').html(data.error);
-						$('p#greetings-message').css('color', '#944E4E');
-						$('input.welcome-submit').attr('value','Create Account');
-						$('input.welcome-submit').attr('class','btn welcome-submit');
-						$(this).unbind('click');
-						creating_account = false;
-					} else {
-						$('p#greetings-message').html('There was an error. :/');
-						$('p#greetings-message').css('color', '#944E4E');
-						$('input.welcome-submit').attr('value','Create Account');
-						$('input.welcome-submit').attr('class','btn welcome-submit');
-						creating_account = false;
-					}
+					$.cookie('coral.session_token', data.session_token);
+					window.location = '/';
 				},
-				error: function() {
-					$('p#greetings-message').html('There was an error. :(');
+				error: function(data) {
+					$('p#greetings-message').html(data.responseText);
 					$('p#greetings-message').css('color', '#944E4E');
-					$('input.welcome-submit').attr('value','Create Account'); // XXX redundant
+					$('input.welcome-submit').attr('value','Create Account');
 					$('input.welcome-submit').attr('class','btn welcome-submit');
 					creating_account = false;
 				}

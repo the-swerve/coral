@@ -64,8 +64,7 @@ class Account
 	def as_hash
 		{:name => self.name.to_s,
 		 :email => self.email,
-		 :short_id => self.short_id,
-		 :session_token => self.session_token}
+		 :short_id => self.short_id}
 #	 :plans => self.plans.map(&:as_hash)}
 	end
 

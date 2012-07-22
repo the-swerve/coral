@@ -1,78 +1,8 @@
-// Backbone Models
-
-Account = Backbone.Model.extend({
-	url: '/account',
-	idAttribute: 'short_id',
-	initialize: function() {
-		this.fetch();
-	},
-	validate: function(attrs) {
-		if(attrs.responseText) return attrs.responseText
-	}
-});
-
-Plan = Backbone.Model.extend({});
-
-// Backbone Collections
-
-Plans = Backbone.Collection.extend({
-	model: Plan,
-	url: '/plans'
-});
-
-// Backbone Views
-
-AccountView = Backbone.View.extend({
-	id: 'account',
-	req: false, // Keep track of whether we're currently making a server request.
-	events: {
-		'click #settings-submit': 'save',
-		'click #settings-button': 'renderForm',
-	},
-	initialize: function() {
-		this.model.bind('change', this.render, this);
-	},
-
-	renderForm: function() {
-		this.$('#settings-name').val(this.model.get('name'));
-		this.$('#settings-email').val(this.model.get('email'));
-		return this;
-	},
-
-	read: function() { this.model.fetch() },
-
-	save: function () {
-		if(this.req == false) {
-			var self = this;
-			toggleSubmit('input#settings-submit');
-			this.req = true; // begin PUT request
-			var attrs = this.model.attributes
-			this.model.save($('form#settings-form').serializeObject(), {
-				success: function(model, response) {
-					$('#account-name').html(model.get('name'));
-					toggleSubmit('input#settings-submit');
-					$('div#settings').modal('hide');
-					self.req = false;
-				},
-				error: function(model, response) {
-					$('p#settings-error').html(response.responseText);
-					toggleSubmit('input#settings-submit');
-					self.req = false;
-				}
-			});
-		}
-	},
-});
 
 
-// The following is a global that 
-var request_block = false;
 
-// Tooltips
 $(document).ready(function() {
 
-	var account = new Account();
-	var account_view = new AccountView({model: account, el: $('div#account')});
 
 	$('a#get-help').tooltip({placement: 'bottom'});
 	$('a#settings-button').tooltip({placement: 'bottom'});
@@ -254,87 +184,31 @@ $(document).ready(function() {
 //		});
 //	});
 //
-//	// Create a new plan
-//	$('input#new-plan-submit').bind('click', function(event) {
-//		event.preventDefault();
-//		$(this).attr('class',"btn disabled");
-//		$(this).attr('value',"Saving...");
-//		$.ajax({
-//			type: 'POST',
-//			url: "/plans",
-//			dataType: 'json',
-//			data: {plan: $('form#new-plan-form').serializeObject()},
-//			success: function(data) {
-//				if(data.plan) {
-//					$('input#new-plan-submit').attr('class',"btn");
-//					$('input#new-plan-submit').attr('value',"Save");
-//					$('div#new-plan').modal('hide');
-//					$('ul.dropdown-menu').prepend(
-//						"<li><a href=\"\">" + data.plan.name + "</a></li>"
-//					);
-//					$('div#share-plan').modal('show');
-//					if(document.location.hostname == 'localhost') // XXX bleh
-//						var url = "http://" + document.location.hostname + ':' + document.location.port + data.plan.url;
-//					else
-//						var url = "http://" + document.location.hostname + data.plan.url;
-//					$('span#plan-url-value').html(
-//						"<a target=\"_blank\" href=\"" + url + "\">" + url + "</a>"
-//					);
-//				} else if (data.error) {
-//					$('input#new-plan-submit').attr('class',"btn");
-//					$('input#new-plan-submit').attr('value',"Save");
-//					$('p.form-error').html(data.error);
-//				} else {
-//					$('input#new-plan-submit').attr('class',"btn");
-//					$('input#new-plan-submit').attr('value',"Save");
-//					$('p.form-error').html('There was an error :/');
-//				}
-//			},
-//			error: function(data) {
-//				$('p.form-error').html('There was an error :(');
-//				$('input#new-plan-submit').attr('class',"btn");
-//				$('input#new-plan-submit').attr('value',"Save");
-//			}
-//		});
-//	});
-//
-//
-//});
-//
-//// Google Charting API
-//
-//// Load the Visualization API and the piechart package.
-//google.load('visualization', '1.0', {'packages':['corechart']});
-//
-//google.setOnLoadCallback(drawVisualization);
-//
-//// Set a callback to run when the Google Visualization API is loaded.
-//function drawVisualization() {
-//  // Some raw data (not necessarily accurate)
-//  var data = google.visualization.arrayToDataTable([
-//    ['Month',   'Basic Membership', 'Long-Term Membership'],
-//    ['Jan',    165,      938],
-//    ['Feb',    135,      1120],
-//    ['Mar',    157,      1167],
-//    ['Apr',    139,      1110],
-//    ['May',    136,      691],
-//    ['Jun',    136,      691],
-//    ['Jul',    136,      691],
-//    ['Aug',    136,      691],
-//    ['Sep',    136,      691],
-//    ['Oct',    136,      691],
-//    ['Nov',    136,      691],
-//    ['Dec',    136,      691]
-//  ]);
-//
-//  // Create and draw the visualization.
-//  var ac = new google.visualization.AreaChart(document.getElementById('revenue'));
-//  ac.draw(data, {
-//    title : 'Your Revenue',
-//    isStacked: true,
-//    width: '100%',
-//    height: 400,
-//		backgroundColor: 'transparent',
-//    vAxis: {title: "Revenue ($)"}
-//  });
-//}
+google.load('visualization', '1.0', {'packages':['corechart']});
+
+function drawVisualization() {
+	// Some raw data (not necessarily accurate)
+	var data = google.visualization.arrayToDataTable([
+		['Month', 'Plan 1', 'Plan 2', 'Plan 3', 'Plan 4', 'Plan 5', 'Subscribers'],
+		['January',  165,      938,         522,             998,           450,      614.6],
+		['February',  135,      1120,        599,             1268,          288,      682],
+		['March',  157,      1167,        587,             807,           397,      623],
+		['April',  139,      1110,        615,             968,           215,      609.4],
+		['May',  136,      691,         629,             1026,          366,      569.6]
+	]);
+
+	var options = {
+		title : 'Sample Placeholder Chart',
+		vAxis: {title: "Revenue"},
+		seriesType: "bars",
+		series: {5: {type: "line"}},
+		width: '100%',
+		height: 370,
+		backgroundColor: 'transparent'
+	};
+
+	var chart = new google.visualization.ComboChart(document.getElementById('chart'));
+	chart.draw(data, options);
+};
+
+google.setOnLoadCallback(drawVisualization);

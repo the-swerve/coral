@@ -16,8 +16,24 @@
 	<script type="text/javascript" src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/bootstrap-modal.js"></script>
 	<script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+	<script type="text/javascript" src="js/account.js"></script>
+	<script type="text/javascript" src="js/plan.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/dashboard.js"></script>
+
+	<script>
+		// Load bootstrapped models served by sinatra.
+		var account = new Account();
+		var plans = new PlanCollection();
+
+		$(document).ready(function() {
+			var account_view = new AccountView({model: account, el: $('div#account')});
+			var plan_view = new PlanView({collection: plans, el: $('div#plan')});
+			account.set(<%= @account.as_hash.to_json %>);
+			plans.reset(<%= @account.plans.map(&:as_hash).to_json %>);
+		});
+	</script>
+
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -26,83 +42,25 @@
 <div id="dashboard" class="container drop-shadow">
 
 
-	<div id="account">
-		<div class="navbar" id="custom_nav">
-			<div class="navbar-inner">
-				<div class="container">
-					<a class="brand" id="logo-teeny" href="/">coral</a>
-					<ul class="nav">
-						<li>
-							<a id="settings-button" rel="tooltip" title="Account Settings" href="">
-								<i class="big-cog-icon"></i></a>
-						</li>
-						<li>
-							<a href="" id="get-help" rel="tooltip" title="Get Help">
-								<i class="big-question-icon"></i></a>
-							</li>
-						<li>
-							<a id="logout-button" rel="tooltip" title="Logout" href="/logout">
-								<i class="big-power-icon"></i></a>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</div>
+	<%= erb :nav %>
 
 		<h2 id="account-name"><%= @account.name %></h2>
 		<%= erb :'forms/settings' %>
 	</div>
 
-	<div class="tab-pane active" id="revenue"> Chart  </div>
+	<div class="tab-pane active" id="chart"> </div>
 
-	<%= erb :plan_nav %>
+	<div id="plan">
+	<%= erb :plan_template %>
+	<div id="plan-header"> </div>
+	<%= erb :'forms/new_plan' %>
+	</div>
+
 	<%= erb :list_profiles %>
 
 <!-- Dialog forms -->
 
 
-<div class="modal hide" id="new-plan">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
-		<h3>New Plan</h3>
-	</div>
-	<div class="modal-body">
-		<p id="new-plan-error"></p>
-		<form class="form form-inline" method="post" action="/plans" id="new-plan-form">
-			<div>
-				<label>Plan Name</label>
-				<input id="new-plan-name" type="text" name="name" /> 
-			</div>
-			<br />
-			<div>
-				<label>Recurring charge of</label>
-				<div class="input-prepend">
-					<span class="add-on">$</span>
-					<input id="prependedInput" size="4" type="text" name="amount" style="width:2em;"/>
-				</div>
-				<label>every</label>
-				<select id="new-plan-cycle" style="width:7em;" name="cycle">
-					<option>1 month</option>
-					<option>2 weeks</option>
-					<option>2 months</option>
-					<option>3 months</option>
-					<option>6 months</option>
-					<option>1 year</option>
-				</select>
-				<br />
-				<br />
-				<label>With initial charge of</label>
-				<div class="input-prepend">
-					<span class="add-on">$</span>
-					<input id="prependedInput" size="16" type="text" name="initial_charge" style="width:2em;" />
-				</div>
-			</div>
-		</form>
-	</div>
-	<div class="modal-footer">
-		<input id="new-plan-submit" class="btn" name="commit" type="submit" value="Save" />
-	</div>
-</div>
 
 <div id="share-plan" class="modal hide">
 	<div class="modal-header">

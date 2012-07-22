@@ -74,7 +74,7 @@ a#logo-teeny {
  */
 
 div#chart {
-	margin-top: 51px;
+	margin-top: 61px;
 }
 
 /*
@@ -128,6 +128,6 @@ input#edit-plan-name {
 	width: 20em;
 }
 
-p#settings-error {
+p#settings-error, p#new-plan-error {
 	color: #944E4E;
 }

@@ -3,18 +3,23 @@
 
 
 // Configuration and statics
+//
+_.templateSettings = {
+	interpolate: /\{\{(.+?)\}\}/g,
+	evaluate: /\[\[(.+?)\]\]/g
+}
 
-// Utility funcs
+// Jquery extension funcs
 
-function toggleSubmit(el) {
-	if($(el).attr('class') == 'btn' && $(el).attr('value') == 'Save') {
-		$(el).attr('class','btn disabled');
-		$(el).attr('value','Saving...');
+jQuery.fn.toggleSubmit = function() {
+	if(this.attr('class') == 'btn' && this.attr('value') == 'Save') {
+		this.attr('class','btn disabled');
+		this.attr('value','Saving...');
 	} else {
-		this.$('#settings-submit').attr('class',"btn");
-		this.$('#settings-submit').attr('value',"Save");
+		this.attr('class',"btn");
+		this.attr('value',"Save");
 	}
-};
+}
 
 // Make form data nestable inside a jso
 jQuery.fn.serializeObject = function() {
