@@ -49,9 +49,11 @@
 <body>
 <div id="dashboard" class="container drop-shadow">
 
-	<%= erb :nav %>
-	<h2 id="account-name"><%= @account.name %></h2>
-	<%= erb :'forms/settings' %>
+	<div id="account'>
+		<%= erb :nav %>
+		<h2 id="account-name"><%= @account.name %></h2>
+		<%= erb :'forms/settings' %>
+	</div>
 
 	<div class="tab-pane active" id="chart"> </div>
 
