@@ -14,14 +14,15 @@
 			with an initial charge of <strong>${{Number(plan.get('initial_charge')).toFixed(2)}}</strong>
 		[[ } ]]
 		<a class='btn btn-info' id='edit-plan-button'><i class="icon-pencil icon-white"></i> Edit</a>
-		<br /><a href="#" id='share-plan-button'><i class="icon-globe"></i> Share this plan</a>
+		<a class='btn btn-info' href="#" id='share-plan-button'><i class="icon-globe icon-white"></i> Share</a><br /><br />
 	[[ } ]]
 </script>
 
 	<ul id="plan-nav" class="nav nav-pills">
 		<li class="dropdown">
 			<a rel="tooltip" title="Select a plan" class="dropdown-toggle" data-toggle="dropdown" href="">
-				<i class="icon-chevron-down"></i> <strong id="dropdown-active">All plans</strong>
+				<i class="icon-chevron-down"></i> <strong id="dropdown-active">
+					All plans</strong><span class='active-plan-id' id=""></span>
 			</a>
 			<ul class="dropdown-menu">
 				<!-- plan-header-tmpl goes here -->

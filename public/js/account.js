@@ -1,4 +1,4 @@
-// Account model/view
+// Top level merchant accounts
 
 Account = Backbone.Model.extend({
 	url: '/account',

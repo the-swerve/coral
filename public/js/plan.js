@@ -58,13 +58,15 @@ PlanView = Backbone.View.extend({
 	render: function() {
 		var self = this;
 
-		if(self.selected == 'all')
+		if(self.selected == 'all') {
 			var active = 'All plans';
-		else {
+			var active_id = '';
+		} else {
 			var active = self.selected.get('name');
+			var active_id = self.selected.id;
 		}
-
 		this.$('#dropdown-active').html(active); // set active plan
+		$('span.active-plan-id').attr('id',active_id); // set active plan id
 
 		var list = _.template(this.$('#plan-header-tmpl').html());
 		this.$('.dropdown-menu').html(list({plans: self.collection}));
@@ -75,7 +77,8 @@ PlanView = Backbone.View.extend({
 		return this;
 	},
 	
-	create: function() {
+	create: function(e) {
+		e.preventDefault();
 		if(this.req == false) {
 			var self = this;
 			$('input#new-plan-submit').toggleSubmit();
@@ -173,6 +176,8 @@ PlanView = Backbone.View.extend({
 	select_plan: function(e) {
 		e.preventDefault();
 		this.selected = this.collection.get($(e.currentTarget).attr('id'));
+		if(this.selected == 'all') 
+			$('span.active-plan-id').attr('id','');
 		this.render();
 	}	
 

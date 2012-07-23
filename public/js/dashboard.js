@@ -35,7 +35,6 @@ $(document).ready(function() {
 	// Since we have to hide the edit-plan modal, we can't use modalize
 	//
 	modalize('settings');
-	modalize('new-profile');
 	modalize('edit-profile');
 
 });

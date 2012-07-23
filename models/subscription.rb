@@ -27,7 +27,7 @@ class Subscription
 
 	# Callbacks
 	before_validation :defaults, :on => :create
-	before_destroy :destroy_unpaid_charges
+#before_destroy :destroy_unpaid_charges
 
 	state_machine :state, :initial => :in_trial do
 

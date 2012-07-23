@@ -8,30 +8,17 @@ class Application < Sinatra::Base
 	end
 
 	post '/profiles', :auth => :account do
-		@profile = @account.profiles.build params[:profile]
+		@profile = @account.profiles.build @params
 		if @profile.save
-			if params[:profile][:plan_name]
-				@plan = @account.plans.first(:name => params[:profile][:plan_name])
-				if @plan
-					@sub = @profile.subscriptions.build :plan_id => @plan.id
-					if @sub.save
-						@profile.settle
-						json :success => true, :profile => @profile.as_hash,
-							:subscription => @sub.as_hash
-					end
-				end
-			end
-			json :success => true, :profile => @profile.as_hash
+			json :profile => @profile.as_hash
 		else
-			json :success => false, 
-				:error => @profile.errors.to_hash.first.first.to_s +
-					' ' + @profile.errors.to_hash.first.second.first.to_s # lol
+			halt 400, @profile.first_error
 		end
 	end
 
 	# The unauthorized endpoint for allowing random people to sign up for subscriptions
-	post '/account/:id/profiles' do
-		@acct = Account.find(params['id'])
+	post '/account/:short_id/profiles' do
+		@acct = Account.find(params['short_id'])
 		if @acct
 			@profile = @acct.profiles.build params[:profile]
 			if @profile.save
@@ -48,8 +35,8 @@ class Application < Sinatra::Base
 		end
 	end
 
-	put '/profiles/:id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['id'].to_i)
+	put '/profiles/:short_id', :auth => :account do
+		@profile = @account.profiles.first(:short_id => params['short_id'].to_i)
 		if @profile
 			if @profile.update_attributes params[:profile]
 				json :success => true, :profile => @profile.as_hash
@@ -63,8 +50,8 @@ class Application < Sinatra::Base
 		end
 	end
 
-	get '/profiles/:id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['id'].to_i)
+	get '/profiles/:short_id', :auth => :account do
+		@profile = @account.profiles.first(:short_id => params['short_id'].to_i)
 		if @profile
 			json :success => true, :profile => @profile.as_hash
 		else
@@ -104,8 +91,8 @@ class Application < Sinatra::Base
 		end
 	end
 
-	delete '/profiles/:id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['id'].to_i)
+	delete '/profiles/:short_id', :auth => :account do
+		@profile = @account.profiles.first(:short_id => params['short_id'].to_i)
 		if @profile
 			@profile.destroy
 			json :success => true, :message => 'profile destroyed'
