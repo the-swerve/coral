@@ -1,21 +1,21 @@
-	<% if !@account.profiles.empty? %>
-		<table id="profiles-table" class="table table-striped clickable-rows">
+<% if !@account.profiles.empty? %>
+	<table id="profiles-table" class="table table-striped clickable-rows">
+		<thead>
 			<thead>
-				<thead>
-					<tr> <th>Name</th> <th>Email</th> <th>Subscriptions</th> <th>Status</th></tr>
-				</thead>
+				<tr> <th>Name</th> <th>Email</th> <th>Subscriptions</th> <th>Status</th></tr>
 			</thead>
-			<tbody>
-			<% @account.profiles.each do |profile| %>
-				<tr id="<%= profile.short_id %>">
-					<td class="profile-name"><%= profile.name %></td>
-					<td class="profile-email"><%= profile.email %></td>
-					<td class="profile-subs"><%= profile.subscription_list %></td>
-				<td class="profile-state"><%= profile.state %></td></tr>
-			<% end %>
-			</tbody>
-	</table>
-	<% else %>
-		<p><em>No subscribers yet.</em></p>
-	<% end %>
-	<a class="btn" id="new-profile-button" href=""><i class="icon-plus"></i> Add Someone</a>
+		</thead>
+		<tbody>
+		<% @account.profiles.each do |profile| %>
+			<tr id="<%= profile.short_id %>">
+				<td class="profile-name"><%= profile.name %></td>
+				<td class="profile-email"><%= profile.email %></td>
+				<td class="profile-subs"><%= profile.subscription_list %></td>
+			<td class="profile-state"><%= profile.state %></td></tr>
+		<% end %>
+		</tbody>
+</table>
+<% else %>
+	<p><em>No subscribers yet.</em></p>
+<% end %>
+<a class="btn btn-info" id="new-profile-button" href=""><i class="icon-plus icon-white"></i> Add Someone</a>

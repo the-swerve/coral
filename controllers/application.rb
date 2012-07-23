@@ -40,10 +40,10 @@ class Application < Sinatra::Base
 		# Backbone.js passes post data as a string in the JSON format rather than
 		# the query format, which sinatra expects. 
 		body = request.body.read.to_s
-		if params.empty? && !body.empty?
-		puts "\nbody: " + body
+		begin
+			puts "\nbody: " + body
 			@params = JSON.parse(body)
-		else
+		rescue
 			@params = params
 		end
 
@@ -60,14 +60,8 @@ class Application < Sinatra::Base
 		@current_user = @account || @profile_user
 	end
 
-	error do
-		throw :halt, [501, json(:errors => env['sinatra.error'].name)]
-	end
-
-	not_found do
-		throw :halt,
-			[404, json(:success=> false, :message => 'not found (404)')]
-	end
+	error { halt 501, env['sinatra.error'].name }
+	not_found { halt 404, 'not found  (404)' }
 
 	get '/' do
 		if @account ;    erb :dashboard

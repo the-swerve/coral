@@ -6,34 +6,7 @@
 		<div class="modal-body">
 			<p id="new-plan-error"></p>
 				<form class="form form-inline" method="post" action="/plans" id="new-plan-form">
-					<div>
-						<label>Name: </label>
-						<input class="plan-name" type="text" name="name" /> 
-					</div>
-					<br />
-					<div>
-						<label>Recurring charge of</label>
-						<div class="input-prepend">
-							<span class="add-on">$</span>
-							<input class="plan-amount" id="prependedInput" size="4" type="text" name="amount" style="width:2em;"/>
-						</div>
-						<label>every</label>
-						<select class="plan-cycle" style="width:7em;" name="cycle">
-							<option>1 month</option>
-							<option>2 weeks</option>
-							<option>2 months</option>
-							<option>3 months</option>
-							<option>6 months</option>
-							<option>1 year</option>
-						</select>
-						<br />
-						<br />
-						<label>With initial charge of</label>
-						<div class="input-prepend">
-							<span class="add-on">$</span>
-							<input class="plan-initial-charge" id="prependedInput" size="16" type="text" name="initial_charge" style="width:2em;" />
-						</div>
-					</div>
+					<%= erb :'forms/plan_form' %>
 				</form>
 		</div>
 		<div class="modal-footer">

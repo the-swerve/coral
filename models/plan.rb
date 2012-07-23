@@ -4,7 +4,7 @@ class Plan
 
 	include MongoMapper::Document
 
-	attr_accessor :cycle
+	attr_accessor :cycle, :url
 
 	key :name, String,
 		:required => true
@@ -36,6 +36,7 @@ class Plan
 
 	# Callbacks
 	before_validation :defaults, :on => :create
+	before_save :parse_cycle
 
   # Associations
 	belongs_to :account
@@ -45,13 +46,11 @@ class Plan
 	def as_hash
 		{:name => self.name.to_s,
 		 :amount => self.amount.to_s,
-		 :cycle_length => self.cycle_length.to_s,
-		 :cycle_type => self.cycle_type.to_s,
+		 :cycle => self.cycle_str,
 		 :initial_charge => self.initial_charge.to_s,
-		 :trial_length => self.trial_length.to_s,
-		 :trial_type => self.trial_length.to_s,
 		 :description => self.description.to_s,
-		 :url => '/share/' + self.short_id.to_s
+		 :url => '/share/' + self.short_id.to_s,
+		 :short_id => self.short_id.to_s
 		}
 	end
 
@@ -65,6 +64,10 @@ class Plan
 		# then get the message for the field name of the first error
 		self.errors.to_hash.first.first.to_s + 
 			' ' + self.errors.to_hash.first.second.first.to_s 
+	end
+
+	def cycle_str
+		self.cycle_length.to_s + ' ' + self.cycle_type
 	end
 
 	private
@@ -87,6 +90,10 @@ class Plan
 	def defaults
 		self.short_id = Plan.all.size
 		self.initial_charge ||= 0
+		parse_cycle
+	end
+
+	def parse_cycle
 		if self.cycle
 			self.cycle_length = self.cycle.split.first.to_i
 			self.cycle_type = self.cycle.split.last

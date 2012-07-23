@@ -16,10 +16,11 @@
 	<script type="text/javascript" src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/bootstrap-modal.js"></script>
 	<script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
-	<script type="text/javascript" src="js/account.js"></script>
-	<script type="text/javascript" src="js/plan.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript" src="js/dashboard.js"></script>
+	<script type="text/javascript" src="js/account.js"></script>
+	<script type="text/javascript" src="js/plan.js"></script>
+	<script type="text/javascript" src="js/chart.js"></script>
 
 	<script>
 		// Load bootstrapped models served by sinatra.
@@ -51,38 +52,16 @@
 	<div class="tab-pane active" id="chart"> </div>
 
 	<div id="plan">
-	<%= erb :plan_template %>
-	<div id="plan-header"> </div>
+	<%= erb :'templates/plan_template' %>
 	<%= erb :'forms/new_plan' %>
+	<%= erb :'forms/edit_plan' %>
+	<%= erb :'modals/share_plan' %>
 	</div>
 
 	<%= erb :list_profiles %>
 
 <!-- Dialog forms -->
 
-
-
-<div id="share-plan" class="modal hide">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
-		<h3>Share Plan</h3>
-	</div>
-
-	<div class="modal-body">
-		<p> Your plan's public page is located at <span id="plan-url-value"></span></p>
-		<form id="share-plan-form">
-			<label>Share with the following emails:</label>
-			<textarea>Emails separated by commas</textarea>
-		</form>
-	</div>
-
-	<div class="modal-footer">
-		<input id="share-plan-submit" class="btn" name="commit" type="submit" value="Share" />
-	</div>
-</div>
-
-<div id="edit-plan">
-</div>
 
 <div class="modal hide" id="edit-profile">
 	<div class="modal-header">

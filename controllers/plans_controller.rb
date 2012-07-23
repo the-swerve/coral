@@ -2,7 +2,7 @@ require './controllers/application.rb'
 
 class Application < Sinatra::Base
 
-	post '/plans', :auth => :account do
+	post '/plans/?', :auth => :account do
 		@plan = @account.plans.build @params
 		if @plan.save
 			json @plan.as_hash
@@ -11,12 +11,12 @@ class Application < Sinatra::Base
 		end
 	end
 
-	get '/plans', :auth => :account do
+	get '/plans/?', :auth => :account do
 		json @account.plans.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
 	end
 
-	get '/plans/:id', :auth => :account do
-		@plan = @account.plans.first(:short_id => @params['id'].to_i)
+	get '/plans/:plan_id', :auth => :account do
+		@plan = @account.plans.first(:short_id => params[:plan_id].to_i)
 		if @plan
 			json :success => true, :plan => @plan.as_hash
 		else
@@ -25,7 +25,7 @@ class Application < Sinatra::Base
 	end
 
 	get '/share/:plan_id', :auth => :account do
-		@plan = Plan.all.first(:short_id => @params['plan_id'].to_i)
+		@plan = Plan.all.first(:short_id => params['plan_id'].to_i)
 		if @plan
 			json :success => true, :plan => @plan.as_hash
 		else
@@ -33,17 +33,13 @@ class Application < Sinatra::Base
 		end
 	end
 
-	put '/plans/:id', :auth => :account do
-		@plan = @account.plans.first(:short_id => @params['id'].to_i)
+	put '/plans/:short_id', :auth => :account do
+		@plan = @account.plans.first(:short_id => params[:short_id].to_i)
 		if @plan
-			if @plan.update_attributes @params[:plan]
-				json :success => true, :plan => @plan.as_hash
-			else
-				json :success => false, :errors => @plan.errors.to_hash
-			end
-		else
-			json :success => false, :errors => 'not found'
-		end
+			if @plan.update_attributes(@params)
+				json @plan.as_hash
+			else ; halt 400, @plan.first_error ; end
+		else ; halt 400, 'plan not found' ; end
 	end
 
 	delete '/plans/:id', :auth => :account do

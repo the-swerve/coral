@@ -24,23 +24,21 @@ AccountView = Backbone.View.extend({
 		return this;
 	},
 
-	read: function() { this.model.fetch() },
-
 	save: function () {
 		if(this.req == false) {
 			var self = this;
-			$('input#new-plan-submit').toggleSubmit();
+			$('input#settings-submit').toggleSubmit();
 			this.req = true; // begin PUT request
 			this.model.save($('form#settings-form').serializeObject(), {
 				success: function(model, response) {
 					$('#account-name').html(model.get('name'));
-					$('input#new-plan-submit').toggleSubmit();
+					$('input#settings-submit').toggleSubmit();
 					$('div#settings').modal('hide');
 					self.req = false;
 				},
 				error: function(model, response) {
 					$('p#settings-error').html(response.responseText);
-					$('input#new-plan-submit').toggleSubmit();
+					$('input#settings-submit').toggleSubmit();
 					self.req = false;
 				}
 			});

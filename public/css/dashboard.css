@@ -114,20 +114,6 @@ div#more-plan-options {
 	display: none;
 }
 
-/*
- * Create a plan dialog
- */
-
-select#new-plan-cycle-unit {
-	width: 6.5em;
-}
-input#new-plan-cycle-amount {
-	width: 1.2em;
-}
-input#edit-plan-name {
-	width: 20em;
-}
-
-p#settings-error, p#new-plan-error {
+p#settings-error, p#new-plan-error, p#edit-plan-error {
 	color: #944E4E;
 }

@@ -1,0 +1,34 @@
+
+<script id='plan-header-tmpl' type='text/template' class='hide'>
+	[[ plans.each(function(plan) { ]]
+		<li><a id="{{plan.id}}" class="dropdown-item" href="">{{ plan.get('name') }}</a></li>
+	[[ }) ]]
+	<li><a href="#" id='all-plans-select'>All plans</a></li>
+</script>
+
+<script id='plan-desc-tmpl' type='text/template' class='hide'>
+	[[ if(!(plan === 'all')) { ]]
+		Charging <strong>${{Number(plan.get('amount')).toFixed(2)}}</strong>
+		every <strong>{{plan.get('cycle')}}</strong>
+		[[if(plan.get('initial_charge') != 0) { ]]
+			with an initial charge of <strong>${{Number(plan.get('initial_charge')).toFixed(2)}}</strong>
+		[[ } ]]
+		<a class='btn btn-info' id='edit-plan-button'><i class="icon-pencil icon-white"></i> Edit</a>
+		<br /><a href="#" id='share-plan-button'><i class="icon-globe"></i> Share this plan</a>
+	[[ } ]]
+</script>
+
+	<ul id="plan-nav" class="nav nav-pills">
+		<li class="dropdown">
+			<a rel="tooltip" title="Select a plan" class="dropdown-toggle" data-toggle="dropdown" href="">
+				<i class="icon-chevron-down"></i> <strong id="dropdown-active">All plans</strong>
+			</a>
+			<ul class="dropdown-menu">
+				<!-- plan-header-tmpl goes here -->
+			</ul>
+		</li>
+		<li class="hide"><a href=""><i class="icon-pencil"></i> Edit</a></li>
+		<li class><a id="new-plan-button" href=""><i class="icon-plus"></i> New Plan</a></li>
+	</ul>
+
+<p class="plan-desc"><!-- plan-desc-tmpl goes here --></p>

@@ -4,10 +4,6 @@
 
 // Configuration and statics
 //
-_.templateSettings = {
-	interpolate: /\{\{(.+?)\}\}/g,
-	evaluate: /\[\[(.+?)\]\]/g
-}
 
 // Jquery extension funcs
 
