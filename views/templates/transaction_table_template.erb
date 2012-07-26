@@ -1,0 +1,25 @@
+
+<script id='charge-table-tmpl' type='text/template' class='hide'>
+	[[ if(!charges.isEmpty()) { ]]
+		<table id="charges-table" class="table table-striped clickable-rows">
+			<tbody>
+				[[ charges.each(function(charge) { ]]
+					<tr id="{{charge.id}}" class="edit-charge-button">
+						<td class="charge-table-name-email"><strong>{{ charge.get('name') }}</strong> {{ charge.get('email') }}</td>
+						<td class="charge-table-subs">{{ charge.get('subscription_names') }}</td>
+						<td class="charge-table-state">{{ charge.get('state') }}</td></tr>
+				[[ }); ]]
+			<tr>
+				<td id="new-charge-button">
+					<a class="" id="new-charge-button" href=""><i class="icon-plus"></i> Add Someone</a>
+				</td><td></td><td></td>
+			</tr>
+			</tbody>
+	</table>
+	[[ } else { ]]
+		<p>
+			<em>No payments yet.</em>
+			<a class="" id="new-charge-button" href=""> New Charge</a>
+		</p>
+	[[ } ]]
+</script>

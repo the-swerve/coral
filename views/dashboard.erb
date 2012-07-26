@@ -8,7 +8,7 @@
 	<link rel="stylesheet" media="screen,projection" href="css/bootstrap-responsive.css">
 	<link rel="stylesheet" media="screen,projection" href="css/style.css">
 	<link rel="stylesheet" media="screen,projection" href="css/dashboard.css">
-	<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
 	<script type="text/javascript" src="js/underscore.js"></script>
@@ -21,24 +21,28 @@
 	<script type="text/javascript" src="js/account.js"></script>
 	<script type="text/javascript" src="js/plan.js"></script>
 	<script type="text/javascript" src="js/profile.js"></script>
-	<!-- <script type="text/javascript" src="js/chart.js"></script> -->
+	<script type="text/javascript" src="js/charge.js"></script>
+	<script type="text/javascript" src="js/chart.js"></script>
 
 	<script>
 		// Initialize backbone models
 		var account = new Account();
 		var plans = new PlanCollection();
 		var profiles = new ProfileCollection();
+		var charges = new ChargeCollection();
 
 		$(document).ready(function() {
 			// Initialize backbone views
 			var account_view = new AccountView({model: account, el: $('div#account')});
 			var plan_view = new PlanView({collection: plans, el: $('div#plan')});
-			var profile_view = new ProfileView({collection: profiles, planCollection: plans, el: $('div.container')});
+			var profile_view = new ProfileView({collection: profiles, el: $('div.container')});
+			var charge_view = new ChargeView({collection: charges, el: $('div.container')});
 
 			// Load in bootstrapped data served by sinatra
 			account.set(<%= @account.as_hash.to_json %>);
 			plans.reset(<%= @account.plans.map(&:as_hash).to_json %>);
 			profiles.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
+			charges.reset(<%= @account.profiles.all.reduce([]) {|ps,p| ps.concat(p.charges.map(&:as_hash))}.to_json %>);
 		});
 	</script>
 
@@ -72,9 +76,13 @@
 		<%= erb :'modals/edit_profile' %>
 	</div>
 
-<input type="hidden" id="empty-plans" value="<%= @account.plans.empty? %>" />
-<span class="hide" id="selected-plan"></span>
-
+	<div id="charge">
+		<h3>Payment History</h3>
+		<%= erb :'templates/charge_table_template' %>
+		<div id="charge-table"></div>
+		<%= erb :'modals/new_charge' %>
+		<%= erb :'modals/edit_charge' %>
+	</div>
 
 </div>
 

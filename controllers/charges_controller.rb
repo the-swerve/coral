@@ -16,6 +16,11 @@ class Application < Sinatra::Base
 		end
 	end
 
+	get '/charges', :auth => :account do
+		json :success => true,
+			:charges => @account.charges.all.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
+	end
+
 	get '/profiles/:id/charges', :auth => :account do
 		@profile = @user.profiles.first(:short_id => params['id'].to_i)
 		if @profile

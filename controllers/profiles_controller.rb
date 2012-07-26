@@ -25,12 +25,12 @@ class Application < Sinatra::Base
 				json :success => true, :profile => @profile.as_hash,
 					:session_token => @profile.generate_session_token
 			else
-				json :success => false, 
+				json :success => false,
 					:error => @profile.errors.to_hash.first.first.to_s +
 						' ' + @profile.errors.to_hash.first.second.first.to_s # lol
 			end
 		else
-			json :success => false, 
+			json :success => false,
 				:error => 'account not found'
 		end
 	end

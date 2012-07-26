@@ -1,0 +1,22 @@
+
+
+<div class="modal hide" id="edit-charge">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Edit Person</h3>
+	</div>
+	<div class="modal-body">
+		<p id="edit-charge-error"></p>
+		<input id="edit-charge-id" type="hidden" value="" />
+		<form method="post" action="/charges" id="edit-charge-form">
+			<label>Name</label>
+			<input id="edit-charge-name" type="text" name="name" /> 
+			<label>Email</label>
+			<input id="edit-charge-email" type="text" name="email" />
+			<input id="edit-charge-id" type="hidden" name="short_id" value="" />
+		</form>
+	</div>
+	<div class="modal-footer">
+		<input id="edit-charge-submit" class="btn" name="commit" type="submit" value="Save" />
+	</div>
+</div>

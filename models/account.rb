@@ -26,11 +26,11 @@ class Account
 	validates_length_of :password, :minimum => 6, :if => :password
 
 	timestamps!
-  
+
   # Associations
 	many :plans, :dependent => :destroy
   many :profiles, :dependent => :destroy
-  many :trnsactions, :dependent => :destroy
+	many :charges, :through => :profiles
 
   # Callbacks
   before_validation :defaults, :on => :create
@@ -38,7 +38,7 @@ class Account
 	after_create :generate_session_token
 # before_save :filter_url
 
-  # Simply removes all non-alphanumerics 
+  # Simply removes all non-alphanumerics
   def defaults
 		self.short_id = Account.all.size
   end
@@ -70,10 +70,10 @@ class Account
 
 	def first_error
 		## Return the very first error in a readable string
-		# Get the field name of the first error 
+		# Get the field name of the first error
 		# then get the message for the field name of the first error
-		self.errors.to_hash.first.first.to_s + 
-			' ' + self.errors.to_hash.first.second.first.to_s 
+		self.errors.to_hash.first.first.to_s +
+			' ' + self.errors.to_hash.first.second.first.to_s
 	end
 
 	private

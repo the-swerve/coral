@@ -30,20 +30,20 @@ class Charge
 	# Callbacks
 	before_validation :defaults, :on => :create
 
-	state_machine :state, :initial => :unpaid do
+	state_machine :state, :initial => 'Unpaid' do
 
 		event :pay do
-			transition [:unpaid,:overdue] => :paid,
+			transition ['Unpaid','Overdue'] => 'Paid',
 				:if => lambda {|c| c.due_date <= Date.today && c.trnsactions.create}
 		end
 
 		event :void do
-			transition :paid => :voided,
+			transition 'Paid' => 'Voided',
 				:if => lambda {|c| c.trnsactions.create(:action => 'Void')}
 		end
 
 		event :past_due do
-			transition :pending => :overdue,
+			transition 'Pending' => 'Overdue',
 				:if => lambda {|c| c.due_date <= DateTime.now}
 		end
 
@@ -56,7 +56,9 @@ class Charge
 	def as_hash
 		{:amount => self.amount.to_s,
 		 :name => self.name,
-		 :due_date => self.due_date.to_s}
+		 :due_date => self.due_date.to_s,
+		 :state => self.state,
+		 :profile => self.profile.name}
 	end
 
 	private

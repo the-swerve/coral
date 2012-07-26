@@ -134,7 +134,7 @@ class Profile
 	def subscription_list
 		# Return a readable string of this person's subscription names
 		if subscriptions.empty?
-			'No subscriptions'
+			' '
 		else
 			subscriptions.collect {|s| s.plan.name}.join ', '
 		end
