@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'mongo_sequence'
 require 'bcrypt'
 
 class Account
@@ -40,7 +41,7 @@ class Account
 
   # Simply removes all non-alphanumerics
   def defaults
-		self.short_id = Account.all.size
+		self.short_id = MongoSequence[:account_id].next
   end
 
 	def encrypt_pass

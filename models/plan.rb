@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'mongo_sequence'
 
 class Plan
 
@@ -89,7 +90,7 @@ class Plan
 	end
 
 	def defaults
-		self.short_id = Plan.all.size
+		self.short_id = MongoSequence[:plan_id].next
 		self.initial_charge ||= 0
 		parse_cycle
 	end

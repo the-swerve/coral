@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'mongo_sequence'
 require 'bcrypt'
 require 'state_machine'
 
@@ -153,7 +154,7 @@ class Profile
   # Callbacks
   def defaults
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
-		self.short_id = Profile.all.size # create a shorter id code.
+		self.short_id = MongoSequence[:profile_id].next
 		self.name ||= '' # hmm
   end
 

@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'mongo_sequence'
 require 'state_machine'
 require 'active_support/core_ext'
 
@@ -61,7 +62,8 @@ class Charge
 		 :state => self.state,
 		 :profile => self.profile.name,
 		 :plan_id => self.plan.short_id,
-		 :plan_name => self.plan.name}
+		 :plan_name => self.plan.name,
+		 :id => self.id}
 	end
 
 	private
@@ -77,7 +79,7 @@ class Charge
 	def defaults
 		self.name ||= "Charge (" + DateTime.now.to_s + ")"
 		self.due_date ||= DateTime.now
-		self.short_id = self.profile.charges.all.size
+		self.short_id = MongoSequence[:charge].next
 	end
 
 end

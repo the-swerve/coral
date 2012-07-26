@@ -2,7 +2,6 @@
 
 Charge = Backbone.Model.extend({
 	urlRoot: '/charges',
-	idAttribute: 'short_id',
 	initialize: function() {
 		this.set({plan_ids: new Array()});
 	}
@@ -26,6 +25,7 @@ ChargeView = Backbone.View.extend({
 			'click #new-profile-submit': 'renderTable',
 			'click .dropdown-item': 'renderTable',
 			'click #new-profile-submit': 'fetchCharges',
+			'click .edit-charge-button': 'renderEditForm',
 //		'click #new-charge-button': 'renderNewForm',
 //		'click #new-charge-submit': 'create',
 //		'click .edit-charge-button': 'renderEditForm',
@@ -98,6 +98,16 @@ ChargeView = Backbone.View.extend({
 		}
 		var table = _.template($('#charge-table-tmpl').html());
 		$('#charge-table').html(table({charges: filtered_charges}));
+	},
+
+	renderEditForm: function(e) {
+		e.preventDefault();
+		this.$('p#edit-charge-error').html(''); // clear errors
+		this.$('form#edit-charge-form input').val(''); // clear form
+		alert($(e.currentTarget).attr('id'));
+		var selectedCharge = this.collection.get($(e.currentTarget).attr('id'));
+		this.$('input#edit-charge-name').val(selectedCharge.get('name')); // populate name field
+		this.$('div#edit-charge').modal('show'); // display new profile dialog
 	},
 
 //	renderNewForm: function(e) {

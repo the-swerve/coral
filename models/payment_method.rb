@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'mongo_sequence'
 
 class PaymentMethod
 
@@ -22,7 +23,7 @@ class PaymentMethod
 
 	def defaults
 		self.name ||= 'your payment method # ' + (self.profile.payment_methods.size + 1).to_s
-		self.short_id = self.profile.payment_methods.size
+		self.short_id = MongoSequence[:payment_method_id].next
 	end
 
 end

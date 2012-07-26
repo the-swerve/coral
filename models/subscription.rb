@@ -1,4 +1,5 @@
 require 'mongo_mapper'
+require 'mongo_sequence'
 require 'active_support/core_ext' # for date operations
 require 'state_machine'
 
@@ -121,7 +122,7 @@ class Subscription
 	private
 
 	def defaults
-		self.short_id = self.profile.subscriptions.size
+		self.short_id = MongoSequence[:subscription_id].next
 		self.starting ||= DateTime.now
 		self.next_due ||= self.trial_end if self.plan
 	end

@@ -9,6 +9,7 @@ gem 'gemcutter'
 gem 'sinatra-resources'
 gem 'state_machine'
 gem 'omniauth'
+gem 'mongo_sequence' # for short ids
 
 # for cross domain requests
 gem 'sinatra-cross_origin'
