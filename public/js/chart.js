@@ -13,6 +13,7 @@ function drawVisualization() {
 	]);
 
 	var options = {
+		colors: ['#ff9c9c', '#d280ad', '#7a7cb7', '#7fd07f', '#65a59e'],
 		title : 'Sample Placeholder Chart',
 		vAxis: {title: "Revenue"},
 		seriesType: "bars",

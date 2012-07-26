@@ -27,6 +27,8 @@ ProfileView = Backbone.View.extend({
 		'click #new-profile-submit': 'create',
 		'click .edit-profile-button': 'renderEditForm',
 		'click #edit-profile-submit': 'update',
+		'click #remove-profile-button': 'renderRemoveForm',
+		'click #remove-profile-submit': 'destroy',
 		'click #new-plan-submit': 'renderTable',
 		'click .dropdown-item': 'renderTable',
 	},
@@ -66,8 +68,8 @@ ProfileView = Backbone.View.extend({
 			var profile = this.collection.get($('input#edit-profile-id').val());
 			profile.save(data, {
 				success: function(model, response) {
-					$('input#edit-profile-submit').toggleSubmit();
 					$('div#edit-profile').modal('hide');
+					$('input#edit-profile-submit').toggleSubmit();
 					self.req = false;
 					self.renderTable();
 				},
@@ -75,6 +77,29 @@ ProfileView = Backbone.View.extend({
 					$('p#edit-profile-error').html(response.responseText);
 					$('input#edit-profile-submit').toggleSubmit();
 					self.req = false;
+				}
+			});
+		}
+	},
+
+	destroy: function() {
+		if(this.req == false) { // check request lock
+			var self = this; // preserve scope
+			$('a#remove-profile-submit').addClass('disabled'); // disable button
+			this.req = true; // set request lock
+			var profile = this.collection.get($('input#edit-profile-id').val());
+			profile.destroy({
+				success: function(model, response) {
+					this.$('#remove-profile').modal('hide');
+					$('a#remove-profile-submit').removeClass('disabled'); // disable button
+					self.collection.remove(profile);
+					self.req = false;
+					self.renderTable();
+				},
+				error: function(model, response) {
+					$('a#remove-profile-submit').removeClass('disabled'); // enable button
+					$('p#remove-profile-error').html(response.responseText); // print error
+					self.req = false; // release request lock
 				}
 			});
 		}
@@ -118,6 +143,13 @@ ProfileView = Backbone.View.extend({
 		this.$('input#edit-profile-name').val(selectedProfile.get('name'));
 		this.$('input#edit-profile-email').val(selectedProfile.get('email'));
 		this.$('div#edit-profile').modal('show'); // display new profile dialog
-	}
+	},
+
+	renderRemoveForm: function(e) {
+		e.preventDefault();
+		$('div#edit-profile').modal('hide');
+		$('p#remove-profile-error').html('');
+		$('div#remove-profile').modal('show');
+	},
 
 });

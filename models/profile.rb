@@ -92,7 +92,7 @@ class Profile
 	def pay_all
 		# 1. Update all the subscriptions, which may cause them to create new charges
 		# 2. Find all unpaid charges and pay them all. If any payments fail, return false.
-		subscriptions.all.each do |s| 
+		subscriptions.all.each do |s|
 			until s.next_due > DateTime.now
 				s.check_dates
 			end
@@ -136,16 +136,16 @@ class Profile
 		if subscriptions.empty?
 			' '
 		else
-			subscriptions.collect {|s| s.plan.name}.join ', '
+			subscriptions.collect {|s| s.plan.name + ' (' + s.state + ')'}.join ', '
 		end
 	end
 
 	def first_error
 		## Return the very first error in a readable string
-		# Get the field name of the first error 
+		# Get the field name of the first error
 		# then get the message for the field name of the first error
-		self.errors.to_hash.first.first.to_s + 
-			' ' + self.errors.to_hash.first.second.first.to_s 
+		self.errors.to_hash.first.first.to_s +
+			' ' + self.errors.to_hash.first.second.first.to_s
 	end
 
   private

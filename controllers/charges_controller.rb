@@ -17,8 +17,7 @@ class Application < Sinatra::Base
 	end
 
 	get '/charges', :auth => :account do
-		json :success => true,
-			:charges => @account.charges.all.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
+		json @account.profiles.all.reduce([]) {|ps,p| ps.concat(p.charges.map(&:as_hash))}
 	end
 
 	get '/profiles/:id/charges', :auth => :account do

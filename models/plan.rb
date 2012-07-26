@@ -42,6 +42,7 @@ class Plan
 	belongs_to :account
 	many :subscriptions, :dependent => :destroy
 	many :profiles, :through => :subscriptions
+	many :charges
 
 	def as_hash
 		{:name => self.name.to_s,
@@ -60,10 +61,10 @@ class Plan
 
 	def first_error
 		## Return the very first error in a readable string
-		# Get the field name of the first error 
+		# Get the field name of the first error
 		# then get the message for the field name of the first error
-		self.errors.to_hash.first.first.to_s + 
-			' ' + self.errors.to_hash.first.second.first.to_s 
+		self.errors.to_hash.first.first.to_s +
+			' ' + self.errors.to_hash.first.second.first.to_s
 	end
 
 	def cycle_str

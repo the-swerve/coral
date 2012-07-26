@@ -24,12 +24,13 @@ ChargeView = Backbone.View.extend({
 
 	events: {
 			'click #new-profile-submit': 'renderTable',
+			'click .dropdown-item': 'renderTable',
+			'click #new-profile-submit': 'fetchCharges',
 //		'click #new-charge-button': 'renderNewForm',
 //		'click #new-charge-submit': 'create',
 //		'click .edit-charge-button': 'renderEditForm',
 //		'click #edit-charge-submit': 'update',
 //		'click #new-plan-submit': 'renderTable',
-//		'click .dropdown-item': 'renderTable',
 	},
 
 //	create: function(e) {
@@ -81,10 +82,22 @@ ChargeView = Backbone.View.extend({
 //		}
 //	},
 
-	renderTable: function() {
-		// Just show all charges
+	fetchCharges: function() {
+		this.collection.fetch();
+	},
+
+	renderTable: function(newCharges) {
+		// Filter charges by the selected plan - XXX redundant with profile renderTable
+		var activePlanID = $('span.active-plan-id').attr('id');
+		if(activePlanID == '') { // No plan selected, show all charges
+			var filtered_charges = this.collection;
+		} else { // a plan has been selected. Filter out charges
+			var filtered_charges = this.collection.filter(function(c) {
+				return c.get('plan_id') == activePlanID;
+			}); filtered_charges = new ChargeCollection(filtered_charges);
+		}
 		var table = _.template($('#charge-table-tmpl').html());
-		$('#charge-table').html(table({charges: this.collection}));
+		$('#charge-table').html(table({charges: filtered_charges}));
 	},
 
 //	renderNewForm: function(e) {

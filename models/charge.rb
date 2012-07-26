@@ -25,6 +25,7 @@ class Charge
 	many :trnsactions
 	belongs_to :subscription
 	belongs_to :profile
+	belongs_to :plan
 	belongs_to :account
 
 	# Callbacks
@@ -58,7 +59,9 @@ class Charge
 		 :name => self.name,
 		 :due_date => self.due_date.to_s,
 		 :state => self.state,
-		 :profile => self.profile.name}
+		 :profile => self.profile.name,
+		 :plan_id => self.plan.short_id,
+		 :plan_name => self.plan.name}
 	end
 
 	private

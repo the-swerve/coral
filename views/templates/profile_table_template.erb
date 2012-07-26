@@ -1,17 +1,23 @@
 <script id='profile-table-tmpl' type='text/template' class='hide'>
 	[[ if(!profiles.isEmpty()) { ]]
 		<table id="profiles-table" class="table table-striped clickable-rows">
+			<thead>
+				<tr>
+					<th>People</th><th></th>
+				</tr>
+			</thead>
 			<tbody>
 				[[ profiles.each(function(profile) { ]]
 					<tr id="{{profile.id}}" class="edit-profile-button">
-						<td class="profile-table-name-email"><strong>{{ profile.get('name') }}</strong> {{ profile.get('email') }}</td>
-						<td class="profile-table-subs">{{ profile.get('subscription_names') }}</td>
-						<td class="profile-table-state">{{ profile.get('state') }}</td></tr>
+						<td class="profile-table-name-email">{{ profile.get('name') ? profile.get('name') + ' - ' : ' ' }}
+							{{ profile.get('email') }}</td>
+
+						<td class="profile-table-subs">{{profile.get('subscription_names') ? profile.get('subscription_names') : '' }}</td>
 				[[ }); ]]
 			<tr>
 				<td id="new-profile-button">
 					<a class="" id="new-profile-button" href=""><i class="icon-plus"></i> Add Someone</a>
-				</td><td></td><td></td>
+				</td><td></td>
 			</tr>
 			</tbody>
 	</table>

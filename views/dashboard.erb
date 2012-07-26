@@ -61,27 +61,28 @@
 
 	<div class="tab-pane active" id="chart"> </div>
 
-	<div id="plan">
-		<%= erb :'templates/plan_template' %>
-		<%= erb :'forms/new_plan' %>
-		<%= erb :'forms/edit_plan' %>
-		<%= erb :'modals/share_plan' %>
-	</div>
+	<div class="well">
+		<div id="plan">
+			<%= erb :'templates/plan_template' %>
+			<%= erb :'forms/new_plan' %>
+			<%= erb :'forms/edit_plan' %>
+			<%= erb :'modals/share_plan' %>
+		</div>
 
 
-	<div id="profile">
-		<%= erb :'templates/profile_table_template' %>
-		<div id="profile-table"></div>
-		<%= erb :'modals/new_profile' %>
-		<%= erb :'modals/edit_profile' %>
-	</div>
+		<div id="profile">
+			<%= erb :'templates/profile_table_template' %>
+			<div id="profile-table"></div>
+			<%= erb :'modals/new_profile' %>
+			<%= erb :'modals/edit_profile' %>
+		</div>
 
-	<div id="charge">
-		<h3>Payment History</h3>
-		<%= erb :'templates/charge_table_template' %>
-		<div id="charge-table"></div>
-		<%= erb :'modals/new_charge' %>
-		<%= erb :'modals/edit_charge' %>
+		<div id="charge">
+			<%= erb :'templates/charge_table_template' %>
+			<div id="charge-table"></div>
+			<%= erb :'modals/new_charge' %>
+			<%= erb :'modals/edit_charge' %>
+		</div>
 	</div>
 
 </div>
