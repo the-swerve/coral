@@ -21,24 +21,25 @@ PlanView = Backbone.View.extend({
 	initialize: function() {
 		this.collection.bind('reset', this.render, this);
 		this.selected = 'all';
+		this.$('#edit-plan-button').tooltip();
+		this.$('#share-plan-button').tooltip();
 	},
 
 	events: {
 		'click #new-plan-submit': 'create',
 		'click #edit-plan-submit': 'update',
-		'click .dropdown-item': 'select_plan',
+		'click .dropdown-item': 'selectPlan',
 		'click #new-plan-button': 'renderNewForm',
 		'click #edit-plan-button': 'renderEditForm',
 		'click #share-plan-button': 'renderShareForm',
 		'click #remove-plan-button': 'renderRemoveForm',
 		'click #remove-plan-submit': 'destroy',
-		'click #all-plans-select': 'selectAll'
 	},
 
-	selectAll: function() {
-		this.selected = 'all';
-		this.render();
-	},
+	//selectAll: function() {
+	//	this.selected = 'all';
+	//	this.render();
+	//},
 
 	renderRemoveForm: function(e) {
 		e.preventDefault();
@@ -59,22 +60,27 @@ PlanView = Backbone.View.extend({
 		var self = this;
 
 		if(self.selected == 'all') {
-			var active = 'All plans';
-			var active_id = '';
-		} else {
-			var active = self.selected.get('name');
-			var active_id = self.selected.id;
+			var active = 'All plans'; // user selected all plans (default)
+			var active_id = ''; // no plan id
+			this.$('.plan-action-btn').hide(); // hide plan editing and sharing btns
+		} else { // user selected a plan
+			var active = self.selected.get('name'); // get selected plan name
+			var active_id = self.selected.id; // get selected plan id
+			this.$('.plan-action-btn').show(); // show plan editing and sharing btns
 		}
-		this.$('#dropdown-active').html(active); // set active plan
-		$('span.active-plan-id').attr('id',active_id); // set active plan id
+		this.$('#dropdown-active').html(active); // write out active plan name to the top of the dropdown
+		this.$('span.active-plan-id').attr('id',active_id); // write out active plan id into the page
 
-		var list = _.template(this.$('#plan-header-tmpl').html());
-		this.$('.dropdown-menu').html(list({plans: self.collection}));
+		var list = _.template(this.$('#plan-header-tmpl').html()); // compile template for plan name/dropdown
+		var notSelected = self.collection.filter(function(plan) { // filter out the selected plan for the dropdown items
+			return plan.get('name') != active;
+		});
+		this.$('.dropdown-menu').html(list({plans: notSelected})); // render dropdown template
 
-		var desc = _.template(this.$('#plan-desc-tmpl').html());
-		this.$('.plan-desc').html(desc({plan: self.selected}));
+		var desc = _.template(this.$('#plan-desc-tmpl').html()); // compile template for the plan description
+		this.$('.plan-desc').html(desc({plan: self.selected})); // render tmpl
 
-		return this;
+		return this; // for chaining methods on this view
 	},
 	
 	create: function(e) {
@@ -111,11 +117,12 @@ PlanView = Backbone.View.extend({
 			var plan = this.collection.get(this.selected.id); // get selected plan
 			plan.destroy({
 				success: function(model, response) {
-					$('a#remove-plan-submit').removeClass('disabled'); // enable button
-					$('div#remove-plan').modal('hide'); // close dialog
-					self.selected = 'all'; // view all plans
-					self.req = false; // release request lock
-					self.render(); // re-render plan view
+					window.location = '/'; // refresh page.
+					// Note: this could be dynamic, without a page reload. We'd have to:
+					// 1. Update all the profiles who subscribe to this plan.
+					// 2. Re-render this (this.render())
+					// 3. Re-render the profile table
+					// Also we'd need to remove request lock for this view, close modal, and enable button.
 				},
 				error: function(model, response) {
 					$('a#remove-plan-submit').removeClass('disabled'); // enable button
@@ -154,7 +161,7 @@ PlanView = Backbone.View.extend({
 		e.preventDefault();
 		$('p#edit-plan-error').html(''); // Make sure form errors are blank
 		$('div#edit-plan').modal('show');
-		// populate edit form - XXX maybe use template
+		// populate edit form - XXX use template
 		this.$('.plan-name').val(this.selected.get('name'));
 		this.$('.plan-amount').val(Number(this.selected.get('amount')).toFixed(2));
 		this.$('.plan-initial-charge').val(Number(this.selected.get('initial_charge')).toFixed(2));
@@ -173,12 +180,13 @@ PlanView = Backbone.View.extend({
 		this.$('.plan-url').attr('href',url);
 	},
 
-	select_plan: function(e) {
+	selectPlan: function(e) {
 		e.preventDefault();
-		this.selected = this.collection.get($(e.currentTarget).attr('id'));
-		if(this.selected == 'all') 
-			$('span.active-plan-id').attr('id','');
-		this.render();
+		if($(e.currentTarget).attr('id') == 'all-plans-select') {
+			this.selected = 'all';
+		} else {
+			this.selected = this.collection.get($(e.currentTarget).attr('id'));
+		} this.render();
 	}	
 
 });

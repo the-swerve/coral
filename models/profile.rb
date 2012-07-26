@@ -38,55 +38,55 @@ class Profile
   before_validation :defaults, :on => :create
   before_validation :encrypt_pass
   before_save :capitalize_name
-	after_create :add_subscription_and_payment_method
+	after_create :add_subscription_and_payment_method_and_settle
 
-	state_machine :state, :initial => :nonsubscriber do
+	state_machine :state, :initial => 'Non-subscriber' do
 
 		event :enter_trial do
-			transition any - :unpaid => :in_trial,
-				:if => lambda {|p| p.subscriptions.last.state == 'in_trial'}
+			transition any - 'Unpaid' => 'In trial',
+				:if => lambda {|p| p.subscriptions.last.state == 'In trial'}
 		end
 
 		event :past_due do
-			transition any => :unpaid,
-				:if => lambda {|p| p.charges.where(:state => 'overdue').any?}
+			transition any => 'Unpaid',
+				:if => lambda {|p| p.charges.where(:state => 'Overdue').any?}
 		end
 
 		event :expire do
-			transition any - :unpaid => :expired,
-				:if => lambda {|p| p.subscriptions.where(:state => 'expired').any?}
+			transition any - 'Unpaid' => 'Expired',
+				:if => lambda {|p| p.subscriptions.where(:state => 'Expired').any?}
 		end
 
 		event :settle do
-			transition any => :paid,
+			transition any => 'Paid',
 				:if => lambda {|p| p.pay_all}
 		end
 
 
-		state :nonsubscriber do
+		state 'Non-subscriber' do
 			# No subscriptions yet
 		end
 
-		state :paid do
+		state 'Paid' do
 			# All charges paid
 		end
 
-		state :unpaid do
+		state 'Unpaid' do
 			# At least one unpaid/due charge
 		end
 
-		state :expired do
+		state 'Expired' do
 			# All subscriptions expired
 		end
 
-		state :in_trial do
+		state 'In trial' do
 			# All subscriptions in trial
 		end
 	end
 
 	def balance
 		# Get the sum of all unpaid charges
-		charges.where(:state => 'unpaid').map(&:amount).sum || 0
+		charges.where(:state => 'Unpaid').map(&:amount).sum || 0
 	end
 
 	def pay_all
@@ -98,9 +98,9 @@ class Profile
 			end
 		end
 		result = true
-		charges.where(:state => 'unpaid').each do |c|
+		charges.where(:state => 'Unpaid').each do |c|
 			c.pay
-			result = false unless c.state == 'paid'
+			result = false unless c.state == 'Paid'
 		end
 		return result
 	end
@@ -125,16 +125,16 @@ class Profile
 	def as_hash
 		{:name => self.name,
 		 :email => self.email,
-		 :subscriptions => self.subscription_list,
+		 :subscription_names => self.subscription_list,
 		 :state => self.state,
-		 :id => self.short_id.to_s,
-		 :plan_ids => self.subscriptions.all.map {|s| s.plan.short_id}}
+		 :short_id => self.short_id.to_s,
+		 :plan_id => self.subscriptions.all.map {|s| s.plan.short_id}.first || 'none'}
 	end
 
 	def subscription_list
 		# Return a readable string of this person's subscription names
 		if subscriptions.empty?
-			'None'
+			'No subscriptions'
 		else
 			subscriptions.collect {|s| s.plan.name}.join ', '
 		end
@@ -153,7 +153,7 @@ class Profile
   # Callbacks
   def defaults
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
-		self.short_id = self.account.profiles.size # create a nice short identifier number
+		self.short_id = Profile.all.size # create a shorter id code.
 		self.name ||= '' # hmm
   end
 
@@ -163,10 +163,11 @@ class Profile
 	end
 
   def capitalize_name
-		self.name.split.each { |x| x.capitalize!}.join(' ')
+		# Split name by spaces, capitalize each word
+		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
   end
 
-	def add_subscription_and_payment_method
+	def add_subscription_and_payment_method_and_settle
 		# Auto-create a dummy payment method for now
 		self.payment_methods.create if self.payment_methods.all.empty?
 		# If we're given a plan_short_id attribute, then let's create a
@@ -178,6 +179,7 @@ class Profile
 			puts found_plan.name if found_plan
 			self.subscriptions.create!(:plan_id => found_plan.id) if found_plan
 			puts self.subscriptions.all.map(&:short_id)
+			self.settle
 		end
 	end
 

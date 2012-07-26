@@ -8,7 +8,7 @@
 	<link rel="stylesheet" media="screen,projection" href="css/bootstrap-responsive.css">
 	<link rel="stylesheet" media="screen,projection" href="css/style.css">
 	<link rel="stylesheet" media="screen,projection" href="css/dashboard.css">
-	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
 	<script type="text/javascript" src="js/underscore.js"></script>
@@ -21,7 +21,7 @@
 	<script type="text/javascript" src="js/account.js"></script>
 	<script type="text/javascript" src="js/plan.js"></script>
 	<script type="text/javascript" src="js/profile.js"></script>
-	<script type="text/javascript" src="js/chart.js"></script>
+	<!-- <script type="text/javascript" src="js/chart.js"></script> -->
 
 	<script>
 		// Initialize backbone models
@@ -69,6 +69,7 @@
 		<%= erb :'templates/profile_table_template' %>
 		<div id="profile-table"></div>
 		<%= erb :'modals/new_profile' %>
+		<%= erb :'modals/edit_profile' %>
 	</div>
 
 <input type="hidden" id="empty-plans" value="<%= @account.plans.empty? %>" />

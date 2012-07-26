@@ -10,7 +10,7 @@ class Application < Sinatra::Base
 	post '/profiles', :auth => :account do
 		@profile = @account.profiles.build @params
 		if @profile.save
-			json :profile => @profile.as_hash
+			json @profile.as_hash
 		else
 			halt 400, @profile.first_error
 		end
@@ -18,7 +18,7 @@ class Application < Sinatra::Base
 
 	# The unauthorized endpoint for allowing random people to sign up for subscriptions
 	post '/account/:short_id/profiles' do
-		@acct = Account.find(params['short_id'])
+		@acct = Account.find(params["short_id"])
 		if @acct
 			@profile = @acct.profiles.build params[:profile]
 			if @profile.save
@@ -35,23 +35,21 @@ class Application < Sinatra::Base
 		end
 	end
 
-	put '/profiles/:short_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['short_id'].to_i)
+	put '/profiles/:profile_id', :auth => :account do
+		@profile = @account.profiles.first(:short_id => params["profile_id"].to_i)
 		if @profile
-			if @profile.update_attributes params[:profile]
-				json :success => true, :profile => @profile.as_hash
+			if @profile.update_attributes params
+				json @profile.as_hash
 			else
-				json :success => false,
-					:error => @profile.errors.to_hash.first.first.to_s +
-						' ' + @profile.errors.to_hash.first.second.first.to_s # lol
+				halt 400, @profile.first_error
 			end
 		else
-			json :success => false, :error => ' profile not found'
+			halt 400, 'profile not found'
 		end
 	end
 
-	get '/profiles/:short_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['short_id'].to_i)
+	get '/profiles/:profile_id', :auth => :account do
+		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			json :success => true, :profile => @profile.as_hash
 		else
@@ -92,7 +90,7 @@ class Application < Sinatra::Base
 	end
 
 	delete '/profiles/:short_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['short_id'].to_i)
+		@profile = @account.profiles.first(:short_id => params["short_id"].to_i)
 		if @profile
 			@profile.destroy
 			json :success => true, :message => 'profile destroyed'

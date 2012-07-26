@@ -140,7 +140,7 @@ class Subscription
 
 	# We don't want the person to have unpaid fees before making another subscription
 	def must_not_be_overdue
-		if self.profile.state == 'unpaid'
+		if self.profile.state == 'Unpaid'
 			errors.add(:base, "This person has unpaid charges.")
 		end
 	end

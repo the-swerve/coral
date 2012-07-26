@@ -33,8 +33,8 @@ class Application < Sinatra::Base
 		end
 	end
 
-	put '/plans/:short_id', :auth => :account do
-		@plan = @account.plans.first(:short_id => params[:short_id].to_i)
+	put '/plans/:plan_id', :auth => :account do
+		@plan = @account.plans.first(:short_id => params['plan_id'].to_i)
 		if @plan
 			if @plan.update_attributes(@params)
 				json @plan.as_hash

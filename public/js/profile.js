@@ -25,6 +25,9 @@ ProfileView = Backbone.View.extend({
 	events: {
 		'click #new-profile-button': 'renderNewForm',
 		'click #new-profile-submit': 'create',
+		'click .edit-profile-button': 'renderEditForm',
+		'click #edit-profile-submit': 'update',
+		'click #new-plan-submit': 'renderTable',
 		'click .dropdown-item': 'renderTable',
 	},
 
@@ -53,17 +56,38 @@ ProfileView = Backbone.View.extend({
 		}
 	},
 
+	update: function(e) {
+		e.preventDefault();
+		if(this.req == false) {
+			var self = this;
+			$('input#edit-profile-submit').toggleSubmit();
+			this.req = true;
+			var data = $('form#edit-profile-form').serializeObject();
+			var profile = this.collection.get($('input#edit-profile-id').val());
+			profile.save(data, {
+				success: function(model, response) {
+					$('input#edit-profile-submit').toggleSubmit();
+					$('div#edit-profile').modal('hide');
+					self.req = false;
+					self.renderTable();
+				},
+				error: function(model, response) {
+					$('p#edit-profile-error').html(response.responseText);
+					$('input#edit-profile-submit').toggleSubmit();
+					self.req = false;
+				}
+			});
+		}
+	},
+
 	renderTable: function() {
-		var plan_id = $('span.active-plan-id').attr('id');
-		if(plan_id == '') {
+		var activePlanID = $('span.active-plan-id').attr('id');
+		if(activePlanID == '') { // No plan selected, show all plans
 			var filtered_profiles = this.collection;
-		} else {
-			var filtered_profiles = this.collection;
-			// TODO
-			//var filtered_profiles = this.collection.filter(function(p) {
-			//	return _.include(p.get('plan_ids'),plan_id);
-			//});
-			//filtered_profiles = new ProfileCollection(filtered_profiles);
+		} else { // a plan has been selected. Filter out subscribers
+			var filtered_profiles = this.collection.filter(function(p) {
+				return p.get('plan_id') == activePlanID;
+			}); filtered_profiles = new PlanCollection(filtered_profiles);
 		}
 		var table = _.template($('#profile-table-tmpl').html());
 		$('#profile-table').html(table({profiles: filtered_profiles}));
@@ -82,6 +106,18 @@ ProfileView = Backbone.View.extend({
 		var activePlanName = $('#dropdown-active').html();
 		if(activePlanName != 'All plans')
 			$('#new-profile-plan-name').html('Subscribing to: ' + activePlanName);
+	},
+
+	renderEditForm: function(e) {
+		e.preventDefault();
+		this.$('p#edit-profile-error').html(''); // clear errors
+		this.$('form#edit-profile-form input').val(''); // clear form
+		var selectedProfile = this.collection.get($(e.currentTarget).attr('id'));
+		this.$('input#edit-profile-id').val(selectedProfile.id); // get the profile id and insert it into a field
+		// populate form fields. XXX use a template
+		this.$('input#edit-profile-name').val(selectedProfile.get('name'));
+		this.$('input#edit-profile-email').val(selectedProfile.get('email'));
+		this.$('div#edit-profile').modal('show'); // display new profile dialog
 	}
 
 });

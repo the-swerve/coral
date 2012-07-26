@@ -114,6 +114,6 @@ div#more-plan-options {
 	display: none;
 }
 
-p#settings-error, p#new-plan-error, p#edit-plan-error {
+p#settings-error, p#new-plan-error, p#edit-plan-error, p#new-profile-error, p#edit-profile-error {
 	color: #944E4E;
 }

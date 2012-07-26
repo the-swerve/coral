@@ -1,23 +1,24 @@
 <script id='profile-table-tmpl' type='text/template' class='hide'>
 	[[ if(!profiles.isEmpty()) { ]]
 		<table id="profiles-table" class="table table-striped clickable-rows">
-			<thead>
-				<thead>
-					<tr> <th>Name</th> <th>Email</th> <th>Subscriptions</th> <th>Status</th></tr>
-				</thead>
-			</thead>
 			<tbody>
 				[[ profiles.each(function(profile) { ]]
-					<tr id="{{ profile.get('short_id') }}">
-						<td class="profile-table-name">{{ profile.get('name') }}</td>
-						<td class="profile-table-email">{{ profile.get('email') }}</td>
-						<td class="profile-table-subs">{{ profile.get('subscriptions') }}</td>
+					<tr id="{{profile.id}}" class="edit-profile-button">
+						<td class="profile-table-name-email"><strong>{{ profile.get('name') }}</strong> {{ profile.get('email') }}</td>
+						<td class="profile-table-subs">{{ profile.get('subscription_names') }}</td>
 						<td class="profile-table-state">{{ profile.get('state') }}</td></tr>
 				[[ }); ]]
+			<tr>
+				<td id="new-profile-button">
+					<a class="" id="new-profile-button" href=""><i class="icon-plus"></i> Add Someone</a>
+				</td><td></td><td></td>
+			</tr>
 			</tbody>
 	</table>
 	[[ } else { ]]
-		<p><em>No subscribers yet.</em></p>
+		<p>
+			<em>No subscribers yet.</em>
+			<a class="" id="new-profile-button" href=""> Add Someone</a>
+		</p>
 	[[ } ]]
-	<a class="btn btn-info" id="new-profile-button" href=""><i class="icon-plus icon-white"></i> Add Someone</a>
 </script>
