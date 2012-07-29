@@ -20,6 +20,7 @@ $(document).ready(function() {
 	$('a#get-help').tooltip({placement: 'bottom'});
 	$('a#settings-button').tooltip({placement: 'bottom'});
 	$('a#logout-button').tooltip({placement: 'bottom'});
+	$('.auto-tooltip').tooltip({placement: 'bottom'});
 
 	// Clickable rows for person profiles
 	// TODO generalize this

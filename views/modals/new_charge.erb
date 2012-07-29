@@ -1,19 +1,11 @@
 
-<div class="hide modal" id="new-charge" title="Add Someone">
+<div class="hide modal" id="new-charge">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">x</button>
-		<h3>Add Someone</h3>
+		<h3>New Charge</h3>
 	</div>
 	<div class="modal-body">
-		<p id="new-charge-error"></p>
-		<p id="new-charge-plan-name"></p>
-		<form method="post" action="/charges" id="new-charge-form">
-			<label>Name</label>
-			<input type="text" name="name" />
-			<label>Email</label>
-			<input type="text" name="email" />
-			<input type="hidden" name="plan_short_id" id="new-charge-plan-id" />
-		</form>
+		<%= erb :'forms/new_charge_form' %>
 	</div>
 	<div class="modal-footer">
 		<input id="new-charge-submit" class="btn" name="commit" type="submit" value="Save" />

@@ -1,5 +1,4 @@
 require 'mongo_mapper'
-require 'mongo_sequence'
 
 class Plan
 
@@ -27,7 +26,7 @@ class Plan
 
 	key :description, String
 
-	key :short_id, Integer
+	key :short_id, String
 
 	validate :trial_length_requires_trial_type
 	validate :cycle_length_requires_cycle_type
@@ -90,7 +89,7 @@ class Plan
 	end
 
 	def defaults
-		self.short_id = MongoSequence[:plan_id].next
+		self.short_id = self._id
 		self.initial_charge ||= 0
 		parse_cycle
 	end

@@ -1,5 +1,4 @@
 require 'mongo_mapper'
-require 'mongo_sequence'
 require 'bcrypt'
 
 class Account
@@ -21,7 +20,7 @@ class Account
 
 	key :name, String
 
-	key :short_id, Integer
+	key :short_id, String
 
 	validates_presence_of :password, :on => :create
 	validates_length_of :password, :minimum => 6, :if => :password
@@ -41,7 +40,7 @@ class Account
 
   # Simply removes all non-alphanumerics
   def defaults
-		self.short_id = MongoSequence[:account_id].next
+		self.short_id = self.id
   end
 
 	def encrypt_pass

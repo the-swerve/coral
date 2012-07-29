@@ -1,6 +1,6 @@
 // Charges/payments/transactions
 
-Charge = Backbone.Model.extend({
+ChargeModel = Backbone.Model.extend({
 	urlRoot: '/charges',
 	initialize: function() {
 		this.set({plan_ids: new Array()});
@@ -8,7 +8,7 @@ Charge = Backbone.Model.extend({
 });
 
 ChargeCollection = Backbone.Collection.extend({
-	model: Charge,
+	model: ChargeModel,
 	url: '/charges',
 	initialize: function() { }
 });
@@ -26,7 +26,7 @@ ChargeView = Backbone.View.extend({
 			'click .dropdown-item': 'renderTable',
 			'click #new-profile-submit': 'fetchCharges',
 			'click .edit-charge-button': 'renderEditForm',
-//		'click #new-charge-button': 'renderNewForm',
+			'click #new-charge-button': 'renderNewForm',
 //		'click #new-charge-submit': 'create',
 //		'click .edit-charge-button': 'renderEditForm',
 //		'click #edit-charge-submit': 'update',
@@ -102,28 +102,30 @@ ChargeView = Backbone.View.extend({
 
 	renderEditForm: function(e) {
 		e.preventDefault();
-		this.$('p#edit-charge-error').html(''); // clear errors
-		this.$('form#edit-charge-form input').val(''); // clear form
-		alert($(e.currentTarget).attr('id'));
-		var selectedCharge = this.collection.get($(e.currentTarget).attr('id'));
-		this.$('input#edit-charge-name').val(selectedCharge.get('name')); // populate name field
-		this.$('div#edit-charge').modal('show'); // display new profile dialog
+		this.$('p#charge-error').html(''); // clear errors
+		var selectedCharge = this.collection.get($(e.currentTarget).attr('id')); // fetch selected charge
+
+		//  Compile and render the form template
+		var table = _.template($('#charge-form-tmpl').html());
+		$('div#edit-charge div.modal-body').html(table(selectedCharge.attributes));
+
+		this.$('div#edit-charge').modal('show'); // display edit charge dialog
 	},
 
-//	renderNewForm: function(e) {
-//		e.preventDefault();
-//		$('p#charge-error').html(''); // clear errors
-//		$('form#new-charge-form input').val(''); // clear form
-//		$('div#new-charge').modal('show'); // display new charge dialog
-//		// In the plan dropdown, fetch the active plan id and put it into the form
-//		// This way we can simulatenously create new subscriptions by sending
-//		// plan_short_id to the server.
-//		$('#new-charge-plan-id').val($('span.active-plan-id').attr('id'));
-//		// Tell the user what plan they are subscribing to above the form.
-//		var activePlanName = $('#dropdown-active').html();
-//		if(activePlanName != 'All plans')
-//			$('#new-charge-plan-name').html('Subscribing to: ' + activePlanName);
-//	},
+	renderNewForm: function(e) {
+		e.preventDefault();
+		this.$('div#edit-profile').modal('hide'); // hide edit profile dialog. 
+		this.$('p#charge-error').html(''); // clear errors
+		this.$('form#new-charge-form input').html(''); // clear form
+		var activePlanID = $('span.active-plan-id').attr('id'); // get selected plan id
+		if(activePlanID) {
+			this.$('#new-charge-plan-id').val(activePlanID); // inject selected plan id into charge form
+			this.$('#new-charge-towards').html('Towards ' + $('#dropdown-active').html()); // inject selected plan id into charge form
+		}
+		var activeProfileID = $('#edit-profile-id').val(); // get selected profile id
+		this.$('div#new-charge h3').html('Charging ' + $('#edit-profile-name').val()); // inject payee name into charge form
+		this.$('div#new-charge').modal('show'); // display edit charge dialog
+	},
 
 //	renderEditForm: function(e) {
 //		e.preventDefault();

@@ -8,8 +8,7 @@ class Subscription
 	include MongoMapper::Document
 
 	key :expiration_date, Date
-	key :short_id, Integer,
-		:required => true
+	key :short_id, String
 	key :state, String
 	key :next_due, Date
 	key :starting, Date
@@ -122,7 +121,7 @@ class Subscription
 	private
 
 	def defaults
-		self.short_id = MongoSequence[:subscription_id].next
+		self.short_id = self.id
 		self.starting ||= DateTime.now
 		self.next_due ||= self.trial_end if self.plan
 	end

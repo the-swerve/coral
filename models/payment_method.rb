@@ -8,7 +8,7 @@ class PaymentMethod
 	key :name, String,
 		:required => true
 
-	key :short_id, Integer
+	key :short_id, String
 
 	timestamps!
 
@@ -23,7 +23,7 @@ class PaymentMethod
 
 	def defaults
 		self.name ||= 'your payment method # ' + (self.profile.payment_methods.size + 1).to_s
-		self.short_id = MongoSequence[:payment_method_id].next
+		self.short_id = self.id
 	end
 
 end

@@ -1,4 +1,4 @@
-
+<%= erb :'forms/edit_charge_form' %>
 
 <div class="modal hide" id="edit-charge">
 	<div class="modal-header">
@@ -6,12 +6,6 @@
 		<h3>Viewing Charge</h3>
 	</div>
 	<div class="modal-body">
-		<p id="edit-charge-error"></p>
-		<input id="edit-charge-id" type="hidden" value="" />
-		<form method="post" action="/charges" id="edit-charge-form">
-			<label>Name</label>
-			<input id="edit-charge-name" type="text" name="name" /> 
-		</form>
 	</div>
 	<div class="modal-footer">
 		<input id="edit-charge-submit" class="btn" name="commit" type="submit" value="Save" />

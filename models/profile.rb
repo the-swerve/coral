@@ -1,5 +1,4 @@
 require 'mongo_mapper'
-require 'mongo_sequence'
 require 'bcrypt'
 require 'state_machine'
 
@@ -15,8 +14,7 @@ class Profile
 		:format => /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/,
 		:unique => true
 	key :pass_hash, String
-	key :short_id, Integer,
-		:required => true
+	key :short_id, String
 	key :name, String
 	key :state, String
 	key :session_token, String
@@ -128,7 +126,7 @@ class Profile
 		 :email => self.email,
 		 :subscription_names => self.subscription_list,
 		 :state => self.state,
-		 :short_id => self.short_id.to_s,
+		 :short_id => self.short_id,
 		 :plan_id => self.subscriptions.all.map {|s| s.plan.short_id}.first || 'none'}
 	end
 
@@ -154,7 +152,7 @@ class Profile
   # Callbacks
   def defaults
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
-		self.short_id = MongoSequence[:profile_id].next
+		self.short_id = self.id
 		self.name ||= '' # hmm
   end
 

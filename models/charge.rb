@@ -1,5 +1,4 @@
 require 'mongo_mapper'
-require 'mongo_sequence'
 require 'state_machine'
 require 'active_support/core_ext'
 
@@ -14,7 +13,7 @@ class Charge
 		:required => true
 	key :due_date, Date,
 		:required => true
-	key :short_id, Integer
+	key :short_id, String
 	key :state, String
 
 	timestamps!
@@ -61,6 +60,7 @@ class Charge
 		 :due_date => self.due_date.to_s,
 		 :state => self.state,
 		 :profile => self.profile.name,
+		 :transactions => self.trnsactions.map(&:as_hash),
 		 :plan_id => self.plan.short_id,
 		 :plan_name => self.plan.name,
 		 :id => self.id}
@@ -79,7 +79,7 @@ class Charge
 	def defaults
 		self.name ||= "Charge (" + DateTime.now.to_s + ")"
 		self.due_date ||= DateTime.now
-		self.short_id = MongoSequence[:charge].next
+		self.short_id = self.id
 	end
 
 end

@@ -35,6 +35,7 @@ class Trnsaction
 		{:amount => self.amount.to_s,
 		 :action => self.action,
 		 :successful => self.successful.to_s,
+		 :date => self.created_at.to_date.to_s,
 		 :message => self.message}
 	end
 
