@@ -2,7 +2,6 @@
 
 Profile = Backbone.Model.extend({
 	urlRoot: '/profiles',
-	idAttribute: 'short_id',
 	initialize: function() {
 		this.set({plan_ids: new Array()});
 	}
@@ -29,7 +28,6 @@ ProfileView = Backbone.View.extend({
 		'click #edit-profile-submit': 'update',
 		'click #remove-profile-button': 'renderRemoveForm',
 		'click #remove-profile-submit': 'destroy',
-		'click #new-plan-submit': 'renderTable',
 		'click .dropdown-item': 'renderTable',
 	},
 
@@ -108,11 +106,11 @@ ProfileView = Backbone.View.extend({
 	renderTable: function() {
 		var activePlanID = $('span.active-plan-id').attr('id');
 		if(activePlanID == '') { // No plan selected, show all plans
-			var filtered_profiles = this.collection;
+			var filtered_profiles = this.collection.toJSON();
 		} else { // a plan has been selected. Filter out subscribers
 			var filtered_profiles = this.collection.filter(function(p) {
 				return p.get('plan_id') == activePlanID;
-			}); filtered_profiles = new PlanCollection(filtered_profiles);
+			}); filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
 		}
 		var table = _.template($('#profile-table-tmpl').html());
 		$('#profile-table').html(table({profiles: filtered_profiles}));
@@ -136,12 +134,12 @@ ProfileView = Backbone.View.extend({
 	renderEditForm: function(e) {
 		e.preventDefault();
 		this.$('p#edit-profile-error').html(''); // clear errors
-		this.$('form#edit-profile-form input').val(''); // clear form
 		var selectedProfile = this.collection.get($(e.currentTarget).attr('id'));
-		this.$('input#edit-profile-id').val(selectedProfile.id); // get the profile id and insert it into a field
-		// populate form fields. XXX use a template
-		this.$('input#edit-profile-name').val(selectedProfile.get('name'));
-		this.$('input#edit-profile-email').val(selectedProfile.get('email'));
+	
+		// Compile and render form template
+		var form = _.template($('#edit-profile-tmpl').html());
+		$('div#edit-profile div.modal-body').html(form(selectedProfile.attributes));
+
 		this.$('div#edit-profile').modal('show'); // display new profile dialog
 	},
 

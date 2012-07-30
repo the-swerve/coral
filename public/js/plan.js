@@ -2,7 +2,6 @@
 
 Plan = Backbone.Model.extend({
 	urlRoot: '/plans',
-	idAttribute: 'short_id',
 	initialize: function() {
 	}
 });
@@ -21,8 +20,6 @@ PlanView = Backbone.View.extend({
 	initialize: function() {
 		this.collection.bind('reset', this.render, this);
 		this.selected = 'all';
-		this.$('#edit-plan-button').tooltip();
-		this.$('#share-plan-button').tooltip();
 	},
 
 	events: {
@@ -31,7 +28,7 @@ PlanView = Backbone.View.extend({
 		'click .dropdown-item': 'selectPlan',
 		'click #new-plan-button': 'renderNewForm',
 		'click #edit-plan-button': 'renderEditForm',
-		'click #share-plan-button': 'renderShareForm',
+		'click .share-plan-button': 'renderShareForm',
 		'click #remove-plan-button': 'renderRemoveForm',
 		'click #remove-plan-submit': 'destroy',
 	},
@@ -93,12 +90,19 @@ PlanView = Backbone.View.extend({
 			var plan = new Plan();
 			plan.save(data, {
 				success: function(model, response) {
-					$('input#new-plan-submit').toggleSubmit();
-					$('div#new-plan').modal('hide');
-					self.collection.add(model);
-					self.selected = model;
-					self.req = false;
-					self.render();
+					$('input#new-plan-submit').toggleSubmit(); // return the save button to normal
+					$('div#new-plan').modal('hide'); // hide the new plan dialog
+
+					// render blank tables for profiles and charges
+					var table = _.template($('#profile-table-tmpl').html());
+					$('#profile-table').html(table({profiles: {}}));
+					var table = _.template($('#charge-table-tmpl').html());
+					$('#charge-table').html(table({charges: {}}));
+
+					self.collection.add(model); // add newly created model to collection
+					self.selected = model; // make the selected field point to the new model
+					self.req = false; // release the request lock
+					self.render(); // render the plan dropdown and description
 				},
 				error: function(model, response) {
 					$('p#new-plan-error').html(response.responseText);

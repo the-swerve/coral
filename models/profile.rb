@@ -7,7 +7,7 @@ class Profile
 	include MongoMapper::Document
 	include BCrypt
 
-	attr_accessor :email, :name, :password, :plan_short_id
+	attr_accessor :email, :name, :password, :plan_id
 
 	key :email, String,
 		:required => true,
@@ -126,8 +126,9 @@ class Profile
 		 :email => self.email,
 		 :subscription_names => self.subscription_list,
 		 :state => self.state,
-		 :short_id => self.short_id,
-		 :plan_id => self.subscriptions.all.map {|s| s.plan.short_id}.first || 'none'}
+		 :id => self.id.to_s,
+		 :plan_id => self.subscriptions.all.map {|s| s.plan.id.to_s}.first || '',
+		 :payment_methods => self.payment_methods.all.map(&:as_hash)}
 	end
 
 	def subscription_list
@@ -169,15 +170,12 @@ class Profile
 	def add_subscription_and_payment_method_and_settle
 		# Auto-create a dummy payment method for now
 		self.payment_methods.create if self.payment_methods.all.empty?
-		# If we're given a plan_short_id attribute, then let's create a
+		# If we're given a plan_id attribute, then let's create a
 		# subscription pointing to it. This is basically simulating
 		# accepts_nested_attributes in rails
-		if self.plan_short_id && self.plan_short_id != ""
-			found_plan = self.account.plans.first(:short_id => self.plan_short_id.to_i)
-			puts 'woot'
-			puts found_plan.name if found_plan
+		if self.plan_id && self.plan_id != ""
+			found_plan = self.account.plans.find(self.plan_id)
 			self.subscriptions.create!(:plan_id => found_plan.id) if found_plan
-			puts self.subscriptions.all.map(&:short_id)
 			self.settle
 		end
 	end

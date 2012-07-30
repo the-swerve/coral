@@ -1,22 +1,21 @@
 <script id='profile-table-tmpl' type='text/template' class='hide'>
-	[[ if(!profiles.isEmpty()) { ]]
+	[[ if(!_.isEmpty(profiles)) { ]]
 		<table id="profiles-table" class="table table-striped clickable-rows">
 			<thead>
 				<tr>
-					<th>People</th><th></th>
+					<th>People</th>
 				</tr>
 			</thead>
 			<tbody>
-				[[ profiles.each(function(profile) { ]]
+				[[ _.each(profiles, function(profile) { ]]
 					<tr id="{{profile.id}}" class="edit-profile-button">
-						<td class="profile-table-name-email">{{ profile.get('name') ? profile.get('name') + ' - ' : ' ' }}
-							{{ profile.get('email') }}</td>
+						<td class="profile-table-name-email">{{ profile.name ? profile.name + ' (' + profile.email + ')' : profile.email }}</td>
 
-						<td class="profile-table-subs">{{profile.get('subscription_names') ? profile.get('subscription_names') : '' }}</td>
+						<td class="profile-table-subs">{{profile.subscription_names ? profile.subscription_names : '' }}</td>
 				[[ }); ]]
-			<tr>
-				<td id="new-profile-button">
-					<a class="" id="new-profile-button" href=""><i class="icon-plus"></i> Add Someone</a>
+			<tr class="share-plan-button">
+				<td>
+					<a href="#"><i class="icon-plus"></i> Invite People</a>
 				</td><td></td>
 			</tr>
 			</tbody>
@@ -24,7 +23,7 @@
 	[[ } else { ]]
 		<p>
 			<em>No subscribers yet.</em>
-			<a class="" id="new-profile-button" href=""> Add Someone</a>
+			<a class="share-plan-button" href="#"><i class="icon-plus"></i> Invite People</a>
 		</p>
 	[[ } ]]
 </script>

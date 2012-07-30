@@ -8,9 +8,10 @@
 	<link rel="stylesheet" media="screen,projection" href="css/bootstrap-responsive.css">
 	<link rel="stylesheet" media="screen,projection" href="css/style.css">
 	<link rel="stylesheet" media="screen,projection" href="css/dashboard.css">
-	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/jquery.jqplot.js"></script>
+	<script type="text/javascript" src="js/jqplot.barRenderer.js"></script>
 	<script type="text/javascript" src="js/underscore.js"></script>
 	<script type="text/javascript" src="js/backbone.js"></script>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
@@ -34,9 +35,10 @@
 		$(document).ready(function() {
 			// Initialize backbone views
 			var account_view = new AccountView({model: account, el: $('div#account')});
-			var plan_view = new PlanView({collection: plans, el: $('div#plan')});
+			var plan_view = new PlanView({collection: plans, el: $('div.container')});
 			var profile_view = new ProfileView({collection: profiles, el: $('div.container')});
 			var charge_view = new ChargeView({collection: charges, el: $('div.container')});
+			var chart_view = new ChartView({collection: charges, el: $('div.container')});
 
 			// Load in bootstrapped data served by sinatra
 			account.set(<%= @account.as_hash.to_json %>);
@@ -59,7 +61,7 @@
 		<%= erb :'forms/settings' %>
 	</div>
 
-	<div class="tab-pane active" id="chart"> </div>
+	<div id="chart"> </div>
 
 	<div class="well">
 		<div id="plan">

@@ -1,0 +1,22 @@
+
+<script id='edit-profile-tmpl' type='text/template' class='hide'>
+		<p id="edit-profile-error"></p>
+		<form method="post" action="/profiles" id="edit-profile-form">
+			<label>Name</label>
+			<input id="edit-profile-name" type="text" name="name" value="{{name}}"/> 
+			<label>Email</label>
+			<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
+			<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
+		</form>
+		<div class="well">
+			[[ if(!_.isEmpty(payment_methods)) { ]]
+				<p>Paying with "<em>{{_.first(payment_methods).name}}</em>" ({{_.first(payment_methods).pay_type}}) 
+				<a class="btn btn-success" id="new-charge-button" href="#"><strong>$</strong> Charge</a></p>
+				[[ } ]]
+			[[ if(plan_id) { ]]
+				<p>Belongs to {{subscription_names}}</p>
+			[[ } else{ ]]
+				<!-- No subscriptions --> 
+			[[ } ]]
+		</div>
+</script>

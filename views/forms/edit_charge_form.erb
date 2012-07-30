@@ -1,22 +1,22 @@
 <script id='charge-form-tmpl' type='text/template' class='hide'>
+	<form method="post" action="/charges" id="charge-form">
+		<label>Charge Label</label>
+		<input id="charge-name" type="text" name="name" value="{{name}}"/> 
+		<label>Amount</label>
+		<div class="input-prepend">
+			<span class="add-on">$</span>
+			<input id="charge-amount" type="text" name="amount" style="width:4em;" value="{{amount}}" /> 
+		</div>
+		<label>Pay Date</label>
+		<input id="charge-due-date" type="date" name="due_date" value="{{due_date}}" /> 
+	</form>
+	<div class="well">
 		<p id="charge-error"></p>
-		<p><strong>Person:</strong> {{profile}}</p>
+		<p><strong>Name:</strong> {{profile.name || profile.email}}</p>
 		<p><strong>Status:</strong> {{state}} </p>
-		[[ if(plan_name) { ]]
-			<p><strong>Towards:</strong> {{plan_name}}</p>
+		[[ if(plan.name) { ]]
+			<p><strong>Towards:</strong> {{plan.name}}</p>
 		[[ } ]]
-		<input id="charge-id" type="hidden" value="{{id}}" />
-		<form method="post" action="/charges" id="charge-form">
-			<label>Charge Label</label>
-			<input id="charge-name" type="text" name="name" value="{{name}}"/> 
-			<label>Amount</label>
-			<div class="input-prepend">
-				<span class="add-on">$</span>
-				<input id="charge-amount" type="text" name="amount" style="width:4em;" value="{{amount}}" /> 
-			</div>
-			<label>Pay Date</label>
-			<input id="charge-due-date" type="date" name="due_date" value="{{due_date}}" /> 
-		</form>
 		[[ if(state == 'Unpaid') { ]]
 			<a href="#" id="pay-charge" class="btn btn-success">Pay Now</a>
 			<a href="#" id="void-charge" class="btn btn-warning">Cancel Charge</a>
@@ -39,6 +39,7 @@
 				</tbody>
 			</table>
 
-			<a href="#" id="void-charge" class="btn btn-danger">Void Payment</a>
+			<a href="#" id="void-charge" class="btn btn-danger"><i class="icon-remove icon-white"></i> Void</a>
 		[[ } ]]
+	</div>
 </script>

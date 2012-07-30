@@ -42,11 +42,11 @@ class Subscription
 
 		after_transition :in_trial => :recurring do |s|
 			# Make initial charge
-			s.profile.charges.create(:name => "Initial fee",
+			s.profile.charges.create(:name => "Initial fee (#{s.plan.name})",
 				:amount => s.plan.initial_charge,
 				:plan_id => s.plan.id)
 			# Make first recurring charge
-			s.profile.charges.create(:name => "Recurring fee",
+			s.profile.charges.create(:name => "Recurring fee (#{s.plan.name})",
 				:amount => s.plan.amount,
 				:plan_id => s.plan.id)
 			s.next_due = s.first_due
@@ -55,7 +55,7 @@ class Subscription
 
 		after_transition :recurring => :recurring do |s|
 			# Continue the recurring billing cycle...
-			s.profile.charges.create(:name => "#{s.plan.name} recurring charge",
+			s.profile.charges.create(:name => "#{s.plan.name} recurring fee",
 				:amount => s.plan.amount,
 				:plan_id => s.plan.id)
 			s.next_due = s.next_due + s.cycle_period

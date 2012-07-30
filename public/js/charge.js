@@ -30,7 +30,6 @@ ChargeView = Backbone.View.extend({
 //		'click #new-charge-submit': 'create',
 //		'click .edit-charge-button': 'renderEditForm',
 //		'click #edit-charge-submit': 'update',
-//		'click #new-plan-submit': 'renderTable',
 	},
 
 //	create: function(e) {
@@ -86,18 +85,39 @@ ChargeView = Backbone.View.extend({
 		this.collection.fetch();
 	},
 
+	renderBlankTable: function() {
+	},
+
 	renderTable: function(newCharges) {
 		// Filter charges by the selected plan - XXX redundant with profile renderTable
 		var activePlanID = $('span.active-plan-id').attr('id');
 		if(activePlanID == '') { // No plan selected, show all charges
-			var filtered_charges = this.collection;
+			var filtered_charges = this.collection.toJSON();
 		} else { // a plan has been selected. Filter out charges
 			var filtered_charges = this.collection.filter(function(c) {
-				return c.get('plan_id') == activePlanID;
-			}); filtered_charges = new ChargeCollection(filtered_charges);
+				return c.get('plan').id == activePlanID;
+			}); filtered_charges = (new ChargeCollection(filtered_charges)).toJSON();
 		}
 		var table = _.template($('#charge-table-tmpl').html());
 		$('#charge-table').html(table({charges: filtered_charges}));
+
+		// jquery code for the payment table show/hide
+		// XXX this should not run on every renderTable. However, the DOM elements
+		// of that table are not accessible until *after* rendered since they're in
+		// a template
+		$('table#charges-table tbody').hide();
+		$('#payment-history-header').toggle(function(e) {
+			e.preventDefault();
+			$('#payment-history-chevron').removeClass('icon-chevron-right');
+			$('#payment-history-chevron').addClass('icon-chevron-down');
+			$('#charges-table tbody').show();
+		},
+		function(e) {
+			e.preventDefault();
+			$('#payment-history-chevron').addClass('icon-chevron-right');
+			$('#payment-history-chevron').removeClass('icon-chevron-down');
+			$('#charges-table tbody').hide();
+		});
 	},
 
 	renderEditForm: function(e) {

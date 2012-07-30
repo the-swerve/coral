@@ -7,6 +7,8 @@ class PaymentMethod
 
 	key :name, String,
 		:required => true
+	key :active, Boolean
+	key :pay_type, String
 
 	key :short_id, String
 
@@ -18,12 +20,16 @@ class PaymentMethod
 	before_validation :defaults, :on => :create
 
 	def as_hash
-		{:name => self.name}
+		{:name => self.name,
+		:active => self.active.to_s,
+		:pay_type => self.pay_type}
 	end
 
 	def defaults
-		self.name ||= 'your payment method # ' + (self.profile.payment_methods.size + 1).to_s
+		self.name ||= 'Automatic payment method # ' + (self.profile.payment_methods.size + 1).to_s
 		self.short_id = self.id
+		self.active = true
+		self.pay_type = 'card'
 	end
 
 end

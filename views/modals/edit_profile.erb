@@ -1,31 +1,25 @@
 
+<%= erb :'templates/edit_profile_form' %>
 <div class="modal hide" id="edit-profile">
 	<div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal">x</button>
 		<h3>Viewing Profile</h3>
 	</div>
+
 	<div class="modal-body">
-		<p id="edit-profile-error"></p>
-		<input id="edit-profile-id" type="hidden" value="" />
-		<form method="post" action="/profiles" id="edit-profile-form">
-			<label>Name</label>
-			<input id="edit-profile-name" type="text" name="name" /> 
-			<label>Email</label>
-			<input id="edit-profile-email" type="text" name="email" />
-			<input id="edit-profile-id" type="hidden" name="short_id" value="" />
-		</form>
-		<a class='btn btn-success' id="new-charge-button"><strong>$</strong> New Charge</a>
 	</div>
+
 	<div class="modal-footer">
-		<input id="edit-profile-submit" class="btn" name="commit" type="submit" value="Save" />
-		<a id="remove-profile-button" href="#" class="btn btn-danger">Remove</a>
+		<input id="edit-profile-submit" class="btn" name="commit" type="submit" value="Save" style="float:left" />
+		<a class="btn btn-info" id="reset-profile-pass-submit" href="#"><i class="icon-refresh icon-white"></i> Reset Password</a>
+		<a class="btn btn-danger" id="remove-profile-button" href="#"><i class="icon-remove icon-white"></i> Remove</a>
 	</div>
 </div>
 
 <div class="modal hide" id="remove-profile">
 	<div class="modal-body">
 		<p id="remove-profile-error"></p>
-		<p>Are you sure you wish to remove this profile? Note: the payment history
+		<p>Are you sure you wish to permanently remove this person? Note: your payment history
 		will remain intact</p>
 
 		<a id="remove-profile-submit" class="btn btn-danger">Remove</a>

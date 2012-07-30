@@ -36,9 +36,9 @@ class Application < Sinatra::Base
 	end
 
 	put '/profiles/:profile_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params["profile_id"].to_i)
+		@profile = @account.profiles.find(params['profile_id'])
 		if @profile
-			if @profile.update_attributes params
+			if @profile.update_attributes @params
 				json @profile.as_hash
 			else
 				halt 400, @profile.first_error
@@ -89,13 +89,13 @@ class Application < Sinatra::Base
 		end
 	end
 
-	delete '/profiles/:short_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params["short_id"].to_i)
+	delete '/profiles/:profile_id', :auth => :account do
+		@profile = @account.profiles.find params['profile_id']
 		if @profile
 			@profile.destroy
-			json :success => true, :message => 'profile destroyed'
+			json :message => 'profile destroyed :\'('
 		else
-			json :success => false, :message => 'not found'
+			halt 400, 'profile not found'
 		end
 	end
 end

@@ -55,15 +55,15 @@ class Charge
 	end
 
 	def as_hash
+		plan_hash = self.plan ? self.plan.as_hash : {}
 		{:amount => self.amount.to_s,
 		 :name => self.name,
 		 :due_date => self.due_date.to_s,
 		 :state => self.state,
-		 :profile => self.profile.name,
+		 :profile => self.profile.as_hash,
 		 :transactions => self.trnsactions.map(&:as_hash),
-		 :plan_id => self.plan.short_id,
-		 :plan_name => self.plan.name,
-		 :id => self.id}
+		 :plan => plan_hash,
+		 :id => self.id.to_s}
 	end
 
 	private

@@ -5,9 +5,10 @@ class Application < Sinatra::Base
 	post '/plans/?', :auth => :account do
 		@plan = @account.plans.build @params
 		if @plan.save
-			json @plan.as_hash
+			puts 'saved plan: ' + @plan.as_hash.to_s
+			json(@plan.as_hash)
 		else
-			halt 400, @plan.first_error
+			halt(400, @plan.first_error)
 		end
 	end
 
@@ -24,8 +25,9 @@ class Application < Sinatra::Base
 		end
 	end
 
-	get '/share/:plan_id', :auth => :account do
-		@plan = Plan.all.first(:short_id => params['plan_id'].to_i)
+	get '/share/:plan_id' do
+		@plan = Plan.find params['plan_id']
+		puts @plan.to_hash
 		if @plan
 			json :success => true, :plan => @plan.as_hash
 		else
@@ -34,22 +36,18 @@ class Application < Sinatra::Base
 	end
 
 	put '/plans/:plan_id', :auth => :account do
-		@plan = @account.plans.first(:short_id => params['plan_id'].to_i)
+		@plan = @account.plans.find params['plan_id']
 		if @plan
-			if @plan.update_attributes(@params)
-				json @plan.as_hash
-			else ; halt 400, @plan.first_error ; end
+			@plan.update_attributes(@params) ? json(@plan.as_hash) : halt(400, @plan.first_error)
 		else ; halt 400, 'plan not found' ; end
 	end
 
-	delete '/plans/:id', :auth => :account do
-		@plan = @account.plans.first(:short_id => @params['id'].to_i)
+	delete '/plans/:plan_id', :auth => :account do
+		@plan = @account.plans.find params['plan_id']
 		if @plan
 			@plan.destroy
-			json :success => true, :message => ":'("
-		else
-			json :success => false, :message => 'not found'
-		end
+			json :message => "plan pushed into the ether :'("
+		else ; halt 400, 'plan not found' ; end
 	end
 
 end

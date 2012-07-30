@@ -30,6 +30,7 @@ class Plan
 
 	validate :trial_length_requires_trial_type
 	validate :cycle_length_requires_cycle_type
+	validate :unique_name_for_account
 	validates_format_of :cycle, :with => /^\d (month|day|week|year)s?$/
 
 	timestamps!
@@ -45,18 +46,17 @@ class Plan
 	many :charges
 
 	def as_hash
-		{:name => self.name.to_s,
+		{:name => self.name,
 		 :amount => self.amount.to_s,
 		 :cycle => self.cycle_str,
 		 :initial_charge => self.initial_charge.to_s,
 		 :description => self.description.to_s,
-		 :url => '/share/' + self.short_id.to_s,
-		 :short_id => self.short_id.to_s
-		}
+		 :url => '/share/' + self.id.to_s,
+		 :id => self.id.to_s}
 	end
 
 	def url
-		'/share/' + self.short_id.to_s
+		'/share/' + self.id
 	end
 
 	def first_error
@@ -86,6 +86,11 @@ class Plan
 		elsif self.cycle_type && !self.cycle_length
       errors.add(:cycle_type, 'requires a cycle length')
     end
+	end
+	def unique_name_for_account
+		if false
+			errors.add(:name, 'has already been used')
+		end
 	end
 
 	def defaults
