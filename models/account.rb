@@ -21,6 +21,7 @@ class Account
 	key :name, String
 
 	key :short_id, String
+	key :bank_name, String
 
 	validates_presence_of :password, :on => :create
 	validates_length_of :password, :minimum => 6, :if => :password
@@ -84,7 +85,8 @@ class Account
 	def as_hash
 		{:name => self.name.to_s,
 		 :email => self.email,
-		 :short_id => self.short_id}
+		 :short_id => self.short_id,
+		 :bank_name => self.bank_name}
 #	 :plans => self.plans.map(&:as_hash)}
 	end
 

@@ -1,0 +1,33 @@
+<%= erb :'forms/edit_account' %>
+
+<div class="modal hide" id="edit-account">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Account Settings</h3>
+	</div>
+
+	<div class="modal-body"> </div>
+
+	<div class="modal-footer">
+		<input id="edit-account-submit" class="btn" name="commit" type="submit" value="Save" />
+	</div>
+</div>
+
+<div class="modal hide" id="new-bank-account">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Add Bank Account</h3>
+	</div>
+	<div class='modal-body'>
+		<form method="post" id="new-bank-account-form">
+			<label>Bank Name</label>
+			<input type="text" name="name" />
+			<label>Account Number</label>
+			<input type="text" name="number" placeholder="Any number" />
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a class="btn back-btn" href="#">Back</a>
+		<input id="new-bank-account-submit" class="btn" name="commit" type="submit" value="Save" />
+	</div>
+</div>

@@ -40,6 +40,7 @@
 
 			// Initialize backbone views
 			var account_view = new AccountView({model: account, el: $('div#account')});
+			var ba_view = new BAView({model: account, el: $('div#account')});
 			var plan_view = new PlanView({collection: plans, el: $('div.container')});
 			var profile_view = new ProfileView({collection: profiles, el: $('div.container')});
 			var charge_view = new ChargeView({collection: charges, el: $('div.container')});
@@ -63,7 +64,7 @@
 	<div id="account">
 		<%= erb :nav %>
 		<h2 id="account-name"><%= @account.name %></h2>
-		<%= erb :'forms/settings' %>
+		<%= erb :'modals/edit_account' %>
 	</div>
 
 	<div class="visualization drop-shadow">

@@ -1,0 +1,23 @@
+<script id='edit-account-form-tmpl' type='text/template' class='hide'>
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Account Settings</h3>
+	</div>
+
+	<p id="edit-account-error"></p>
+
+	<form method="post" action="/account/update" id="edit-account-form">
+		<label>Name</label>
+		<input type="text" name="name" value="{{name}}" style="width:30em"/>
+		<label>Email Address</label>
+		<input type="text" name="email" value="{{email}}" />
+	</form>
+
+	<div lass="well">
+		[[ if(bank_name) { ]]
+			<p>Bank account: {{bank_name}</p>
+		[[ } else {]]
+			<a class="btn btn-success" id="new-bank-account-button"><strong>$</strong> Add Bank Account</a>
+		[[ } ]]
+	</div>
+</script>

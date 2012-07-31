@@ -11,37 +11,60 @@ AccountView = Backbone.View.extend({
 	id: 'account',
 	req: false, // Keep track of whether we're currently making a server request.
 	events: {
-		'click #settings-submit': 'save',
-		'click #settings-button': 'renderForm',
+		'click #edit-account-submit': 'save',
+		'click #edit-account-button': 'renderForm',
 	},
 	initialize: function() {
 		this.model.bind('change', this.render, this);
 	},
 
-	renderForm: function() {
-		this.$('#settings-name').val(this.model.get('name'));
-		this.$('#settings-email').val(this.model.get('email'));
+	renderForm: function(e) {
+		e.preventDefault();
+		var body = _.template($('#edit-account-form-tmpl').html());
+		$('div#edit-account div.modal-body').html(body(this.model.toJSON()));
+		$('div#edit-account').modal('show');
 		return this;
 	},
 
 	save: function () {
 		if(this.req == false) {
 			var self = this;
-			$('input#settings-submit').toggleSubmit();
+			$('input#edit-account-submit').toggleSubmit();
 			this.req = true; // begin PUT request
-			this.model.save($('form#settings-form').serializeObject(), {
+			this.model.save($('form#edit-account-form').serializeObject(), {
 				success: function(model, response) {
 					$('#account-name').html(model.get('name'));
-					$('input#settings-submit').toggleSubmit();
-					$('div#settings').modal('hide');
+					$('input#edit-account-submit').toggleSubmit();
+					$('div#edit-account').modal('hide');
 					self.req = false;
 				},
 				error: function(model, response) {
-					$('p#settings-error').html(response.responseText);
-					$('input#settings-submit').toggleSubmit();
+					$('p#edit-account-error').html(response.responseText);
+					$('input#edit-account-submit').toggleSubmit();
 					self.req = false;
 				}
 			});
 		}
+		return this;
+	},
+});
+
+BAView = Backbone.View.extend({
+	req: false,
+	events: {
+		'click #new-bank-account-button': 'renderForm',
+		'click div#new-bank-account .back-btn': 'goBack'
+	},
+
+	renderForm: function(e) {
+		e.preventDefault();
+		$('div#edit-account').modal('hide');
+		$('div#new-bank-account').modal('show');
+	},
+
+	goBack: function(e) {
+		e.preventDefault();
+		$('div#new-bank-account').modal('hide');
+		$('div#edit-account').modal('show');
 	},
 });
