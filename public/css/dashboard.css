@@ -133,3 +133,7 @@ div#more-plan-options {
 p#settings-error, p#new-plan-error, p#edit-plan-error, p#new-profile-error, p#edit-profile-error {
 	color: #944E4E;
 }
+
+input[type="submit"] {
+	float: left;
+}

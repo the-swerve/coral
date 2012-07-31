@@ -54,20 +54,12 @@ $(document).ready(function() {
 				url: '/',
 				dataType: 'json',
 				data: {auth: $('form#welcome-form').serializeObject()},
-				success: function(data) {
-					if(data.success) {
-						$.cookie('coral.session_token', data.session_token);
-						window.location = '/';
-					} else {
-						$('p#greetings-message').html('Invalid email or password.');
-						$('p#greetings-message').css('color', '#944E4E');
-						$('input.welcome-submit').attr('value','Sign In');
-						$('input.welcome-submit').attr('class','btn welcome-submit');
-						signing_in = false;
-					}
+				success: function(d) {
+					$.cookie('coral.session_token', d.session_token);
+					window.location = '/';
 				},
-				error: function() {
-					$('p#greetings-message').html('Invalid account.');
+				error: function(d) {
+					$('p#greetings-message').html(d.responseText);
 					$('p#greetings-message').css('color', '#944E4E');
 					$('input.welcome-submit').attr('value','Sign In');
 					$('input.welcome-submit').attr('class','btn welcome-submit');

@@ -1,15 +1,17 @@
 source :rubygems
 
-#server
-gem 'thin'
-
 # base
 gem 'sinatra'
 gem 'sinatra-contrib'
+gem 'rack-contrib'
 gem 'json'
+gem 'gemcutter'
 gem 'bcrypt-ruby'
 gem 'sinatra-resources'
 gem 'state_machine'
+
+#server
+gem 'thin'
 
 # recurring charges
 gem 'whenever'

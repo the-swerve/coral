@@ -1,4 +1,4 @@
-require 'sinatra'
+require 'sinatra/base'
 require 'sinatra/json'
 
 Dir['./models/*.rb'].each {|f| require f}
@@ -29,8 +29,7 @@ class Application < Sinatra::Base
 	set :auth do |*roles|
 		condition do
 			unless roles.map {|r| send("is_#{r}?")}.any?
-				throw :halt,
-					[401, json(:success => false, :message => 'unauthorized (401)')]
+				halt 401, 'unauthorized'
 			end
 		end
 	end
@@ -75,17 +74,15 @@ class Application < Sinatra::Base
 			@profile_user = Profile.first(:email => @params['auth']['email'])
 			if @account && @account.authenticate(@params['auth']['password'])
 				@current_user = @account
-				json :success => true, :session_token => @account.generate_session_token,
-					:role => 'administrator', :account => @account.as_hash
+				json :session_token => @account.generate_session_token, :account => @account.as_hash
 			elsif @profile_user && @profile_user.authenticate(@params['auth']['password'])
 				@current_user = @profile_user
-				json :success => true, :session_token => @profile_user.generate_session_token,
-					:role => 'administrator', :profile => @profile_user.as_hash
+				json :session_token => @profile_user.generate_session_token, :profile => @profile_user.as_hash
 			else
-				json :success => false, :message => 'invalid credentials'
+				halt 400, 'Invalid email or password'
 			end
 		else
-			json :success => false, :message => 'no authorization parameters provided'
+			halt 400, 'Invalid email or password'
 		end
 	end
 

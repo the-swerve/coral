@@ -1,14 +1,5 @@
 <script id='edit-account-form-tmpl' type='text/template' class='hide'>
 	<p id="edit-account-error"></p>
-	<div class="well">
-		[[ if(bank_name) { ]]
-			<p>Bank account: {{bank_name}}</p>
-		[[ } else {]]
-			<a class="btn btn-success" id="new-bank-account-button"><strong>$</strong> Add Bank Account</a>
-		[[ } ]]
-			<a class="btn btn-info" id="reset-profile-pass-submit" href="#"><i class="icon-refresh icon-white"></i> Reset Password</a>
-			<a class="btn btn-danger" id="remove-profile-button" href="#"><i class="icon-remove icon-white"></i> Remove Account</a>
-	</div>
 
 	<form method="post" action="/account/update" id="edit-account-form">
 		<label>Name</label>
@@ -16,5 +7,8 @@
 		<label>Email Address</label>
 		<input type="text" name="email" value="{{email}}" />
 	</form>
+	<p>Bank account: {{bank_name || 'none'}}
+		<a class="btn btn-success" id="new-bank-account-button"><strong>$</strong> {{bank_name ? 'Change' : 'Add'}} Account</a>
+	</p>
 
 </script>

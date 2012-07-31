@@ -86,7 +86,7 @@ class Account
 		{:name => self.name.to_s,
 		 :email => self.email,
 		 :short_id => self.short_id,
-		 :bank_name => self.bank_name}
+		 :bank_name => self.bank_name || 'none'}
 #	 :plans => self.plans.map(&:as_hash)}
 	end
 

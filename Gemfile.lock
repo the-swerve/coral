@@ -17,6 +17,7 @@ GEM
     colorize (0.5.8)
     daemons (1.1.8)
     eventmachine (0.12.10)
+    gemcutter (0.7.1)
     httparty (0.8.3)
       multi_json (~> 1.0)
       multi_xml
@@ -34,6 +35,8 @@ GEM
     plucky (0.4.4)
       mongo (~> 1.5)
     rack (1.4.1)
+    rack-contrib (1.1.0)
+      rack (>= 0.9.1)
     rack-protection (1.2.0)
       rack
     rack-test (0.6.1)
@@ -69,10 +72,12 @@ DEPENDENCIES
   bcrypt-ruby
   bson_ext
   colorize
+  gemcutter
   httparty
   json
   log_buddy
   mongo_mapper
+  rack-contrib
   sinatra
   sinatra-contrib
   sinatra-resources
