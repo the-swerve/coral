@@ -20,6 +20,7 @@ class Charge
 
 	validate  :due_date_in_future
 	validates_numericality_of :amount, :greater_than => 0
+	validate :must_be_unpaid, :on => :update
 
 	# Associations
 	many :trnsactions
@@ -81,6 +82,12 @@ class Charge
 	def due_date_in_future
 		if self.due_date < Date.today
 			errors.add(:due_date, "date can't be in the past")
+		end
+	end
+
+	def must_be_unpaid
+		if self.state == 'Paid'
+			errors.add(:base, "Cannot edit a charge that's already been paid")
 		end
 	end
 
