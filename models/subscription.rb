@@ -1,5 +1,4 @@
 require 'mongo_mapper'
-require 'mongo_sequence'
 require 'active_support/core_ext' # for date operations
 require 'state_machine'
 

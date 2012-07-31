@@ -1,5 +1,4 @@
 require 'mongo_mapper'
-require 'mongo_sequence'
 
 class PaymentMethod
 
