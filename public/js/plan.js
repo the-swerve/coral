@@ -33,11 +33,6 @@ PlanView = Backbone.View.extend({
 		'click #remove-plan-submit': 'destroy',
 	},
 
-	//selectAll: function() {
-	//	this.selected = 'all';
-	//	this.render();
-	//},
-
 	renderRemoveForm: function(e) {
 		e.preventDefault();
 		$('div#edit-plan').modal('hide');
@@ -59,11 +54,9 @@ PlanView = Backbone.View.extend({
 		if(self.selected == 'all') {
 			var active = 'All plans'; // user selected all plans (default)
 			var active_id = ''; // no plan id
-			this.$('.plan-action-btn').hide(); // hide plan editing and sharing btns
 		} else { // user selected a plan
 			var active = self.selected.get('name'); // get selected plan name
 			var active_id = self.selected.id; // get selected plan id
-			this.$('.plan-action-btn').show(); // show plan editing and sharing btns
 		}
 		this.$('#dropdown-active').html(active); // write out active plan name to the top of the dropdown
 		this.$('span.active-plan-id').attr('id',active_id); // write out active plan id into the page
@@ -179,7 +172,8 @@ PlanView = Backbone.View.extend({
 		var url = 'http://' + document.location.hostname
 		if(url == 'http://localhost') {
 			url += ':' + document.location.port
-		} url += this.selected.get('url');
+		}
+		this.selected != 'all'? url += this.selected.get('url') : url += '/share';
 		this.$('.plan-url').html(url);
 		this.$('.plan-url').attr('href',url);
 	},

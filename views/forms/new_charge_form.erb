@@ -3,7 +3,7 @@
 <p id='new-charge-towards'></p>
 <form method="post" action="/charges" id="new-charge-form">
 	<input id="new-charge-id" type="hidden" />
-	<label></label>
+	<label>Label</label>
 	<input class="auto-tooltip" rel="tooltip" title="What is this charge for?" id="new-charge-name" type="text" name="name" />
 	<label>Amount</label>
 	<div class="input-prepend">
@@ -12,5 +12,6 @@
 	</div>
 	<label>Pay Date</label>
 	<input class="auto-tooltip" id="new-charge-due-date" type="date" name="due_date" title="Delay this charge to a future date (optional)."/> 
-	<input id="new-charge-plan-id" type="hidden" name="due_date"/> 
+	<input id="new-charge-profile-id" type="hidden" name="profile_id"/> 
+	<input id="new-charge-plan-id" type="hidden" name="ignore"/> 
 </form>

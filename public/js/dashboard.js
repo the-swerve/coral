@@ -16,15 +16,35 @@ function modalize(prefix) {
 
 $(document).ready(function() {
 
-
-	$('a#get-help').tooltip({placement: 'bottom'});
-	$('a#settings-button').tooltip({placement: 'bottom'});
-	$('a#logout-button').tooltip({placement: 'bottom'});
+	// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
 	$('.auto-tooltip').tooltip({placement: 'bottom'});
 	$('.auto-tooltip-top').tooltip({placement: 'top'});
 
 	// TODO put into AccountView
 	modalize('settings');
+
+	// Fade the payments/profiles tables in and out
+	// Also, change the background color/highlight of selected button
+	$('a.view-people-button').click(function(e) {
+		e.preventDefault();
+		$('a.view-payments-button').css('backgroundColor', 'transparent');
+		$('a.view-payments-button').css('color', 'black');
+		$(this).css('backgroundColor','gray');
+		$(this).children('i').addClass('icon-white');
+		$('div#charge').fadeOut(function() {
+			$('div#profile').fadeIn();
+		});
+	});
+	$('a.view-payments-button').click(function(e) {
+		e.preventDefault();
+		$('a.view-people-button').css('backgroundColor', 'transparent');
+		$('a.view-people-button').children('i').removeClass('icon-white');
+		$(this).css('backgroundColor','gray');
+		$(this).css('color','white');
+		$('div#profile').fadeOut(function() {
+			$('div#charge').fadeIn();
+		});
+	});
 
 
 });

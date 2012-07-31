@@ -14,7 +14,7 @@ $(document).ready(function() {
 			data: {profile: $('form#signup-form').serializeObject()},
 			success: function(data) {
 				if(data.session_token) {
-					$.cookie('friendofthegrue', data.session_token);
+					$.cookie('coral.session_token', data.session_token);
 					window.location = '/';
 				} else if (data.error) {
 					$('p#form-error').html(data.error);

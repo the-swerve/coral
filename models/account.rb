@@ -38,6 +38,26 @@ class Account
 	after_create :generate_session_token
 # before_save :filter_url
 
+	def charting_data
+		{:signups => self.signups_six_months} #, :revenue => self.revenue_six_months}
+	end
+
+	# Return the signups over the last six months
+	def signups_six_months
+		# all profiles created less than six months ago (the date is greater than the six-months-ago date).
+		data = self.profiles.filter {|p| p.created_at > 6.months.ago}.map {|p| p.created_at.month } # lolwut
+		months = [0] * 12 # lolwut
+		data.each { |d| months[d] += 1 } # sort of like bucket sort? :p
+		names = [] ; vals = [] # XXX bleh
+		(0..5).to_a.each do |n|
+			m = n.months.ago.month
+			y = n.months.ago.year
+			names[n] = m.to_s + '/' + y.to_s  # XXX bleh
+			vals[n] = months[m]
+		end
+		return {:months => names, :values => vals}
+	end
+
   # Simply removes all non-alphanumerics
   def defaults
 		self.short_id = self.id

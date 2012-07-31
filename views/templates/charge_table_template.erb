@@ -2,19 +2,17 @@
 <script id='charge-table-tmpl' type='text/template' class='hide'>
 	[[ if(!_.isEmpty(charges)) { ]]
 		<table id="charges-table" class="table table-striped clickable-rows">
-			<thead>
-				<tr>
-					<th id='payment-history-header'><i id="payment-history-chevron" class="icon-chevron-right"></i> Payment History</th>
-				</tr>
-			</thead>
+			<thead> <tr> <th></th> </tr> </thead>
 			<tbody>
 				[[ _.each(charges,function(charge) { ]]
 					<tr id="{{charge.id}}" class="edit-charge-button">
-						<td>${{Number(charge.amount).toFixed(2)}} charged to {{charge.profile.name || charge.profile.email}} for {{charge.name}}</td>
+						<td>${{Number(charge.amount).toFixed(2)}} charged to {{charge.my_profile.name || charge.my_profile.email}} for {{charge.name}}</td>
 						<td class="charge-table-state"><strong>{{ charge.state }}</strong></td>
 					</tr>
 				[[ }); ]]
 			</tbody>
 		</table>
+	[[ } else {]]
+		<p><em>No payments yet</em></p>
 	[[ } ]]
 </script>

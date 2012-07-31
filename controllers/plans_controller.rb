@@ -25,13 +25,20 @@ class Application < Sinatra::Base
 		end
 	end
 
-	get '/share/:plan_id' do
-		@plan = Plan.find params['plan_id']
-		puts @plan.to_hash
+	# post a string of many emails, separated by strings
+	# will send email invitations to each
+	post '/share/:plan_id', :auth => :account do
+		@plan = Plan.find params['plan_id'] # fetch plan model
 		if @plan
-			json :success => true, :plan => @plan.as_hash
+			people = @params['emails'].split # get posted string of emails, split by spaces
+			people = people.map do |e| # map over emails, strip comma, create the profile
+				e = e[0..-2] if e[-1] == ',' # strip out the comma
+				p = @account.profiles.build({:email => e, :plan_id => @plan.id}) # build profile with email and default subscription
+				p.save ? p.as_hash : {} # if valid, return the profile as a hash, else return empty hash
+			end
+			json people # respond with newly-created batch of people
 		else
-			json :success => false, :errors => 'not found'
+			halt 400, 'plan not found'
 		end
 	end
 
@@ -48,6 +55,11 @@ class Application < Sinatra::Base
 			@plan.destroy
 			json :message => "plan pushed into the ether :'("
 		else ; halt 400, 'plan not found' ; end
+	end
+
+	get '/share/:plan_id' do
+		@plan = Plan.find @params['plan_id']
+		erb :share
 	end
 
 end

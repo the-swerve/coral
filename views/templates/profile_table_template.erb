@@ -1,11 +1,7 @@
 <script id='profile-table-tmpl' type='text/template' class='hide'>
 	[[ if(!_.isEmpty(profiles)) { ]]
-		<table id="profiles-table" class="table table-striped clickable-rows">
-			<thead>
-				<tr>
-					<th>People</th>
-				</tr>
-			</thead>
+	<table id="profiles-table" class="table table-striped clickable-rows">
+			<thead> <tr> <th></th> </tr> </thead>
 			<tbody>
 				[[ _.each(profiles, function(profile) { ]]
 					<tr id="{{profile.id}}" class="edit-profile-button">
@@ -15,15 +11,15 @@
 				[[ }); ]]
 			<tr class="share-plan-button">
 				<td>
-					<a href="#"><i class="icon-plus"></i> Invite People</a>
+				<li><a href="#" class='plan-action-btn auto-tooltip-top share-plan-button' title='Share Plan'><i class="icon-globe"></i> Invite More People</a></li>
 				</td><td></td>
 			</tr>
 			</tbody>
-	</table>
 	[[ } else { ]]
 		<p>
 			<em>No subscribers yet.</em>
-			<a class="share-plan-button" href="#"><i class="icon-plus"></i> Invite People</a>
+			<a class="share-plan-button" href="#"><i class="icon-globe"></i> Invite People</a>
 		</p>
+	</table>
 	[[ } ]]
 </script>

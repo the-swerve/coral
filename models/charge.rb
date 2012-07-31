@@ -60,10 +60,19 @@ class Charge
 		 :name => self.name,
 		 :due_date => self.due_date.to_s,
 		 :state => self.state,
-		 :profile => self.profile.as_hash,
 		 :transactions => self.trnsactions.map(&:as_hash),
-		 :plan => plan_hash,
-		 :id => self.id.to_s}
+		 :my_profile => self.profile.as_hash,
+		 :my_plan => plan_hash,
+		 :id => self.id.to_s,
+		 :created_at => self.created_at.to_s}
+	end
+
+	def first_error
+		## Return the very first error in a readable string
+		# Get the field name of the first error
+		# then get the message for the field name of the first error
+		self.errors.to_hash.first.first.to_s +
+			' ' + self.errors.to_hash.first.second.first.to_s
 	end
 
 	private

@@ -18,33 +18,44 @@
 
 <body>
 
-<div id="share" class="container drop-shadow" style="padding:2em; margin-top:1em;">
+<div id="share" class="container drop-shadow" style="padding:2em; margin-top:1em; background-color:white;">
 
 	<% if @profile_user %>
-		<h1><%= @profile_user.name %>'s Subscriptions</h1>
+		<h1><%= @profile_user.name %>'s Subscriptions and Memberships</h1>
 
 	<% if @profile_user.subscriptions.empty? %>
 		<p><em>No subscriptions yet.</em></p>
 	<% else %>
 		<table class="table table-striped">
 			<thead>
-				<tr> <th>Name</th> <th>Description</th> <th></th></tr>
+				<tr> <th></th></tr>
 			</thead>
 			<tbody>
 			<% @profile_user.subscriptions.each do |sub| %>
 				<tr>
 					<td><%= sub.plan.name %></td>
+					<td>
+						<strong>$<%= sub.plan.amount %></strong>
+						every <strong><%= sub.plan.cycle_str %></strong>
+						<% if sub.plan.initial_charge > 0 %>
+							with an initial charge of <strong>$<%= sub.plan.initial_charge %> </strong>
+						<% end %>
+					</td>
+					<td><a class="btn btn-danger" href="#"><i class="icon-remove icon-white"></i> Unsubscribe</a></td>
 				</tr>
 			<% end %>
 			</tbody>
 	</table>
+
+	<a class='btn btn-success' href="#">Payment Method</a>
+	<a class='btn' href="/logout">Logout</a>
+
 	<% end %>
 
 	<% else %>
 		<p>Person not found</p>
 	<% end %>
 
-	<a class='btn' href="/logout">Logout</a>
 
 </div>
 

@@ -29,6 +29,37 @@ ProfileView = Backbone.View.extend({
 		'click #remove-profile-button': 'renderRemoveForm',
 		'click #remove-profile-submit': 'destroy',
 		'click .dropdown-item': 'renderTable',
+		'click #share-plan-submit': 'sharePlan',
+	},
+
+	sharePlan: function(e) {
+		e.preventDefault();
+		if(this.req == false) {
+			this.req = true; // block other requests
+			var planID = $('span.active-plan-id').attr('id'); // fetch selected plan id
+			var emails = $('textarea#plan-share-emails').val(); // fetch string of emails
+			var self = this; // save this object for scope
+			$('input#share-plan-submit').val('Sharing...');  // toggle share button
+			$('input#share-plan-submit').addClass('disabled');
+			$.ajax({ // this is a custom, non-"restful" route, so we need to manually ajax
+				type: 'post',
+				url: '/share/' + planID, // may resolve to either the plan controller share or account controller share if planID is ''
+				dataType: 'json',
+				data: {emails: emails},
+				success: function(data) {
+					$('div#share-plan').modal('hide'); // close sharing dialog
+					$('input#share-plan-submit').val('Share'); // reset submit button
+					$('input#share-plan-submit').removeClass('disabled');
+					_.each(data, function(d) { self.collection.add(new Profile(d)); });
+					self.renderTable(); // re-render table
+					self.req = false;
+				},
+				error: function(data) {
+					$('div#share-plan').modal('hide'); // close sharing dialog
+					self.req = false;
+				}
+			});
+		}
 	},
 
 	create: function(e) {
@@ -110,7 +141,8 @@ ProfileView = Backbone.View.extend({
 		} else { // a plan has been selected. Filter out subscribers
 			var filtered_profiles = this.collection.filter(function(p) {
 				return p.get('plan_id') == activePlanID;
-			}); filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
+			});
+			filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
 		}
 		var table = _.template($('#profile-table-tmpl').html());
 		$('#profile-table').html(table({profiles: filtered_profiles}));
@@ -135,7 +167,7 @@ ProfileView = Backbone.View.extend({
 		e.preventDefault();
 		this.$('p#edit-profile-error').html(''); // clear errors
 		var selectedProfile = this.collection.get($(e.currentTarget).attr('id'));
-	
+
 		// Compile and render form template
 		var form = _.template($('#edit-profile-tmpl').html());
 		$('div#edit-profile div.modal-body').html(form(selectedProfile.attributes));

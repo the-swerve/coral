@@ -7,19 +7,8 @@ html, body {
 }
 
 body {
-  background-color: #DDE2EE;
-  background: url('../img/texture.png');
-}
-
-div#dashboard {
-	margin-top: 15px;
-	margin-bottom: 15px;
-	padding-right: 12px;
-	padding-left: 12px;
-	padding-bottom: 18px;
-	background-color: rgba(255,255,255,0.6);
-	min-height: 100%;
-	position: relative;
+  background-color: #D2DBDF;
+  /* background: url('../img/texture.png'); */
 }
 
 /*

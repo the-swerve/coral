@@ -39,14 +39,16 @@
 			<label></label>
 			<input type="password" name="password" placeholder="Password" />
 
+			<input type="hidden" name="plan_id" value="<%= @plan.id %>" />
+
 			<div class="">
 				<input id="signup-submit" class="btn" name="commit" type="submit" value="Sign Up" />
 			</div>
 
 		</form>
 
-	<% else %>
-		<p>Plan not found</p>
+	<% elsif @acct %>
+		<p><%= @acct.name %></p>
 	<% end %>
 
 </div>

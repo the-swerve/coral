@@ -128,7 +128,8 @@ class Profile
 		 :state => self.state,
 		 :id => self.id.to_s,
 		 :plan_id => self.subscriptions.all.map {|s| s.plan.id.to_s}.first || '',
-		 :payment_methods => self.payment_methods.all.map(&:as_hash)}
+		 :payment_methods => self.payment_methods.all.map(&:as_hash),
+		 :created_at => self.created_at.to_date.to_s }
 	end
 
 	def subscription_list

@@ -64,9 +64,9 @@ class Application < Sinatra::Base
 	not_found { halt 404, 'not found  (404)' }
 
 	get '/' do
-		if @account ;    erb :dashboard
+		if @account ; erb :dashboard
 		elsif @profile_user ; erb :public
-		else ;           erb :welcome ; end
+		else ; erb :welcome ; end
 	end
 
 	post '/' do
@@ -100,11 +100,6 @@ class Application < Sinatra::Base
 		@profile_user.destroy_session_token if @profile_user
 		request.cookies.delete 'coral.session_token'
 		redirect '/'
-	end
-
-	get '/share/:planid' do
-		@plan = Plan.first(:short_id => @params[:planid].to_i)
-		erb :share
 	end
 
 end

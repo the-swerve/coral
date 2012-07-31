@@ -2,6 +2,42 @@
  * Dashboard
  */
 
+div#account {
+	margin: 12px 0 0 0;
+}
+
+a.logo {
+  display: block;
+  margin: 22px auto;
+  line-height: 0;
+  font-size: 0;
+  color: transparent;
+  background: url("../img/coral.png") no-repeat;
+  width: 196px;
+  height: 126px;
+	opacity: .3;
+}
+a.logo:hover {
+	opacity: 1;
+}
+
+div.data {
+	background-color: whiteSmoke;
+	padding: 12px;
+	-webkit-border-radius: 0 0 0 0;
+	-moz-border-radius: 0 0 9px 9px;
+	border-radius: 0 0 9px 9px;
+}
+
+div.visualization {
+	background-color: whiteSmoke;
+	margin: 16px 0 26px 0;
+	padding: 28px 48px 28px 48px;
+	-webkit-border-radius: 9px 9px 0 0;
+	-moz-border-radius: 9px 9px 0 0;
+	border-radius: 9px 9px 0 0;
+}
+
 a#logo-teeny {
   line-height: 0;
   font-size: 0;
@@ -14,44 +50,22 @@ a#logo-teeny {
 	margin-top: 6px;
 }
 
-.navbar {
-	width: 266px;
-	display: block;
+.account-nav {
+	margin: 12px;
+	list-style: none;
 	float: right;
-	z-index: 99;
-	margin-right: -12px;
 }
 
-.navbar-inner {
-	background-color: #fff;
-	background-image: -moz-linear-gradient(top, #ADCC74, #788B54);
-	background-image: -ms-linear-gradient(top, #ADCC74, #788B54);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from( #ADCC74), to( #788B54));
-	background-image: -webkit-linear-gradient(top, #ADCC74, #788B54);
-	background-image: -o-linear-gradient(top, #ADCC74, #788B54);
-	background-image: linear-gradient(top, #ADCC74, #788B54);
-	-webkit-border-radius: 0 0 0 4px;
-	-moz-border-radius:  0 0 0 4px;
-	border-radius: 0 0 0 4px;
+.account-nav li {
+	display: inline;
+	margin-left: 12px;
 }
 
-.navbar .nav {
-	margin-left: -17px;
-	margin-right: -17px;
-}
-
-.navbar .nav > li > a {
-	color: white;
-	padding-left: 0;
-	margin: 0; padding: 0;
-	margin-right: 0;
-	margin-left: 15px;
-	margin-top: 17px;
+.account-nav li a {
 	font-size: 1.2em;
-	display: block;
-	float: left;
 }
-.navbar .nav > li > a:hover { color: #2C3320; }
+
+.account-nav > li > a:hover { color: #2C3320; }
 
 .big-question-icon {
 	display: block;
@@ -67,14 +81,6 @@ a#logo-teeny {
 	display: block;
 	width: 26px; height: 26px;
 	background: url('../img/cog-icon.png') no-repeat;
-}
-
-/*
- * Google chart
- */
-
-div#chart {
-	margin-top: 61px;
 }
 
 /*
@@ -94,8 +100,17 @@ ul#plan-nav {
 	padding-bottom: 4px;
 	padding-top: 2px;
 }
-ul#plan-nav a {
+ul#plan-nav li a {
 	padding: 0.5em;
+	color: black;
+}
+ul#plan-nav li a:hover {
+	background-color: gray;
+	color: white;
+}
+
+a.view-people-button {
+	background-color: gray;
 }
 
 /*

@@ -6,12 +6,16 @@
   <title>coral payments</title>
 	<link rel="stylesheet" media="screen,projection" href="css/bootstrap.css">
 	<link rel="stylesheet" media="screen,projection" href="css/bootstrap-responsive.css">
+	<link rel="stylesheet" media="screen,projection" href="css/jquery.jqplot.css">
 	<link rel="stylesheet" media="screen,projection" href="css/style.css">
 	<link rel="stylesheet" media="screen,projection" href="css/dashboard.css">
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
 	<script type="text/javascript" src="js/jquery.jqplot.js"></script>
 	<script type="text/javascript" src="js/jqplot.barRenderer.js"></script>
+	<script type="text/javascript" src="js/jqplot.categoryAxisRenderer.min.js"></script>
+	<script type="text/javascript" src="js/jqplot.pointLabels.min.js"></script>
+	<script type="text/javascript" src="js/jqplot.dateAxisRenderer.min.js"></script>
 	<script type="text/javascript" src="js/underscore.js"></script>
 	<script type="text/javascript" src="js/backbone.js"></script>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
@@ -33,12 +37,13 @@
 		var charges = new ChargeCollection();
 
 		$(document).ready(function() {
+
 			// Initialize backbone views
 			var account_view = new AccountView({model: account, el: $('div#account')});
 			var plan_view = new PlanView({collection: plans, el: $('div.container')});
 			var profile_view = new ProfileView({collection: profiles, el: $('div.container')});
 			var charge_view = new ChargeView({collection: charges, el: $('div.container')});
-			var chart_view = new ChartView({collection: charges, el: $('div.container')});
+			var chart_view = new ChartView({el: $('div.container')});
 
 			// Load in bootstrapped data served by sinatra
 			account.set(<%= @account.as_hash.to_json %>);
@@ -53,17 +58,19 @@
 </head>
 
 <body>
-<div id="dashboard" class="container drop-shadow">
 
+<div class="container">
 	<div id="account">
 		<%= erb :nav %>
 		<h2 id="account-name"><%= @account.name %></h2>
 		<%= erb :'forms/settings' %>
 	</div>
 
-	<div id="chart"> </div>
+	<div class="visualization drop-shadow">
+		<div id="chart"> </div>
+	</div>
 
-	<div class="well">
+	<div class="data drop-shadow">
 		<div id="plan">
 			<%= erb :'templates/plan_template' %>
 			<%= erb :'forms/new_plan' %>
@@ -73,19 +80,23 @@
 
 
 		<div id="profile">
-			<%= erb :'templates/profile_table_template' %>
+			<h3>Your People</h3>
 			<div id="profile-table"></div>
-			<%= erb :'modals/new_profile' %>
-			<%= erb :'modals/edit_profile' %>
 		</div>
+		<%= erb :'modals/new_profile' %>
+		<%= erb :'modals/edit_profile' %>
+		<%= erb :'templates/profile_table_template' %>
 
-		<div id="charge">
-			<%= erb :'templates/charge_table_template' %>
+		<div id='charge' class='hide'>
+			<h3>Payments</h3>
 			<div id="charge-table"></div>
-			<%= erb :'modals/new_charge' %>
-			<%= erb :'modals/edit_charge' %>
 		</div>
+		<%= erb :'modals/new_charge' %>
+		<%= erb :'modals/edit_charge' %>
+		<%= erb :'templates/charge_table_template' %>
 	</div>
+
+	<a class="logo" href="/">coral</a>
 
 </div>
 
