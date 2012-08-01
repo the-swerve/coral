@@ -20,26 +20,27 @@ class Subscription
 	belongs_to :plan
 
 	# Validations
-	validate  :requires_payment_method
+	# validate  :requires_payment_method ## XXX only want this on invited => recurring
 	validate  :must_not_be_overdue
 	validates_presence_of :plan_id
 
 	# Callbacks
-	before_validation :defaults, :on => :create
-#before_destroy :destroy_unpaid_charges
+	before_validation(:on => :create) do
+		self.short_id = self.id
+	end
 
-	state_machine :state, :initial => :invited do
+	state_machine :state, :initial => 'Invited' do
 
 		event :check_dates do
-			transition :in_trial => :recurring,
+			transition 'In Trial' => 'Recurring',
 				:if => lambda {|s| s.trial_end && s.trial_end <= DateTime.now}
-			transition :recurring => :expired,
+			transition 'Recurring' => 'Expired',
 				:if => lambda {|s| s.expiration_date && s.expiration_date > DateTime.now}
-			transition :recurring => :recurring,
+			transition 'Recurring' => 'Recurring',
 				:if => lambda {|s| s.next_due <= DateTime.now}
 		end
 
-		after_transition :in_trial => :recurring do |s|
+		after_transition 'In Trial' => 'Recurring' do |s|
 			# Make initial charge
 			s.profile.charges.create(:name => "Initial fee (#{s.plan.name})",
 				:amount => s.plan.initial_charge,
@@ -52,7 +53,7 @@ class Subscription
 			s.save
 		end
 
-		after_transition :recurring => :recurring do |s|
+		after_transition 'Recurring' => 'Recurring' do |s|
 			# Continue the recurring billing cycle...
 			s.profile.charges.create(:name => "#{s.plan.name} recurring fee",
 				:amount => s.plan.amount,
@@ -61,16 +62,16 @@ class Subscription
 			s.save
 		end
 
-		state :unpaid do
+		state 'Unpaid' do
 		end
 
-		state :in_trial do
+		state 'In Trial' do
 		end
 
-		state :recurring do
+		state 'Recurring' do
 		end
 
-		state :expired do
+		state 'Expired' do
 		end
 
 	end
@@ -119,12 +120,6 @@ class Subscription
 
 	private
 
-	def defaults
-		self.short_id = self.id
-		self.starting ||= DateTime.now
-		self.next_due ||= self.trial_end if self.plan
-	end
-
 	# Callbacks
 
 	def destroy_unpaid_charges
@@ -132,17 +127,9 @@ class Subscription
 		self.profile.settle
 	end
 
-	# Validations
-	# We don't want to create a subscription for anyone if they have no way of paying for it
-	def requires_payment_method
-		if self.profile.payment_methods.empty?
-			errors.add(:base, "This person must have a payment method to subscribe.")
-		end
-	end
-
 	# We don't want the person to have unpaid fees before making another subscription
 	def must_not_be_overdue
-		if self.profile.state == 'Unpaid'
+		if self.profile.state == 'Overdue'
 			errors.add(:base, "This person has unpaid charges.")
 		end
 	end

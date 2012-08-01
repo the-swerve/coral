@@ -5,7 +5,7 @@
 			<tbody>
 				[[ _.each(profiles, function(profile) { ]]
 					<tr id="{{profile.id}}" class="edit-profile-button">
-						<td class="profile-table-name-email">{{ profile.name ? profile.name + ' (' + profile.email + ')' : profile.email }}</td>
+						<td class="profile-table-name-email">{{ profile.name ? profile.name + ' (' + profile.email + ')' : profile.email }} &#x2012; <em>{{profile.state}}</em></td>
 
 						<td class="profile-table-subs">{{profile.subscription_names ? profile.subscription_names : '' }}</td>
 				[[ }); ]]

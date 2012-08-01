@@ -8,7 +8,8 @@
 			<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
 			<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
 		</form>
-		<div class="well">
+		[[ if(plan_id || !_.isEmpty(payment_methods)) { ]]
+			<div class="well">
 			[[ if(!_.isEmpty(payment_methods)) { ]]
 				<p>Paying with "<em>{{_.first(payment_methods).name}}</em>" ({{_.first(payment_methods).pay_type}}) 
 				<a class="btn btn-success" id="new-charge-button" href="#"><strong>$</strong> Charge</a></p>
@@ -18,5 +19,6 @@
 			[[ } else{ ]]
 				<!-- No subscriptions --> 
 			[[ } ]]
-		</div>
+			</div>
+		[[ } ]]
 </script>

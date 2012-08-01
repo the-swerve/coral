@@ -37,9 +37,15 @@ class Profile
   before_validation :defaults, :on => :create
   before_validation :encrypt_pass
   before_save :capitalize_name
-	after_create :add_subscription_and_payment_method_and_settle
 
-	state_machine :state, :initial => 'Non-subscriber' do
+	after_create do 
+		if plan_id && plan_id != ""
+			found_plan = account.plans.find(self.plan_id)
+			subscriptions.create!(:plan_id => found_plan.id) if found_plan
+		end
+	end
+
+	state_machine :state, :initial => 'Invited' do
 
 		event :enter_trial do
 			transition any - 'Unpaid' => 'In trial',
@@ -167,18 +173,5 @@ class Profile
 		# Split name by spaces, capitalize each word
 		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
   end
-
-	def add_subscription_and_payment_method_and_settle
-		# Auto-create a dummy payment method for now
-		self.payment_methods.create if self.payment_methods.all.empty?
-		# If we're given a plan_id attribute, then let's create a
-		# subscription pointing to it. This is basically simulating
-		# accepts_nested_attributes in rails
-		if self.plan_id && self.plan_id != ""
-			found_plan = self.account.plans.find(self.plan_id)
-			self.subscriptions.create!(:plan_id => found_plan.id) if found_plan
-			self.settle
-		end
-	end
 
 end

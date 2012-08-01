@@ -9,9 +9,17 @@ html, body {
 }
 
 body {
-  background-color: #D2DBDF;
+  background-color: #BDD9E6;
   /* background: url('../img/texture.png'); */
 	font-family: 'Open Sans', sans-serif;
+}
+
+div#footer {
+	position: relative;
+	top: 0; /* could be negative if we want overlap */
+	height: 334px;
+	background:url('../img/bg-seascape.png') bottom center repeat-x;
+	z-index: -1;
 }
 
 /*

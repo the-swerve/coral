@@ -31,11 +31,14 @@ class Application < Sinatra::Base
 		@plan = Plan.find params['plan_id'] # fetch plan model
 		if @plan
 			people = @params['emails'].split # get posted string of emails, split by spaces
-			people = people.map do |e| # map over emails, strip comma, create the profile
+			people = people.reduce([]) do |ps, e| # map over emails, strip comma, create the profile
 				e = e[0..-2] if e[-1] == ',' # strip out the comma
+				puts 'sharing with: ' +  e
 				p = @account.profiles.build({:email => e, :plan_id => @plan.id}) # build profile with email and default subscription
-				p.save ? p.as_hash : {} # if valid, return the profile as a hash, else return empty hash
+				puts 'built profile'
+				p.save ? (ps << p.as_hash) : nil # if valid, append the profile as a hash, else return empty hash
 			end
+			puts 'out of loop'
 			json people # respond with newly-created batch of people
 		else
 			halt 400, 'plan not found'
