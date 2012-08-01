@@ -137,7 +137,7 @@ class Profile
 		if subscriptions.empty?
 			' '
 		else
-			subscriptions.collect {|s| s.plan.name + ' (' + s.state + ')'}.join ', '
+			subscriptions.collect {|s| s.plan.name + ' &#x2012; <em>' + s.state + '</em>'}.join ', '
 		end
 	end
 

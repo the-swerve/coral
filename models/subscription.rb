@@ -28,7 +28,7 @@ class Subscription
 	before_validation :defaults, :on => :create
 #before_destroy :destroy_unpaid_charges
 
-	state_machine :state, :initial => :in_trial do
+	state_machine :state, :initial => :invited do
 
 		event :check_dates do
 			transition :in_trial => :recurring,

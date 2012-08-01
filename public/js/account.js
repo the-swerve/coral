@@ -41,6 +41,7 @@ AccountView = Backbone.View.extend({
 				},
 				error: function(model, response) {
 					$('p#edit-account-error').html(response.responseText);
+					$('input#edit-account-submit span').html('Save');
 					$('input#edit-account-submit').toggleSubmit();
 					self.req = false;
 				}
@@ -49,6 +50,10 @@ AccountView = Backbone.View.extend({
 		return this;
 	},
 });
+			$('input#edit-account-submit span').html('Saving...');
+			$('input#edit-account-submit').addClass('disabled');
+					$('input#edit-account-submit span').html('Save');
+					$('input#edit-account-submit').removeClass('disabled');
 
 // bank account updating form
 BAView = Backbone.View.extend({

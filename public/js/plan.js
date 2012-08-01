@@ -19,7 +19,14 @@ PlanView = Backbone.View.extend({
 
 	initialize: function() {
 		this.collection.bind('reset', this.render, this);
+		this.collection.bind('reset', this.checkNew, this);
 		this.selected = 'all';
+	},
+
+	checkNew: function () {
+		if(this.collection.isEmpty()) { // show the new plan dialog after new account creation
+			this.renderNewForm();
+		}
 	},
 
 	events: {
@@ -41,7 +48,7 @@ PlanView = Backbone.View.extend({
 	},
 
 	renderNewForm: function(e) {
-		e.preventDefault();
+		if(e) e.preventDefault();
 		$('form#new-plan-form input').val(''); // clear inputs
 		$('p#new-plan-error').html(''); // clear errors
 		$('div#new-plan').modal('show'); // display dialog
@@ -96,6 +103,7 @@ PlanView = Backbone.View.extend({
 					self.selected = model; // make the selected field point to the new model
 					self.req = false; // release the request lock
 					self.render(); // render the plan dropdown and description
+					self.renderShareForm();
 				},
 				error: function(model, response) {
 					$('p#new-plan-error').html(response.responseText);
@@ -166,7 +174,7 @@ PlanView = Backbone.View.extend({
 	},
 
 	renderShareForm: function(e) {
-		e.preventDefault();
+		if(e) e.preventDefault();
 		$('div#share-plan').modal('show');
 		// populate share form - XXX maybe use template
 		var url = 'http://' + document.location.hostname

@@ -5,6 +5,7 @@
 
 div#account {
 	margin: 12px 0 0 0;
+	height: 3em;
 }
 
 a.logo {
@@ -64,9 +65,12 @@ a#logo-teeny {
 
 .account-nav li a {
 	font-size: 1.2em;
+	text-decoration: none;
 }
 
-.account-nav > li > a:hover { color: #2C3320; }
+.account-nav > li > a:hover {
+	color: #2C3320;
+}
 
 .big-question-icon {
 	display: block;
@@ -134,6 +138,6 @@ p#settings-error, p#new-plan-error, p#edit-plan-error, p#new-profile-error, p#ed
 	color: #944E4E;
 }
 
-input[type="submit"] {
+input[type="submit"], .submit-btn {
 	float: left;
 }
