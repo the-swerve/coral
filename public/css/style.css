@@ -15,11 +15,14 @@ body {
 }
 
 div#footer {
-	position: relative;
-	top: 0; /* could be negative if we want overlap */
+	position: fixed;
+	bottom: 0; /* could be negative if we want overlap */
+	left: 0;
 	height: 334px;
+	width: 100%;
 	background:url('../img/bg-seascape.png') bottom center repeat-x;
 	z-index: -1;
+	opacity: 0.8;
 }
 
 /*

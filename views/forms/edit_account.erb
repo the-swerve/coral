@@ -1,14 +1,67 @@
 <script id='edit-account-form-tmpl' type='text/template' class='hide'>
-	<p id="edit-account-error"></p>
+	<div class="tabbable">
+		<ul class="nav nav-tabs">
+			<h3 style="float:left;padding-right:1em;">Account Settings</h3>
+			<li class="active auto-tooltip" title="Edit info"><a href="#account-info" data-toggle="tab"><i class="icon-user"></i> Your Info</a></li>
+			<li><a href="#account-money" data-toggle="tab"><i class="icon-lock"></i> Your Money</a></li>
+			<button type="button" class="close" data-dismiss="modal" style="float:right">x</button>
+		</ul>
 
-	<form method="post" action="/account/update" id="edit-account-form">
-		<label>Account Name</label>
-		<input type="text" name="name" value="{{name}}" style="width:30em"/>
-		<label>Email Address</label>
-		<input type="text" name="email" value="{{email}}" />
-	</form>
-	<p>Bank account: {{bank_name}}
-		<a class="btn btn-success" id="new-bank-account-button"><strong>$</strong> {{bank_name == 'none' ? 'Add' : 'Change'}} Bank Account</a>
-	</p>
+	<div class="tab-content">
+		<div class="tab-pane active" id="account-info">
+			<p id="edit-account-error"></p>
+			<form method="post" action="/account/update" id="edit-account-form" class="form-horizontal">
+				<div class="control-group">
+					<label class="control-label">Account Name</label>
+					<div class="controls"><input type="text" name="name" value="{{name}}" /></div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label">Email Address</label>
+					<div class="controls"><input type="text" name="email" value="{{email}}" /></div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label">Phone Number</label>
+					<div class="controls"><input type="text" name="phone" value="" /></div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label">Address</label>
+					<div class="controls"><input type="text" name="address" value="" /></div>
+				</div>
+
+				<div style="border-top:1px solid #DDD; padding-top: 1em; margin-top: 1em;">
+					<input class="btn" id="edit-account-submit" name="commit" type="submit" value="Save" />
+				</div>
+			</form>
+		</div>
+		<div class="tab-pane" id="account-money">
+			<div class="well">
+				<p>In escrow: $0</p>
+				<p>Total received: $0</p>
+				<p><a href="#" class="btn btn-success">Pay out</a></p>
+			</div>
+			[[ if(bank_name == 'none') { ]]
+			<form method="post" id="new-bank-account-form" class="form-horizontal">
+
+				<div class="control-group"> <label class="control-label">Bank Name</label>
+					<div class="controls"> <input type="text" name="name" /></div>
+				</div>
+
+				<div class="control-group"> <label class="control-label">Account Number</label>
+					<div class="controls"> <input type="text" name="number" placeholder="Any number" /> </div>
+				</div>
+
+				<div style="border-top:1px solid #DDD; padding-top: 1em; margin-top: 1em;">
+					<input class="btn" id="new-bank-account-submit" name="commit" type="submit" value="Save" />
+				</div>
+			</form>
+			[[ } else { ]]
+				<p>Connected bank account: {{bank_name}}</p>
+			[[ } ]]
+		</div>
+	</div>
+</div>
 
 </script>

@@ -26,6 +26,7 @@ a.logo:hover {
 div.data {
 	background-color: whiteSmoke;
 	padding: 12px;
+	margin-bottom: 3em;
 	-webkit-border-radius: 0 0 0 0;
 	-moz-border-radius: 0 0 9px 9px;
 	border-radius: 0 0 9px 9px;

@@ -4,10 +4,16 @@ require 'state_machine'
 
 class Profile
 
+	# Inclusions
+
 	include MongoMapper::Document
 	include BCrypt
 
-	attr_accessor :email, :name, :password, :plan_id
+	# Accessors
+
+	attr_accessor :email, :name, :password, :plan_id, :invited
+
+	# Data
 
 	key :email, String,
 		:required => true,
@@ -18,25 +24,38 @@ class Profile
 	key :name, String
 	key :state, String
 	key :session_token, String
+	timestamps!
+
+	# Validations
 
 	validates_length_of :password, :minimum => 6, :if => :password
 
-	timestamps!
-
   # Associations
-  belongs_to :account
 
+  belongs_to :account
 	many :subscriptions, :dependent => :destroy
 	many :plans, :through => :subscriptions
-
 	many :payment_methods, :dependent => :destroy
 	many :charges
 	many :trnsactions, :through => :charges
 
   # Callbacks
-  before_validation :defaults, :on => :create
-  before_validation :encrypt_pass
-  before_save :capitalize_name
+
+  before_validation(:on => :create) do
+		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
+		self.short_id = self.id
+		self.name ||= '' # hmm
+	end
+
+  before_validation do
+		# Use bcrypt to generate the pass hash/salt
+		self.pass_hash = Password.create(self.password)
+	end
+
+  before_save do
+		# Split name by spaces, capitalize each word
+		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
+  end
 
 	after_create do 
 		if plan_id && plan_id != ""
@@ -45,48 +64,43 @@ class Profile
 		end
 	end
 
-	state_machine :state, :initial => 'Invited' do
+	# States
 
-		event :enter_trial do
-			transition any - 'Unpaid' => 'In trial',
+	state_machine :state, :initial => 'Gray' do
+
+		event :subscribe do
+			transition any - 'Gray' => 'Green',
 				:if => lambda {|p| p.subscriptions.last.state == 'In trial'}
 		end
 
 		event :past_due do
-			transition any => 'Unpaid',
+			transition any => 'Red',
 				:if => lambda {|p| p.charges.where(:state => 'Overdue').any?}
 		end
 
 		event :expire do
-			transition any - 'Unpaid' => 'Expired',
+			transition any - 'Red' => 'Gray',
 				:if => lambda {|p| p.subscriptions.where(:state => 'Expired').any?}
 		end
 
 		event :settle do
-			transition any => 'Paid',
+			transition any => 'Green',
 				:if => lambda {|p| p.pay_all}
 		end
 
 
-		state 'Non-subscriber' do
-			# No subscriptions yet
+		state 'Gray' do
+			# Non-subscriber and/or no payment method
 		end
 
-		state 'Paid' do
-			# All charges paid
+		state 'Green' do
+			# Subscriber with payment method and no failed transactions
 		end
 
-		state 'Unpaid' do
-			# At least one unpaid/due charge
+		state 'Red' do
+			# At least one unpaid/due charge (from a failed transaction)
 		end
 
-		state 'Expired' do
-			# All subscriptions expired
-		end
-
-		state 'In trial' do
-			# All subscriptions in trial
-		end
 	end
 
 	def balance
@@ -141,7 +155,7 @@ class Profile
 	def subscription_list
 		# Return a readable string of this person's subscription names
 		if subscriptions.empty?
-			' '
+			'none'
 		else
 			subscriptions.collect {|s| s.plan.name + ' &#x2012; <em>' + s.state + '</em>'}.join ', '
 		end
@@ -154,24 +168,5 @@ class Profile
 		self.errors.to_hash.first.first.to_s +
 			' ' + self.errors.to_hash.first.second.first.to_s
 	end
-
-  private
-
-  # Callbacks
-  def defaults
-		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
-		self.short_id = self.id
-		self.name ||= '' # hmm
-  end
-
-	def encrypt_pass
-		# Use bcrypt to generate the pass hash/salt
-		self.pass_hash = Password.create(self.password)
-	end
-
-  def capitalize_name
-		# Split name by spaces, capitalize each word
-		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
-  end
 
 end

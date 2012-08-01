@@ -145,7 +145,9 @@ ProfileView = Backbone.View.extend({
 			filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
 		}
 		var table = _.template($('#profile-table-tmpl').html());
+		$('#profile-table').slideUp();
 		$('#profile-table').html(table({profiles: filtered_profiles}));
+		$('#profile-table').slideDown('slow');
 	},
 
 	renderNewForm: function(e) {

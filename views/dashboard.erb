@@ -51,6 +51,10 @@
 			plans.reset(<%= @account.plans.map(&:as_hash).to_json %>);
 			profiles.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
 			charges.reset(<%= @account.profiles.all.reduce([]) {|ps,p| ps.concat(p.charges.map(&:as_hash))}.to_json %>);
+
+			// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
+			$('.auto-tooltip').tooltip({placement: 'bottom'});
+			$('.auto-tooltip-top').tooltip({placement: 'top'});
 		});
 	</script>
 
@@ -101,7 +105,7 @@
 </div>
 
 	<div id='footer'>
-		<a class="logo" href="/">coral</a>
+		<!-- <a class="logo" href="/">coral</a> -->
 	</div>
 
 </body>

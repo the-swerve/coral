@@ -16,10 +16,6 @@ function modalize(prefix) {
 
 $(document).ready(function() {
 
-	// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
-	$('.auto-tooltip').tooltip({placement: 'bottom'});
-	$('.auto-tooltip-top').tooltip({placement: 'top'});
-
 	// TODO put into AccountView
 	modalize('settings');
 

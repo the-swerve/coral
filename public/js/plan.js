@@ -61,9 +61,11 @@ PlanView = Backbone.View.extend({
 		if(self.selected == 'all') {
 			var active = 'All plans'; // user selected all plans (default)
 			var active_id = ''; // no plan id
+			$('.plan-actions').hide();
 		} else { // user selected a plan
 			var active = self.selected.get('name'); // get selected plan name
 			var active_id = self.selected.id; // get selected plan id
+			$('.plan-actions').show();
 		}
 		this.$('#dropdown-active').html(active); // write out active plan name to the top of the dropdown
 		this.$('span.active-plan-id').attr('id',active_id); // write out active plan id into the page
