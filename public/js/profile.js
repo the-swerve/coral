@@ -161,7 +161,7 @@ ProfileView = Backbone.View.extend({
 		$('#new-profile-plan-id').val($('span.active-plan-id').attr('id'));
 		// Tell the user what plan they are subscribing to above the form.
 		var activePlanName = $('#dropdown-active').html();
-		if(activePlanName != 'Everyone')
+		if(activePlanName != 'All plans')
 			$('#new-profile-plan-name').html('Subscribing to: ' + activePlanName);
 	},
 
