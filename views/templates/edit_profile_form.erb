@@ -1,7 +1,7 @@
 <script id='edit-profile-tmpl' type='text/template' class='hide'>
 	<div class="tabbable">
+		<h3 style="float:left;padding-right:1em;">{{name}}</h3>
 		<ul class="nav nav-tabs">
-			<h3 style="float:left;padding-right:1em;">{{name}}</h3>
 			<li class="active"><a href="#edit-profile-info" data-toggle="tab"><i class="icon-user"></i> Edit Info</a></li>
 			<li><a href="#edit-profile-payments" data-toggle="tab"><i class="icon-lock"></i> Payments</a></li>
 			<button type="button" class="close" data-dismiss="modal" style="float:right">x</button>
@@ -24,18 +24,29 @@
 			</div>
 
 			<div class="tab-pane" id="edit-profile-payments">
-				<div class="well">
-					<p>Subscribed to: {{subscription_names || 'none'}}
-				</div>
-				[[ if(!_.isEmpty(payment_methods)) { ]]
-					<p>Paying with "<em>{{_.first(payment_methods).name}}</em>" ({{_.first(payment_methods).pay_type}}) 
+				<h4>Subscriptions</h4>
+				<ul>
+					[[_.each(_subscriptions, function(s) { ]]
+						<li>
+						<p>{{s}} <a href='#' class='auto-tooltip unemph' title='Remove this subscription'>
+							<i class='icon-remove'></i> </a></p>
+						</li>
+					[[ }); ]]
+					<li><a href="#" class='auto-tooltip' title='Add a subscription'><i class='icon-plus'></i> new</a></li>
+				</ul>
+				[[ if(!_.isEmpty(_payment_methods)) { ]]
+					<p>Paying with "<em>{{_.first(_payment_methods).name}}</em>" ({{_.first(_payment_methods).pay_type}}) 
 					<a class="btn btn-success" id="new-charge-button" href="#"><strong>$</strong> Charge</a></p>
 				[[ } ]]
 
-			<div style="border-bottom:1px solid #DDD; margin-bottom: 1em">
-				<h4> New Payment Method</h4>
-			</div>
-				<form method="post" id="new-bank-account-form" class="form-horizontal">
+				<h4> Payment Methods</h4>
+				<ul>
+					[[ _.each(_payment_methods, function(p) { ]]
+						<li>p.name <a href='#' class='unemph'><i class='icon-remove'></i> </a></li>
+					[[ }); ]]
+						<li><a href="#"><i class='icon-plus'></i> new</a></li>
+				</ul>
+				<form method="post" id="new-bank-account-form" class="form-horizontal hide">
 
 					<div class="control-group"> <label class="control-label">Type</label>
 						<div class="controls"> <select><option>Card</option><option>E-check</option></select></div>
@@ -45,6 +56,9 @@
 						<input class="btn" id="new-payment-method-submit" name="commit" type="submit" value="Save" />
 					</div>
 				</form>
+
+				<h4> Payment History</h4>
+				<p>This subscriber's payment/transaction history</p>
 			</div>
 
 		</div>

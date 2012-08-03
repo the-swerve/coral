@@ -59,7 +59,7 @@ PlanView = Backbone.View.extend({
 		var self = this;
 
 		if(self.selected == 'all') {
-			var active = 'All plans'; // user selected all plans (default)
+			var active = 'Everyone'; // user selected all plans (default)
 			var active_id = ''; // no plan id
 			$('.plan-actions').hide();
 		} else { // user selected a plan

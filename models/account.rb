@@ -22,6 +22,10 @@ class Account
 
 	key :short_id, String
 	key :bank_name, String
+	key :escrow_total, Integer,
+		:default => 0
+	key :paidout_total, Integer,
+		:default => 0
 
 	validates_presence_of :password, :on => :create
 	validates_length_of :password, :minimum => 6, :if => :password
@@ -41,6 +45,11 @@ class Account
 
 	def charting_data
 		{:signups => self.signups_six_months} #, :revenue => self.revenue_six_months}
+	end
+
+	def pay_out
+		self.paidout_total += self.escrow_total
+		self.save
 	end
 
 	# Return the signups over the last six months
@@ -86,7 +95,9 @@ class Account
 		{:name => self.name.to_s,
 		 :email => self.email,
 		 :short_id => self.short_id,
-		 :bank_name => self.bank_name || 'none'}
+		 :bank_name => self.bank_name || 'none',
+		 :escrow_total => self.escrow_total,
+		 :paidout_total => self.paidout_total}
 #	 :plans => self.plans.map(&:as_hash)}
 	end
 

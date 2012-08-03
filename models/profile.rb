@@ -144,12 +144,17 @@ class Profile
 	def as_hash
 		{:name => self.name,
 		 :email => self.email,
-		 :subscription_names => self.subscription_list,
+		 :_subscriptions => self.subscriptions.map {|s| s.plan.name},
 		 :state => self.state,
 		 :id => self.id.to_s,
 		 :plan_id => self.subscriptions.all.map {|s| s.plan.id.to_s}.first || '',
-		 :payment_methods => self.payment_methods.all.map(&:as_hash),
-		 :created_at => self.created_at.to_date.to_s }
+		 :_payment_methods => self.payment_methods.all.map(&:as_hash),
+		 :created_at => self.created_at.to_date.to_s,
+		 :total_paid => self.total_paid.to_s}
+	end
+
+	def total_paid
+		charges.where(:state => 'Paid').map(&:amount).sum || 0
 	end
 
 	def subscription_list

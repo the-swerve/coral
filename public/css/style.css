@@ -47,3 +47,7 @@ div.form-actions {
   -moz-box-shadow: 0 0 7px 3px #BBB;
   box-shadow: 0 0 7px 3px #BBB;
 }
+
+.unemph {
+	color: gray
+}

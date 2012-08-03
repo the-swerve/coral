@@ -4,6 +4,7 @@
 			<h3 style="float:left;padding-right:1em;">Account Settings</h3>
 			<li class="active auto-tooltip" title="Edit info"><a href="#account-info" data-toggle="tab"><i class="icon-user"></i> Your Info</a></li>
 			<li><a href="#account-money" data-toggle="tab"><i class="icon-lock"></i> Your Money</a></li>
+			<li><a href="#account-sharing" data-toggle="tab"><i class="icon-globe"></i> Sharing</a></li>
 			<button type="button" class="close" data-dismiss="modal" style="float:right">x</button>
 		</ul>
 
@@ -36,10 +37,11 @@
 				</div>
 			</form>
 		</div>
+
 		<div class="tab-pane" id="account-money">
 			<div class="well">
-				<p>In escrow: $0</p>
-				<p>Total received: $0</p>
+				<p>In escrow: ${{escrow_total}}</p>
+				<p>Total received: ${{paidout_total}}</p>
 				<p><a href="#" class="btn btn-success">Pay out</a></p>
 			</div>
 			[[ if(bank_name == 'none') { ]]
@@ -60,6 +62,10 @@
 			[[ } else { ]]
 				<p>Connected bank account: {{bank_name}}</p>
 			[[ } ]]
+		</div>
+		<div class="tab-pane" id="account-sharing">
+			<p>Sharing your account: add custom colors and a banner to your public
+			page, get code to embed a list of your plans on your own site.</p>
 		</div>
 	</div>
 </div>
