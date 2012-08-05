@@ -15,13 +15,13 @@ class Plan
 
 	# Fields
 
-	field :name, String,
-	field :amount, Float,
-	field :cycle_length, Integer,
-	field :cycle_type, String,
-	field :initial_charge, Float
-	field :description, String
-	field :short_id, String
+	field :name, type: String
+	field :amount, type: Float
+	field :cycle_length, type: Integer
+	field :cycle_type, type: String
+	field :initial_charge, type: Float
+	field :description, type: String
+	field :short_id, type: String
 
 	# Validations
 
@@ -33,7 +33,6 @@ class Plan
 		format: {with: /^(month|day|week|year)?s?$/}
 	validates :cycle,
 		format: {with: /^\d (month|day|week|year)s?$/}
-	validate :trial_length_requires_trial_type
 	validate :cycle_length_requires_cycle_type
 	validate :unique_name_for_account
 
@@ -43,8 +42,8 @@ class Plan
 
   # Associations
 	belongs_to :account
-	many :subscriptions, :dependent => :destroy
-	many :charges
+	has_many :subscriptions, :dependent => :destroy
+	has_many :charges
 
 	def as_hash
 		{:name => self.name,
@@ -74,13 +73,6 @@ class Plan
 
 	private
 
-	def trial_length_requires_trial_type
-    if self.trial_length && !self.trial_type
-      errors.add(:trial_length, 'requires a trial type')
-		elsif self.trial_type && !self.trial_length
-      errors.add(:trial_type, 'requires a trial length')
-    end
-	end
 	def cycle_length_requires_cycle_type
     if self.cycle_length && !self.cycle_type
       errors.add(:cycle_length, 'requires a cycle type')

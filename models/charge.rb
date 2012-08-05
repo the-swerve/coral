@@ -13,16 +13,16 @@ class Charge
 
 	# Fields
 
-	field :amount, Integer
-	field :name, String
-	field :due_date, Date
-	field :state, String
+	field :amount, type: Integer
+	field :name, type: String
+	field :due_date, type: Date
+	field :state, type: String
 
 	# Validations
 
-	validates :amount, required: true
-	validates :name, required: true
-	validates :due_date, required: true
+	validates :amount, presence: true
+	validates :name, presence: true
+	validates :due_date, presence: true
 	validates :amount,
 		numericality: {greater_than: 0}
 	validate :due_date_in_future

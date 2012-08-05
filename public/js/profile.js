@@ -19,13 +19,13 @@ ProfileView = Backbone.View.extend({
 
 	initialize: function(options) {
 		this.collection.bind('reset', this.renderTable, this);
+		this.plans = options.plans;
 	},
 
 	events: {
 		'click #new-profile-button': 'renderNewForm',
 		'click #new-profile-submit': 'create',
 		'click .edit-profile-button': 'renderEditForm',
-		'change:_payment_methods': 'renderEditForm',
 		'click #edit-profile-submit': 'update',
 		'click #remove-profile-button': 'renderRemoveForm',
 		'click #remove-profile-submit': 'destroy',
@@ -152,18 +152,20 @@ ProfileView = Backbone.View.extend({
 	},
 
 	renderNewForm: function(e) {
-		e.preventDefault();
+		if(e) e.preventDefault();
+		var self = this;
 		$('p#profile-error').html(''); // clear errors
 		$('form#new-profile-form input').val(''); // clear form
 		$('div#new-profile').modal('show'); // display new profile dialog
-		// In the plan dropdown, fetch the active plan id and put it into the form
-		// This way we can simulatenously create new subscriptions by sending
-		// plan_short_id to the server.
-		$('#new-profile-plan-id').val($('span.active-plan-id').attr('id'));
-		// Tell the user what plan they are subscribing to above the form.
-		var activePlanName = $('#dropdown-active').html();
-		if(activePlanName != 'All plans')
-			$('#new-profile-plan-name').html('Subscribing to: ' + activePlanName);
+		// render the new payment method template
+		var pm_tmpl = _.template($('#new-payment-method-tmpl').html());
+		$('#new-profile-payment-method').html(pm_tmpl({}));
+		// render the new subscription template
+		// this is made complicated by the fact that we have to load the available plans into the dropdown
+		var sub_tmpl = _.template($('#new-profile-sub-tmpl').html());
+		// filter out the auto-selected plan from the dropdown options
+		var unselected = this.plans.filter(function(p) { return p != self.plans.selected });
+		$('#new-profile-sub').html(sub_tmpl({plans: unselected, selected: this.plans.selected}));
 	},
 
 	renderEditForm: function(e) {
@@ -255,4 +257,17 @@ PMView = Backbone.View.extend({
 	},
 
 
+});
+
+SubView = Backbone.View.extend({
+	initialize: function(options) {
+	},
+
+	events: {
+		'change #new-sub-selector': 'showStarting',
+	},
+
+	showStarting: function() {
+		$('#new-sub-starting-date').removeClass('hide');
+	},
 });

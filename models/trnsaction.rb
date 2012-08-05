@@ -11,19 +11,19 @@ class Trnsaction
 
 	# Fields
 
-	field :amount, Integer,
-	field :action, String,
-	field :successful, String,
-	field :message, String,
+	field :amount, type: Integer
+	field :action, type: String
+	field :successful, type: String
+	field :message, type: String
 
 	# Validations
 	
-	validates :amount, required: true
+	validates :amount, presence: true
 	validates :action,
-		required: true,
+		presence: true,
 		inclusion: {in: ['Payment','Void']}
-	validates :successful, required: true
-	validates :message, required: true
+	validates :successful, presence: true
+	validates :message, presence: true
 
 	# Associations
 

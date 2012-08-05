@@ -9,7 +9,9 @@ Plan = Backbone.Model.extend({
 PlanCollection = Backbone.Collection.extend({
 	model: Plan,
 	url: '/plans',
-	initialize: function() { }
+	initialize: function() {
+		this.selected = null;	
+	}
 });
 
 PlanView = Backbone.View.extend({
@@ -59,26 +61,28 @@ PlanView = Backbone.View.extend({
 	render: function() {
 		var self = this;
 
-		if(self.selected == 'all') {
-			var active = 'All plans'; // user selected all plans (default)
+		if(this.selected == 'all') {
+			this.collection.selected = null;
+			var active_name = 'Everyone'; // user selected all plans (default)
 			var active_id = ''; // no plan id
 			$('.plan-actions').hide();
 		} else { // user selected a plan
-			var active = self.selected.get('name'); // get selected plan name
-			var active_id = self.selected.id; // get selected plan id
+			var active_name = this.selected.get('name'); // get selected plan name
+			var active_id = this.selected.id; // get selected plan id
+			this.collection.selected = this.collection.get(active_id);
 			$('.plan-actions').show();
 		}
-		this.$('#dropdown-active').html(active); // write out active plan name to the top of the dropdown
+		this.$('#dropdown-active').html(active_name); // write out active plan name to the top of the dropdown
 		this.$('span.active-plan-id').attr('id',active_id); // write out active plan id into the page
 
 		var list = _.template(this.$('#plan-header-tmpl').html()); // compile template for plan name/dropdown
 		var notSelected = self.collection.filter(function(plan) { // filter out the selected plan for the dropdown items
-			return plan.get('name') != active;
+			return plan.get('name') != active_name;
 		});
 		this.$('.dropdown-menu').html(list({plans: notSelected})); // render dropdown template
 
 		var desc = _.template(this.$('#plan-desc-tmpl').html()); // compile template for the plan description
-		this.$('.plan-desc').html(desc({plan: self.selected})); // render tmpl
+		this.$('.plan-desc').html(desc({plan: this.selected})); // render tmpl
 
 		return this; // for chaining methods on this view
 	},

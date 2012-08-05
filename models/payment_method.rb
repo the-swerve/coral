@@ -12,10 +12,10 @@ class PaymentMethod
 
 	# Fields
 
-	field :name, String
-	field :active, Boolean
-	field :pay_type, String
-	field :last4, String
+	field :name, type: String
+	field :active, type: Boolean
+	field :pay_type, type: String
+	field :last4, type: String
 
 	# Validations
 

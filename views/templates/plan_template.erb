@@ -1,7 +1,7 @@
 
 <script id='plan-header-tmpl' type='text/template' class='hide'>
 			[[ if($('.active-plan-id').attr('id') != '') { ]]
-				<li><a class="dropdown-item" href="#" id='all-plans-select'>All plans</a></li>
+				<li><a class="dropdown-item" href="#" id='all-plans-select'>Everyone</a></li>
 			[[ } if(_.isEmpty(plans)) { ]]
 				<li><a href="#" id="new-plan-button">Create a plan</a></li>
 			[[ } else { ]]
@@ -24,7 +24,7 @@
 <ul id="plan-nav" class="nav nav-pills">
 	<li class="dropdown">
 		<a rel="tooltip" title="Select a plan" class="dropdown-toggle auto-tooltip-top" data-toggle="dropdown" href="">
-			<i class="icon-chevron-down"></i> <strong id="dropdown-active"> All plans</strong><span class='active-plan-id' id=""></span>
+			<i class="icon-chevron-down"></i> <strong id="dropdown-active"> Everyone</strong><span class='active-plan-id' id=""></span>
 		</a>
 		<ul class="dropdown-menu">
 			<!-- plan-header-tmpl goes here -->

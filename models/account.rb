@@ -7,27 +7,26 @@ class Account
 	include Mongoid::Timestamps
 	include BCrypt
 
-	attr_accessor :password, :email, :session_token
+	attr_accessor :password
 
 	# Fields
 
-	field :email, String
-	field :pass_hash, String
-	field :session_token, String
-	field :name, String
-	field :bank_name, String
+	field :email, type: String
+	field :pass_hash, type: String
+	field :session_token, type: String
+	field :name, type: String
+	field :bank_name, type: String
 
 	# Validations
 
 	validates :email,
-		required: true,
+		presence: true,
 		uniqueness: true,
 		format: {with: /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/}
 	validates :pass_hash,
-		required: true
+		presence: true
 	validates :password,
-		presence: {on: :create},
-		length: {minimum: 8}
+		length: {minimum: 6, on: :create}
 
   # Associations
 
@@ -48,7 +47,9 @@ class Account
 
 	def generate_session_token
 		self.session_token = rand(36**8).to_s(36)
-		self.save
+		self.save!
+		puts self.attributes
+		puts self.errors.to_hash
 		return self.session_token
 	end
 	def destroy_session_token

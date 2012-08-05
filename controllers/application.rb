@@ -50,16 +50,17 @@ class Application < Sinatra::Base
 		puts request.request_method + ' '+ request.fullpath
 		puts request.cookies['coral.session_token']
 		toke = request.cookies['coral.session_token'] || @params['session_token']
+		puts 'toke: ' + toke.to_s
 		if toke
-			@account = Account.first(:session_token => toke)
-			@profile_user = Profile.first(:session_token => toke)
+			@account = Account.where(session_token: toke).first
+			@profile_user = Profile.where(session_token: toke).first
 		end
 		puts @account.email if @account
 		puts @profile_user.email if @profile_user
 		@current_user = @account || @profile_user
 	end
 
-	error { halt 501, env['sinatra.error'].name }
+	error { halt 501, 'There was an error :/'}
 	not_found { halt 404, 'not found  (404)' }
 
 	get '/' do
@@ -70,8 +71,8 @@ class Application < Sinatra::Base
 
 	post '/' do
 		if @params['auth']
-			@account = Account.first(:email => @params['auth']['email'])
-			@profile_user = Profile.first(:email => @params['auth']['email'])
+			@account = Account.where(email: @params['auth']['email']).first
+			@profile_user = Profile.where(email: @params['auth']['email']).first
 			if @account && @account.authenticate(@params['auth']['password'])
 				@current_user = @account
 				json :session_token => @account.generate_session_token, :account => @account.as_hash

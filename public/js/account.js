@@ -2,7 +2,6 @@
 
 Account = Backbone.Model.extend({
 	url: '/account',
-	idAttribute: 'short_id',
 	initialize: function() { }
 });
 

@@ -12,7 +12,7 @@ class Profile
 
 	# Accessors
 
-	attr_accessor :email, :name, :password, :plan_id
+	attr_accessor :password, :plan_id
 
 	# Data
 
@@ -54,6 +54,12 @@ class Profile
 		# Capitalize each word of the name
 		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
   end
+
+	after_create do
+		if self.plan_id && self.plan_id != ''
+			p = Plan.find(self.plan_id)
+		end
+	end
 
 	# States
 
@@ -136,7 +142,6 @@ class Profile
 		{:name => self.name,
 		 :email => self.email,
 		 :_subscriptions => self.subscriptions.map(&:as_hash),
-		 :_transactions => self.trnsactions.map(&:as_hash),
 		 :state => self.state,
 		 :id => self.id.to_s,
 		 :plan_id => self.subscriptions.map {|s| s.plan.id.to_s}.first || '',

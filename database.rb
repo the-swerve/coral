@@ -1,4 +1,7 @@
+require 'mongoid'
+require 'mongo'
 require 'uri'
+require 'logger'
 
 # Heroku database setup:
 # 1. Add the MongoHQ add-on
@@ -17,18 +20,13 @@ class Database
 	def initialize(env)
 		env = 'dev' unless ENVS.include? env # Fall back to dev if given invalid env
 
-		# Heroku will supply a 'MONGOHQ_URL' environment variable
 		if ENV['MONGOHQ_URL']
-			# https://devcenter.heroku.com/articles/mongohq
-			db = URI.parse ENV['MONGOHQ_URL']
-			db_name = db.path.gsub(/^\//, '')
-			@conn = Mongo::Connection.new(db.host, db.port).db(db_name)
-			@conn.authenticate(db.user, db.password) # heroku/deep sea creature
-			Mongoid.connection.connect
-		else # we're in dev
-			@conn = Mongo::Connection.new('localhost', 27017).db(env)
+			Mongoid.load! './config/db.yml', :production
+		else
+			Mongoid.load! './config/db.yml', :development
 		end
-		@conn
+		Mongoid.logger = Logger.new('./log/mongoid.log')
+		Moped.logger = Logger.new('./log/moped.log')
 	end
 
 	def clear

@@ -13,11 +13,11 @@ class Subscription
 
 	# Fields
 
-	field :expiration_date, Date
-	field :short_id, String
-	field :state, String
-	field :next_due, Date
-	field :starting, Date
+	field :expiration_date, type: Date
+	field :short_id, type: String
+	field :state, type: String
+	field :next_due, type: Date
+	field :starting, type: Date
 
 	# Associations
 

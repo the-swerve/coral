@@ -50,8 +50,9 @@
 			var ba_view = new BAView({model: Coral.account.model, el: $('div#account')});
 			var plan_view = new PlanView({collection: Coral.plans.coll, el: $('div.container')});
 
-			var profile_view = new ProfileView({collection: Coral.profiles.coll, el: $('div.container')});
+			var profile_view = new ProfileView({collection: Coral.profiles.coll, el: $('div.container'), plans: Coral.plans.coll});
 			var pm_view = new PMView({collection: Coral.profiles.coll, el: $('div.container')});
+			var sub_view = new SubView({collection: Coral.profiles.coll, el: $('div.container')});
 			var charge_view = new ChargeView({collection: Coral.charges.coll, el: $('div.container')});
 			var chart_view = new ChartView({el: $('div.container')});
 
@@ -59,7 +60,6 @@
 			Coral.account.model.set(<%= @account.as_hash.to_json %>);
 			Coral.plans.coll.reset(<%= @account.plans.map(&:as_hash).to_json %>);
 			Coral.profiles.coll.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
-			Coral.charges.coll.reset(<%= @account.charges.map(&:as_hash).to_json %>);
 
 			// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
 			$('.auto-tooltip').tooltip({placement: 'bottom'});
