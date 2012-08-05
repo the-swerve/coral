@@ -1,4 +1,4 @@
-require 'mongo_mapper'
+require 'mongoid'
 require 'bcrypt'
 require 'state_machine'
 
@@ -6,63 +6,54 @@ class Profile
 
 	# Inclusions
 
-	include MongoMapper::Document
+	include Mongoid::Document
+	include Mongoid::Timestamps
 	include BCrypt
 
 	# Accessors
 
-	attr_accessor :email, :name, :password, :plan_id, :invited
+	attr_accessor :email, :name, :password, :plan_id
 
 	# Data
 
-	key :email, String,
-		:required => true,
-		:format => /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/,
-		:unique => true
-	key :pass_hash, String
-	key :short_id, String
-	key :name, String
-	key :state, String
-	key :session_token, String
-	timestamps!
+	field :email, type: String
+	field :pass_hash, type: String
+	field :name, type: String
+	field :state, type: String
+	field :session_token, type: String
+	field :account_ids, type: Array
 
 	# Validations
 
-	validates_length_of :password, :minimum => 6, :if => :password
+	validates :password,
+		length: {minimum: 8}
+	validates :email,
+		presence: true,
+		uniqueness: true,
+		format: {with: /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/}
 
   # Associations
 
-  belongs_to :account
-	many :subscriptions, :dependent => :destroy
-	many :plans, :through => :subscriptions
-	many :payment_methods, :dependent => :destroy
-	many :charges
-	many :trnsactions, :through => :charges
+  has_and_belongs_to_many :accounts
+	has_many :subscriptions, :dependent => :destroy
+	has_many :payment_methods, :dependent => :destroy
+	has_many :charges
 
   # Callbacks
 
   before_validation(:on => :create) do
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
-		self.short_id = self.id
-		self.name ||= '' # hmm
 	end
 
   before_validation do
 		# Use bcrypt to generate the pass hash/salt
-		self.pass_hash = Password.create(self.password)
+		self.pass_hash = Password.create(self.password) if self.password
 	end
 
   before_save do
-		# Split name by spaces, capitalize each word
+		# Capitalize each word of the name
 		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
   end
-
-	after_create do 
-		if plan_id && plan_id != ""
-			found_plan = account.plans.find(self.plan_id)
-			subscriptions.create!(:plan_id => found_plan.id) if found_plan
-		end
-	end
 
 	# States
 
@@ -144,11 +135,12 @@ class Profile
 	def as_hash
 		{:name => self.name,
 		 :email => self.email,
-		 :subscription_names => self.subscription_list,
+		 :_subscriptions => self.subscriptions.map(&:as_hash),
+		 :_transactions => self.trnsactions.map(&:as_hash),
 		 :state => self.state,
 		 :id => self.id.to_s,
-		 :plan_id => self.subscriptions.all.map {|s| s.plan.id.to_s}.first || '',
-		 :payment_methods => self.payment_methods.all.map(&:as_hash),
+		 :plan_id => self.subscriptions.map {|s| s.plan.id.to_s}.first || '',
+		 :_payment_methods => self.payment_methods.map(&:as_hash),
 		 :created_at => self.created_at.to_date.to_s }
 	end
 

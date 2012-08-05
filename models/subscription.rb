@@ -1,30 +1,37 @@
-require 'mongo_mapper'
+require 'mongoid'
 require 'active_support/core_ext' # for date operations
 require 'state_machine'
 
 class Subscription
 
-	include MongoMapper::Document
+	# Inclusions
 
-	key :expiration_date, Date
-	key :short_id, String
-	key :state, String
-	key :next_due, Date
-	key :starting, Date
+	include Mongoid::Document
+	include Mongoid::Timestamps
 
-	timestamps!
+	# Accessors
+
+	# Fields
+
+	field :expiration_date, Date
+	field :short_id, String
+	field :state, String
+	field :next_due, Date
+	field :starting, Date
 
 	# Associations
-	many :charges
+
+	has_many :charges
 	belongs_to :profile
 	belongs_to :plan
 
 	# Validations
-	# validate  :requires_payment_method ## XXX only want this on invited => recurring
+
 	validate  :must_not_be_overdue
-	validates_presence_of :plan_id
+	validates :plan_id, presence: true
 
 	# Callbacks
+
 	before_validation(:on => :create) do
 		self.short_id = self.id
 	end
@@ -78,8 +85,7 @@ class Subscription
 
 	def as_hash
 		{:expiration_date => self.expiration_date.to_s,
-		 :plan => self.plan.name,
-		 :profile => self.profile.name}
+		 :plan => self.plan.as_hash}
 	end
 
 	def balance

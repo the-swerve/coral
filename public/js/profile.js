@@ -10,14 +10,14 @@ Profile = Backbone.Model.extend({
 ProfileCollection = Backbone.Collection.extend({
 	model: Profile,
 	url: '/profiles',
-	initialize: function() { }
+	initialize: function() { this.selected = null; }
 });
 
 ProfileView = Backbone.View.extend({
-	id: 'profile',
-	req: false,
 
-	initialize: function() {
+	req: false, // used to block simultaneous requests (prevent the form submit from being clicked repeatedly)
+
+	initialize: function(options) {
 		this.collection.bind('reset', this.renderTable, this);
 	},
 
@@ -25,14 +25,15 @@ ProfileView = Backbone.View.extend({
 		'click #new-profile-button': 'renderNewForm',
 		'click #new-profile-submit': 'create',
 		'click .edit-profile-button': 'renderEditForm',
+		'change:_payment_methods': 'renderEditForm',
 		'click #edit-profile-submit': 'update',
 		'click #remove-profile-button': 'renderRemoveForm',
 		'click #remove-profile-submit': 'destroy',
 		'click .dropdown-item': 'renderTable',
-		'click #share-plan-submit': 'sharePlan',
+		'click #share-plan-submit': 'invitePeople',
 	},
 
-	sharePlan: function(e) {
+	invitePeople: function(e) {
 		e.preventDefault();
 		if(this.req == false) {
 			this.req = true; // block other requests
@@ -166,15 +167,19 @@ ProfileView = Backbone.View.extend({
 	},
 
 	renderEditForm: function(e) {
-		e.preventDefault();
-		this.$('p#edit-profile-error').html(''); // clear errors
-		var selectedProfile = this.collection.get($(e.currentTarget).attr('id'));
+		if(e) e.preventDefault();
+		this.collection.selected = this.collection.get($(e.currentTarget).attr('id'));
+		$('p#edit-profile-error').html(''); // clear form errors
 
 		// Compile and render form template
-		var form = _.template($('#edit-profile-tmpl').html());
-		$('div#edit-profile div.modal-body').html(form(selectedProfile.attributes));
+		var hdr = _.template($('#edit-profile-header-tmpl').html());
+		var info = _.template($('#edit-profile-info-tmpl').html());
+		var payments = _.template($('#edit-profile-payments-tmpl').html());
+		attrs = this.collection.selected.attributes;
+		edit_view = hdr(attrs) + info(attrs) + payments(attrs); // render template
+		$('div#edit-profile div.modal-body').html(edit_view);
 
-		this.$('div#edit-profile').modal('show'); // display new profile dialog
+		$('div#edit-profile').modal('show'); // display new profile dialog
 	},
 
 	renderRemoveForm: function(e) {
@@ -183,5 +188,71 @@ ProfileView = Backbone.View.extend({
 		$('p#remove-profile-error').html('');
 		$('div#remove-profile').modal('show');
 	},
+
+});
+
+PMView = Backbone.View.extend({
+	req: false,
+
+	initialize: function(options) {
+	},
+
+	events: {
+		'click #new-payment-method-button': 'render',
+		'click #new-payment-method-submit': 'create',
+		'click #back-from-new-pm': 'goBack',
+		'change #new-payment-method-type': 'getType',
+	},
+
+	render: function(e) {
+		if(e) e.preventDefault();
+		var tmpl = _.template($('#new-payment-method-tmpl').html());
+		$('div#edit-profile-payments').html(tmpl(this.collection.selected.toJSON()));
+	},
+
+	getType: function(e) {
+		var sel = $('#new-payment-method-type option:selected').text();
+		if(sel == 'Credit Card') {
+			$('#echeck-selected').hide();
+			$('#credit-card-selected').show();
+		} else if(sel == 'E-check') {
+			$('#credit-card-selected').hide();
+			$('#echeck-selected').show();
+		}
+	},
+
+	goBack: function(e) {
+		if(e) e.preventDefault();
+		var payments = _.template($('#edit-profile-payments-tmpl').html());
+		$('div#edit-profile-payments').html(payments(this.collection.selected.attributes));
+	},
+
+	create: function(e) {
+		if(e) e.preventDefault();
+		if(this.req == false) {
+			this.req = true;
+			var self = this;
+			$('input#new-payment-method-submit').toggleSubmit();
+			var profile = this.collection.selected;
+			$.ajax({
+				type: 'post',
+				url: '/profiles/' + profile.id + '/payment_methods',
+				dataType: 'json',
+				data: $('#new-payment-method-form').serializeObject(),
+				success: function(d) {
+					$('input#new-payment-method-submit').toggleSubmit();
+					profile.get('_payment_methods').push(d);
+					self.goBack();
+					self.req = false;
+				},
+				error: function(d) {
+					$('p#new-payment-method-error').html(d.responseText);
+					$('input#new-payment-method-submit').toggleSubmit();
+					self.req = false;
+				}
+			});
+		}
+	},
+
 
 });

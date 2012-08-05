@@ -94,9 +94,9 @@ $(document).ready(function() {
 
 	// A little logo hover fade effect
 	$('a.logo').hover(function(event) {
-			$(this).fadeTo('fast',0.6);
-		}, function(event) {
 			$(this).fadeTo('fast',1);
+		}, function(event) {
+			$(this).fadeTo('fast',0.4);
 	});
 
 });

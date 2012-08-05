@@ -1,39 +1,41 @@
-require 'mongo_mapper'
+require 'mongoid'
 
 class Plan
 
-	include MongoMapper::Document
+	# Inclusions
 
-	attr_accessor :cycle, :url
+	include Mongoid::Document
+	include Mongoid::Timestamps
 
-	key :name, String,
-		:required => true
+	# Accessors
+	# cycle represents the whole-string version of the billing cycle, such as '3
+	# months' or '1 month' and so on, which we can parse into the integer and the
+	# type after receiving it (for convenience to the api user)
+	attr_accessor :cycle
 
-	key :amount, Float,
-		:required => true
+	# Fields
 
-	key :cycle_length, Integer,
-		:required => true
-	key :cycle_type, String,
-		:required => true,
-		:format => /^(month|day|week|year)?s?$/
+	field :name, String,
+	field :amount, Float,
+	field :cycle_length, Integer,
+	field :cycle_type, String,
+	field :initial_charge, Float
+	field :description, String
+	field :short_id, String
 
-	key :initial_charge, Float
+	# Validations
 
-	key :trial_length, Integer
-	key :trial_type, String,
-		:format => /^(month|day|week|year)?s?$/
-
-	key :description, String
-
-	key :short_id, String
-
+	validates :name, presence: true
+	validates :amount, presence: true
+	validates :cycle_length, presence: true
+	validates :cycle_type,
+		presence: true,
+		format: {with: /^(month|day|week|year)?s?$/}
+	validates :cycle,
+		format: {with: /^\d (month|day|week|year)s?$/}
 	validate :trial_length_requires_trial_type
 	validate :cycle_length_requires_cycle_type
 	validate :unique_name_for_account
-	validates_format_of :cycle, :with => /^\d (month|day|week|year)s?$/
-
-	timestamps!
 
 	# Callbacks
 	before_validation :defaults, :on => :create
@@ -42,7 +44,6 @@ class Plan
   # Associations
 	belongs_to :account
 	many :subscriptions, :dependent => :destroy
-	many :profiles, :through => :subscriptions
 	many :charges
 
 	def as_hash

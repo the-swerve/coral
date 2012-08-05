@@ -1,22 +1,44 @@
-require 'mongo_mapper'
+require 'mongoid'
 
 class PaymentMethod
 
-	include MongoMapper::Document
+	# Inclusions
 
-	key :name, String,
-		:required => true
-	key :active, Boolean
-	key :pay_type, String
+	include Mongoid::Document
 
-	key :short_id, String
+	# Accessors
 
-	timestamps!
+	attr_accessor :cc_number, :acct_number
+
+	# Fields
+
+	field :name, String
+	field :active, Boolean
+	field :pay_type, String
+	field :last4, String
+
+	# Validations
+
+	validates :pay_type, presence: {on: :create}
+	validates :last4, presence: {on: :create}
 
 	# Associations
+
 	belongs_to :profile
 
-	before_validation :defaults, :on => :create
+	# Callbacks
+
+	before_validation(:on => :create) do
+		self.name ||= self.pay_type + ' *' if self.pay_type
+		if self.cc_number == '' && self.pay_type == 'Credit Card'
+			self.errors.add('', 'missing credit card number')
+		elsif self.acct_number == '' && self.pay_type == 'E-check'
+			self.errors.add('', 'missing bank account number')
+		end
+		n = self.cc_number != '' ? self.cc_number : self.acct_number != '' ? self.acct_number : ''
+		self.last4 = n.to_s[-4..-1]
+		self.name += self.last4
+	end
 
 	def as_hash
 		{:name => self.name,
@@ -24,11 +46,12 @@ class PaymentMethod
 		:pay_type => self.pay_type}
 	end
 
-	def defaults
-		self.name ||= 'Automatic payment method # ' + (self.profile.payment_methods.size + 1).to_s
-		self.short_id = self.id
-		self.active = true
-		self.pay_type = 'card'
+	def first_error
+		## Return the very first error in a readable string
+		# Get the field name of the first error
+		# then get the message for the field name of the first error
+		self.errors.to_hash.first.first.to_s +
+			' ' + self.errors.to_hash.first.second.first.to_s
 	end
 
 end

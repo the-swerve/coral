@@ -1,0 +1,17 @@
+<p id="charge-error"></p>
+<p id='new-charge-payee'></p>
+<p id='new-charge-towards'></p>
+<form method="post" action="/charges" id="new-charge-form">
+	<input id="new-charge-id" type="hidden" />
+	<label>Label</label>
+	<input class="auto-tooltip" rel="tooltip" title="What is this charge for?" id="new-charge-name" type="text" name="name" />
+	<label>Amount</label>
+	<div class="input-prepend">
+		<span class="add-on">$</span>
+		<input id="new-charge-amount" type="text" name="amount" style="width:4em;" />
+	</div>
+	<label>Pay Date</label>
+	<input class="auto-tooltip" id="new-charge-due-date" type="date" name="due_date" title="Delay this charge to a future date (optional)."/> 
+	<input id="new-charge-profile-id" type="hidden" name="profile_id"/> 
+	<input id="new-charge-plan-id" type="hidden" name="ignore"/> 
+</form>

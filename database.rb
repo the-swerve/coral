@@ -1,5 +1,3 @@
-require 'log_buddy'
-require 'mongo_mapper'
 require 'uri'
 
 # Heroku database setup:
@@ -17,52 +15,24 @@ class Database
 	ENVS = ['dev','prod','test']
 
 	def initialize(env)
-		# Fall back to dev if given invalid env
-		env = 'development' unless ENVS.include? env
-		# Set configuration settings
-		@config = {
-			'test' => {
-				'host' => 'localhost',
-				'port' => '27017',
-				'database' => 'coral_test',
-				'logfile' => 'test.log'
-			}, 'dev' => {
-				'host' => 'localhost',
-				'port' => '27017',
-				'database' => 'coral_dev',
-				'logfile' => 'development.log'
-			}, 'prod' => {
-				'host' => 'localhost',
-				'port' => '27017',
-				'database' => 'coral_prod',
-				'logfile' => 'production.log'
-			}, 'environment' => env
-		}
-		# Initialize env-specific vars for brevity
-		env  = @config['environment']
-		host = @config[env]['host']
-		port = @config[env]['port']
-		name = @config[env]['database']
-		log  = @config[env]['logfile']
+		env = 'dev' unless ENVS.include? env # Fall back to dev if given invalid env
 
 		# Heroku will supply a 'MONGOHQ_URL' environment variable
 		if ENV['MONGOHQ_URL']
-			uri = URI.parse(ENV['MONGOHQ_URL'])
-			MongoMapper.connection = Mongo::Connection.new(uri.host, uri.port)
-			MongoMapper.database = uri.path.gsub(/^\//,'')
-			MongoMapper.database.authenticate('heroku', 'deep sea creature')
-			MongoMapper.connection.connect
+			# https://devcenter.heroku.com/articles/mongohq
+			db = URI.parse ENV['MONGOHQ_URL']
+			db_name = db.path.gsub(/^\//, '')
+			@conn = Mongo::Connection.new(db.host, db.port).db(db_name)
+			@conn.authenticate(db.user, db.password) # heroku/deep sea creature
+			Mongoid.connection.connect
 		else # we're in dev
-			logger = Logger.new('./log/'+log)
-			LogBuddy.init(:logger => logger)
-			MongoMapper.connection = Mongo::Connection.new(host,port,:logger => logger)
-			MongoMapper.database = name
-			MongoMapper.connection.connect
+			@conn = Mongo::Connection.new('localhost', 27017).db(env)
 		end
+		@conn
 	end
 
 	def clear
-		MongoMapper.database.collections.each { |c| c.remove }
+		Mongoid.purge!
 	end
 
 

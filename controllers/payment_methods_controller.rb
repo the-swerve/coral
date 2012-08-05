@@ -4,22 +4,22 @@ class Application < Sinatra::Base
 
 	# Payment methods
 
-	post '/profiles/:profile_id/payment_methods', :auth => :account do
-		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
+	post '/profiles/:profile_id/payment_methods/?', :auth => :account do
+		@profile = @account.profiles.find params['profile_id']
 		if @profile
-			@payment_method = @profile.payment_methods.build params[:payment_method]
+			@payment_method = @profile.payment_methods.build @params
 			if @payment_method.save
-				json :success => true, :payment_method => @payment_method.as_hash
+				json @payment_method.as_hash
 			else
-				json :success => false, :errors => @payment_method.errors.to_hash
+				halt 400, @payment_method.first_error
 			end
 		else
-			json :success => false, :message => 'profile not found'
+			halt 400, 'profile not found'
 		end
 	end
 
 	get '/profiles/:profile_id/payment_methods', :auth => :account do
-		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			@payment_methods = @profile.payment_methods.all.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
 			json :success => true, :payment_methods => @payment_methods
@@ -29,7 +29,7 @@ class Application < Sinatra::Base
 	end
 
 	get '/profiles/:profile_id/payment_methods/:payment_method_id', :auth => :account do
-		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			@payment_method = @profile.payment_methods.first(:short_id => params['payment_method_id'].to_i)
 			if @payment_method
@@ -43,7 +43,7 @@ class Application < Sinatra::Base
 	end
 
 	put '/profiles/:profile_id/payment_methods/:payment_method_id', :auth => :account do
-		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			@payment_method = @profile.payment_methods.first(:short_id => params['payment_method_id'].to_i)
 			if @payment_method
@@ -61,7 +61,7 @@ class Application < Sinatra::Base
 	end
 
 	delete '/profiles/:profile_id/payment_methods/:payment_method_id', :auth => :account do
-		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile
 			@payment_method = @profile.payment_methods.first(:short_id => params['payment_method_id'].to_i)
 			if @payment_method

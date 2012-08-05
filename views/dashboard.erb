@@ -31,26 +31,35 @@
 
 	<script>
 		// Initialize backbone models
-		var account = new Account();
-		var plans = new PlanCollection();
-		var profiles = new ProfileCollection();
-		var charges = new ChargeCollection();
+		Coral = {}; // application-level namespace
+		Coral.account = {};
+		Coral.plans = {};
+		Coral.profiles = {};
+		Coral.charges = {};
+
+		Coral.account.model = new Account();
+		Coral.plans.coll = new PlanCollection();
+		Coral.profiles.coll = new ProfileCollection();
+		Coral.charges.coll = new ChargeCollection();
+		Coral.ev = _.extend({}, Backbone.Events); // app-wide event aggregator
 
 		$(document).ready(function() {
 
 			// Initialize backbone views
-			var account_view = new AccountView({model: account, el: $('div#account')});
-			var ba_view = new BAView({model: account, el: $('div#account')});
-			var plan_view = new PlanView({collection: plans, el: $('div.container')});
-			var profile_view = new ProfileView({collection: profiles, el: $('div.container')});
-			var charge_view = new ChargeView({collection: charges, el: $('div.container')});
+			var account_view = new AccountView({model: Coral.account.model, el: $('div#account')});
+			var ba_view = new BAView({model: Coral.account.model, el: $('div#account')});
+			var plan_view = new PlanView({collection: Coral.plans.coll, el: $('div.container')});
+
+			var profile_view = new ProfileView({collection: Coral.profiles.coll, el: $('div.container')});
+			var pm_view = new PMView({collection: Coral.profiles.coll, el: $('div.container')});
+			var charge_view = new ChargeView({collection: Coral.charges.coll, el: $('div.container')});
 			var chart_view = new ChartView({el: $('div.container')});
 
 			// Load in bootstrapped data served by sinatra
-			account.set(<%= @account.as_hash.to_json %>);
-			plans.reset(<%= @account.plans.map(&:as_hash).to_json %>);
-			profiles.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
-			charges.reset(<%= @account.profiles.all.reduce([]) {|ps,p| ps.concat(p.charges.map(&:as_hash))}.to_json %>);
+			Coral.account.model.set(<%= @account.as_hash.to_json %>);
+			Coral.plans.coll.reset(<%= @account.plans.map(&:as_hash).to_json %>);
+			Coral.profiles.coll.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
+			Coral.charges.coll.reset(<%= @account.charges.map(&:as_hash).to_json %>);
 
 			// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
 			$('.auto-tooltip').tooltip({placement: 'bottom'});
@@ -86,7 +95,6 @@
 
 
 		<div id="profile">
-			<h3>Your People</h3>
 			<div id="profile-table"></div>
 		</div>
 		<%= erb :'modals/new_profile' %>

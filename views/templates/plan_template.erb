@@ -13,7 +13,7 @@
 
 <script id='plan-desc-tmpl' type='text/template' class='hide'>
 	[[ if(!(plan === 'all')) { ]]
-		Charging <strong>${{Number(plan.get('amount')).toFixed(2)}}</strong>
+		<strong>${{Number(plan.get('amount')).toFixed(2)}}</strong>
 		every <strong>{{plan.get('cycle')}}</strong>
 		[[if(plan.get('initial_charge') != 0) { ]]
 			with an initial charge of <strong>${{Number(plan.get('initial_charge')).toFixed(2)}}</strong>

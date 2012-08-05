@@ -1,0 +1,27 @@
+<script id='profile-table-tmpl' type='text/template' class='hide'>
+	[[ if(!_.isEmpty(profiles)) { ]]
+	<table id="profiles-table" class="table table-striped clickable-rows">
+			<thead> <tr> <th></th> </tr> </thead>
+			<tbody>
+				[[ _.each(profiles, function(profile) { ]]
+					<tr id="{{profile.id}}" class="edit-profile-button">
+						<td class="profile-table-name-email">{{ profile.name ? profile.name + ' (' + profile.email + ')' : profile.email }} &#x2012; <em>{{profile.state}}</em></td>
+
+						<td class="profile-table-subs">
+							[[if(profile.state != 'Gray') {]] ${{profile.total_paid}} since {{profile.created_at}}[[}]]
+						</td>
+				[[ }); ]]
+			<tr id="new-profile-button">
+				<td>
+				<a id="new-profile-button" href="#"><i class="icon-plus"></i> Add Someone</a>
+				</td><td></td>
+			</tr>
+			</tbody>
+	[[ } else { ]]
+		<p>
+			<em>No subscribers yet.</em>
+			<a id="new-profile-button" href="#"><i class="icon-plus"></i> Add Someone</a>
+		</p>
+	</table>
+	[[ } ]]
+</script>

@@ -17,7 +17,7 @@ gem 'thin'
 gem 'whenever'
 
 # db
-gem 'mongo_mapper'
+gem 'mongoid'
 gem 'bson_ext'
 gem 'log_buddy'
 

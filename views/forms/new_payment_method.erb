@@ -1,0 +1,26 @@
+<script id='new-payment-method-tmpl' type='text/template' class='hide'>
+	<h4>New Payment Method</h4>
+	<p id="new-payment-method-error" class='form-error'></p>
+	<form id='new-payment-method-form'>
+		<select id='new-payment-method-type' name='pay_type'>
+			<option>Type</option>
+			<option id='new-credit-card'>Credit Card</option>
+			<option id='new-echeck'>E-check</option>
+		</select>
+		<div id='credit-card-selected' class='hide'>
+			<label>Card Number</label>
+			<input id="" type="text" name="cc_number" value=""/>
+			<label>Expiration</label>
+			<input id="" type="text" name="expiration" value=""/>
+		</div>
+		<div id='echeck-selected' class='hide'>
+			<label>Account Number</label>
+			<input id="" type="text" name="acct_number" value=""/>
+		</div>
+
+		<div class="modal-form-actions">
+			<input class="btn" id="new-payment-method-submit" name="commit" type="submit" value="Save" />
+			<a class="btn" id='back-from-new-pm' style='float:right'>Back</a>
+		</div>
+	</form>
+</script>

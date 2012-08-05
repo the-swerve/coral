@@ -38,6 +38,7 @@ PlanView = Backbone.View.extend({
 		'click .share-plan-button': 'renderShareForm',
 		'click #remove-plan-button': 'renderRemoveForm',
 		'click #remove-plan-submit': 'destroy',
+		'click #new-subscription-button': 'renderNewSubscriptionForm',
 	},
 
 	renderRemoveForm: function(e) {
@@ -195,6 +196,13 @@ PlanView = Backbone.View.extend({
 		} else {
 			this.selected = this.collection.get($(e.currentTarget).attr('id'));
 		} this.render();
-	}	
+	},
+
+	renderNewSubscriptionForm: function(e) {
+		if(e) e.preventDefault();
+		var options = '<select>';
+		$('div#edit-profile').modal('show');
+		$('div#new-subscription').modal('show');
+	},
 
 });

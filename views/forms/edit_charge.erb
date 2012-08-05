@@ -1,0 +1,50 @@
+<script id='charge-form-tmpl' type='text/template' class='hide'>
+	<p id="edit-charge-error"></p>
+	[[ if(state != 'Paid') {]]
+	<form method="post" action="/charges" id="edit-charge-form">
+		<label>Charge Label</label>
+		<input id="charge-name" type="text" name="name" value="{{name}}"/> 
+		<label>Amount</label>
+		<div class="input-prepend">
+			<span class="add-on">$</span>
+			<input id="charge-amount" type="text" name="amount" style="width:4em;" value="{{amount}}" /> 
+		</div>
+		<label>Pay Date</label>
+		<input id="edit-charge-due-date" type="date" name="due_date" value="{{due_date}}" /> 
+		<input id="edit-charge-id" type="hidden" name="charge_id" value="{{id}}" /> 
+		<input id="edit-charge-profile-id" type="hidden" name="profile_id" value="{{my_profile.id}}" /> 
+	</form>
+	[[ } ]]
+	<div class="well">
+		<p><strong>Payee:</strong> {{my_profile.name || my_profile.email}}</p>
+		[[ if(my_plan.name) { ]]
+			<p><strong>Towards:</strong> {{my_plan.name}}</p>
+		[[ } ]]
+		<p><strong>Total amount:</strong> ${{amount}}</p>
+		<p><strong>Status:</strong> {{state}} </p>
+		[[ if(state == 'Unpaid') { ]]
+			<a href="#" id="pay-charge" class="btn btn-success">Pay Now</a>
+			<a href="#" id="void-charge" class="btn btn-warning">Cancel Charge</a>
+		[[ } else if(state == 'Paid') {]]
+			<h4>Transactions</h4>
+			<table id="transaction-table" class="table table-striped">
+				<thead>
+					<tr><th>Date</th><th>Action</th><th>Amount</th><th>Successful?</th><th>Message</th></tr>
+				</thead>
+				<tbody>
+					[[ _.each(transactions, function(t) { ]]
+						<tr>
+							<td>{{t.date}}</td>
+							<td>{{t.action}}</td>
+							<td>${{Number(t.amount).toFixed(2)}}</td>
+							<td>{{t.successful}}</td>
+							<td>{{t.message}}</td>
+						</tr>
+					[[ }); ]]
+				</tbody>
+			</table>
+
+			<a href="#" id="void-charge" class="btn btn-danger"><i class="icon-remove icon-white"></i> Void</a>
+		[[ } ]]
+	</div>
+</script>

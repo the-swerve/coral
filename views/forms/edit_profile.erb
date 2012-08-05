@@ -1,0 +1,72 @@
+<script id='edit-profile-header-tmpl' type='text/template' class='hide'>
+	<div class="tabbable">
+		<h3 style="float:left;padding-right:1em;">{{name}}</h3>
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#edit-profile-info" data-toggle="tab"><i class="icon-user"></i> Info</a></li>
+			<li><a href="#edit-profile-payments" data-toggle="tab"><i class="icon-lock"></i> Payments</a></li>
+			<button type="button" class="close" data-dismiss="modal" style="float:right">x</button>
+		</ul>
+</script>
+
+<script id='edit-profile-info-tmpl' type='text/template' class='hide'>
+		<div class="tab-content">
+			<div class="tab-pane active" id="edit-profile-info">
+				<p id="edit-profile-error"></p>
+				<form method="post" action="/profiles" id="edit-profile-form">
+					<label>Name</label>
+					<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
+					<label>Email</label>
+					<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
+					<label>Phone</label>
+					<input id="edit-profile-email" type="text" name="phone" value=""/>
+					<label>Address</label>
+					<input id="edit-profile-email" type="text" name="address" value=""/>
+					<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
+
+					<div style="border-top:1px solid #DDD; padding-top: 1em; margin-top: 1em;">
+						<input class="btn" id="edit-profile-submit" name="commit" type="submit" value="Save" />
+					</div>
+				</form>
+			</div>
+</script>
+
+<script id='edit-profile-payments-tmpl' type='text/template' class='hide'>
+			<div class="tab-pane" id="edit-profile-payments">
+
+				<h4> Payment Methods</h4>
+				<ul>
+					[[ _.each(_payment_methods, function(p) { ]]
+						<li>{{p.name}} <a href='#' class='unemph'><i class='icon-remove'></i> </a></li>
+					[[ }); ]]
+						<li><a id='new-payment-method-button' href="#"><i class='icon-plus'></i> new</a></li>
+				</ul>
+				<form method="post" id="new-bank-account-form" class="form-horizontal hide">
+
+					<div class="control-group"> <label class="control-label">Type</label>
+						<div class="controls"> <select><option>Card</option><option>E-check</option></select></div>
+					</div>
+
+					<div style="border-top:1px solid #DDD; padding-top: 1em; margin-top: 1em;">
+						<input class="btn" id="new-payment-method-submit" name="commit" type="submit" value="Save" />
+					</div>
+				</form>
+
+				<h4> Payment History</h4>
+				<table>
+					<thead><th></th></thead>
+					<tbody>
+						[[if(_.isEmpty(_transactions)) { ]]
+							<p><em>No transactions yet</em></p>
+						[[ } else { ]]
+							[[_.each(_transactions, function(t) { ]]
+								<td>{{t.amount}}</td>
+							[[ }); ]]
+						[[ } ]]
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+
+	</div>
+</script>

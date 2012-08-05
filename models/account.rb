@@ -1,72 +1,46 @@
-require 'mongo_mapper'
+require 'mongoid'
 require 'bcrypt'
 
 class Account
 
-	include MongoMapper::Document
+	include Mongoid::Document
+	include Mongoid::Timestamps
 	include BCrypt
 
 	attr_accessor :password, :email, :session_token
 
-	key :email, String,
-		:required => true,
-		:unique => true,
-		:format => /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/
+	# Fields
 
-	key :pass_hash, String,
-		:required => true
+	field :email, String
+	field :pass_hash, String
+	field :session_token, String
+	field :name, String
+	field :bank_name, String
 
-	key :session_token, String
+	# Validations
 
-	key :name, String
-
-	key :short_id, String
-	key :bank_name, String
-
-	validates_presence_of :password, :on => :create
-	validates_length_of :password, :minimum => 6, :if => :password
-
-	timestamps!
+	validates :email,
+		required: true,
+		uniqueness: true,
+		format: {with: /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/}
+	validates :pass_hash,
+		required: true
+	validates :password,
+		presence: {on: :create},
+		length: {minimum: 8}
 
   # Associations
-	many :plans, :dependent => :destroy
-  many :profiles, :dependent => :destroy
-	many :charges, :through => :profiles
+
+	has_many :plans, :dependent => :destroy
+  has_and_belongs_to_many :profiles
 
   # Callbacks
-  before_validation :defaults, :on => :create
-  before_validation :encrypt_pass
-	after_create :generate_session_token
-# before_save :filter_url
 
-	def charting_data
-		{:signups => self.signups_six_months} #, :revenue => self.revenue_six_months}
-	end
-
-	# Return the signups over the last six months
-	def signups_six_months
-		# all profiles created less than six months ago (the date is greater than the six-months-ago date).
-		data = self.profiles.filter {|p| p.created_at > 6.months.ago}.map {|p| p.created_at.month } # lolwut
-		months = [0] * 12 # lolwut
-		data.each { |d| months[d] += 1 } # sort of like bucket sort? :p
-		names = [] ; vals = [] # XXX bleh
-		(0..5).to_a.each do |n|
-			m = n.months.ago.month
-			y = n.months.ago.year
-			names[n] = m.to_s + '/' + y.to_s  # XXX bleh
-			vals[n] = months[m]
-		end
-		return {:months => names, :values => vals}
-	end
-
-  # Simply removes all non-alphanumerics
-  def defaults
-		self.short_id = self.id
-  end
-
-	def encrypt_pass
+  before_validation do
 		self.pass_hash = Password.create(self.password) if self.password
 	end
+
+	after_create :generate_session_token
 
 	def authenticate pass
 		Password.new(self.pass_hash) == pass
@@ -85,9 +59,8 @@ class Account
 	def as_hash
 		{:name => self.name.to_s,
 		 :email => self.email,
-		 :short_id => self.short_id,
+		 :id => self.id.to_s,
 		 :bank_name => self.bank_name || 'none'}
-#	 :plans => self.plans.map(&:as_hash)}
 	end
 
 	def first_error

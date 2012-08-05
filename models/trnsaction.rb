@@ -1,34 +1,36 @@
-require 'mongo_mapper'
+require 'active_support/core_ext' # for date operations
 
 class Trnsaction
 
-	include MongoMapper::Document
+	# Inclusions
 
-	# Constants
-	ACTIONS = ['Payment','Payment-voided','Void'] # XXX wat is payment-voided?
+	include Mongoid::Document
+	include Mongoid::Timestamps
 
-	key :amount, Integer,
-		:required => true
+	# Accessors
 
-	key :action, String,
-		:required => true,
-		:inclusion => ACTIONS
+	# Fields
 
-	# Note: mongomapper will always fail validation on a Boolean false value
-	# (it's really dumb, I know). So we're storing this as a string.
-	key :successful, String,
-		:required => true,
-		:inclusion => ['true','false']
+	field :amount, Integer,
+	field :action, String,
+	field :successful, String,
+	field :message, String,
 
-	key :message, String,
-		:required => true
-
-	timestamps!
+	# Validations
+	
+	validates :amount, required: true
+	validates :action,
+		required: true,
+		inclusion: {in: ['Payment','Void']}
+	validates :successful, required: true
+	validates :message, required: true
 
 	# Associations
+
   belongs_to :charge
 
 	# Callbacks
+
 	before_validation :defaults, :on => :create
 
 	def as_hash

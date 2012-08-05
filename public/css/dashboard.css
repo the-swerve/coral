@@ -135,10 +135,33 @@ div#more-plan-options {
 	display: none;
 }
 
-p#settings-error, p#new-plan-error, p#edit-plan-error, p#new-profile-error, p#edit-profile-error {
+p.form-error {
 	color: #944E4E;
 }
+
+/*
+ * Modal forms
+ */
 
 input[type="submit"], .submit-btn {
 	float: left;
 }
+
+.modal-form-actions {
+	border-top:1px solid #DDD;
+	padding-top: 1em;
+	margin-top: 1em;
+}
+
+.profile-tile {
+	float: left;
+	background-color: whiteSmoke;
+	padding: 4px;
+	margin: 4px;
+	height: 2em;
+	-webkit-border-radius: 9px;
+	-moz-border-radius: 9px;
+	border-radius: 9px
+}
+
+

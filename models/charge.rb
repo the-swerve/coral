@@ -1,36 +1,47 @@
-require 'mongo_mapper'
+require 'mongoid'
 require 'state_machine'
 require 'active_support/core_ext'
 
 class Charge
 
-	include MongoMapper::Document
+	# Inclusions
 
-	# Keys
-	key :amount, Integer,
-		:required => true
-	key :name, String,
-		:required => true
-	key :due_date, Date,
-		:required => true
-	key :short_id, String
-	key :state, String
+	include Mongoid::Document
+	include Mongoid::Timestamps
 
-	timestamps!
+	# Accessors
 
-	validate  :due_date_in_future
-	validates_numericality_of :amount, :greater_than => 0
+	# Fields
+
+	field :amount, Integer
+	field :name, String
+	field :due_date, Date
+	field :state, String
+
+	# Validations
+
+	validates :amount, required: true
+	validates :name, required: true
+	validates :due_date, required: true
+	validates :amount,
+		numericality: {greater_than: 0}
+	validate :due_date_in_future
 	validate :must_be_unpaid, :on => :update
 
 	# Associations
-	many :trnsactions
+
+	has_many :trnsactions
 	belongs_to :subscription
 	belongs_to :profile
 	belongs_to :plan
 	belongs_to :account
 
 	# Callbacks
-	before_validation :defaults, :on => :create
+
+	before_validation(on: :create) do
+		self.name ||= "Charge (" + DateTime.now.to_s + ")"
+		self.due_date ||= DateTime.now
+	end
 
 	state_machine :state, :initial => 'Unpaid' do
 
@@ -78,7 +89,8 @@ class Charge
 
 	private
 
-	# Validation
+	# Custom validation methods
+
 	def due_date_in_future
 		if self.due_date < Date.today
 			errors.add(:due_date, "date can't be in the past")
@@ -89,13 +101,6 @@ class Charge
 		if self.state == 'Paid'
 			errors.add(:base, "Cannot edit a charge that's already been paid")
 		end
-	end
-
-	# Callbacks
-	def defaults
-		self.name ||= "Charge (" + DateTime.now.to_s + ")"
-		self.due_date ||= DateTime.now
-		self.short_id = self.id
 	end
 
 end

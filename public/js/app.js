@@ -45,3 +45,6 @@ jQuery.fn.serializeObject = function() {
 
   return objectData;
 };
+
+// Backbone event aggregator
+
