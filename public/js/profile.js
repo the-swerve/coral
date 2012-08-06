@@ -176,6 +176,7 @@ ProfileView = Backbone.View.extend({
 		$('div#edit-profile div.modal-body').html(edit_view);
 
 		$('div#edit-profile').modal('show'); // display new profile dialog
+
 	},
 
 	renderRemoveForm: function(e) {
@@ -196,8 +197,10 @@ PMView = Backbone.View.extend({
 	events: {
 		'click #new-payment-method-button': 'render',
 		'click #new-payment-method-submit': 'create',
-		'click #back-from-new-pm': 'goBack',
-		'change #new-payment-method-type': 'getType',
+		'click .back-to-profile': 'goBack',
+		'change .new-payment-method-type': 'getType',
+		'click .remove-pm-button': 'renderRemoveForm',
+		'click #remove-pm-submit': 'destroy',
 	},
 
 	render: function(e) {
@@ -207,14 +210,14 @@ PMView = Backbone.View.extend({
 	},
 
 	getType: function(e) {
-		var sel = $('#new-payment-method-type option:selected').text();
+		var sel = $('.new-payment-method-type option:selected').text();
 		if(sel == 'Credit Card') {
 			$('.echeck-selected').hide();
 			$('.credit-card-selected').show();
 		} else if(sel == 'E-check') {
 			$('.credit-card-selected').hide();
 			$('.echeck-selected').show();
-		} else if(sel == 'Payment Method') {
+		} else if(sel == '') {
 			$('.credit-card-selected').hide();
 			$('.echeck-selected').hide();
 		}
@@ -253,6 +256,37 @@ PMView = Backbone.View.extend({
 		}
 	},
 
+	renderRemoveForm: function(e) {
+		e.preventDefault();
+		this.selected_id = $(e.currentTarget).attr('data-id');
+		tmpl = _.template($('#remove-pm-tmpl').html());
+		$('div#edit-profile-payments').html(tmpl());
+	},
+
+	destroy: function(e) {
+		if(e) e.preventDefault();
+		if(this.req == false) { // check request lock
+			var self = this; // preserve scope
+			$('a#remove-pm-submit').addClass('disabled'); // disable button
+			this.req = true; // set request lock
+			$.ajax({
+				type: 'delete',
+				url: '/profiles/' + self.collection.selected.id + '/payment_methods/' + self.selected_id,
+				dataType: 'json',
+				success: function(d) {
+					self.req = false;
+					self.collection.selected.set(d);
+					$('a#remove-pm-submit').removeClass('disabled');
+					self.goBack();
+				},
+				error: function(d) {
+					$('p#remove-pm-error').html(d.responseText);
+					$('a#remove-pm-submit').removeClass('disabled');
+					self.req = false;
+				}
+			});
+		}
+	},
 
 });
 

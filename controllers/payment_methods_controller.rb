@@ -60,18 +60,14 @@ class Application < Sinatra::Base
 		end
 	end
 
-	delete '/profiles/:profile_id/payment_methods/:payment_method_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
+	delete '/profiles/:profile_id/payment_methods/:pm_id', :auth => :account do
+		@profile = @account.profiles.find params['profile_id']
 		if @profile
-			@payment_method = @profile.payment_methods.first(:short_id => params['payment_method_id'].to_i)
+			@payment_method = @profile.payment_methods.find params['pm_id']
 			if @payment_method
 				@payment_method.destroy
-				json :success => true, :message => ":'("
-			else
-				json :success => false, :errors => 'payment_method not found'
-			end
-		else
-			json :success => false, :message => 'profile not found'
-		end
+				json @profile.as_hash
+			else ; halt 400, 'payment method not found' ; end
+		else ; halt 400, 'profile not found' ; end
 	end
 end

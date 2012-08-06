@@ -53,8 +53,7 @@ PlanView = Backbone.View.extend({
 			this.$('#plan-desc').html(desc({plan: this.collection.selected}));
 
 			// jquery fluff (dependent on template being rendered)
-			$('.auto-tooltip').tooltip({placement: 'bottom'});
-			$('.auto-tooltip-top').tooltip({placement: 'top'});
+			$('.dropdown-toggle, .plan-actions').tooltip();
 			$('.plan-actions').hover(function() {$(this).children('i').addClass('icon-white');}, function() {$(this).children('i').removeClass('icon-white');});
 
 			return this;

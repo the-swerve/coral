@@ -45,7 +45,8 @@ class PaymentMethod
 	def as_hash
 		{:name => self.name,
 		:active => self.active.to_s,
-		:pay_type => self.pay_type}
+		:pay_type => self.pay_type,
+		:id => self.id.to_s}
 	end
 
 	def first_error

@@ -2,25 +2,25 @@
 	<h4>Payment Method</h4>
 	<p id="new-payment-method-error" class='form-error'></p>
 	<form id='new-payment-method-form'>
-		<select id='new-payment-method-type' name='pay_type'>
-			<option>Type</option>
+		<select class='new-payment-method-type' name='pay_type'>
+			<option label='Type'></option>
 			<option id='new-credit-card'>Credit Card</option>
 			<option id='new-echeck'>E-check</option>
 		</select>
-		<div class='credit-card-selected' class='hide'>
+		<div class='credit-card-selected hide'>
 			<label>Card Number</label>
 			<input id="" type="text" name="cc_number" value=""/>
 			<label>Expiration</label>
 			<input id="" type="text" name="expiration" value=""/>
 		</div>
-		<div class='echeck-selected' class='hide'>
+		<div class='echeck-selected hide'>
 			<label>Account Number</label>
 			<input id="" type="text" name="acct_number" value=""/>
 		</div>
 
 		<div class="modal-form-actions">
 			<input class="btn" id="new-payment-method-submit" name="commit" type="submit" value="Save" />
-			<a class="btn" id='back-from-new-pm' style='float:right'>Back</a>
+			<a class='btn back-to-profile' style='float:right'>Back</a>
 		</div>
 	</form>
 </script>
