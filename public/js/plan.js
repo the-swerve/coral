@@ -9,86 +9,75 @@ Plan = Backbone.Model.extend({
 PlanCollection = Backbone.Collection.extend({
 	model: Plan,
 	url: '/plans',
-	initialize: function() {
-		this.selected = null;	
-	}
+	initialize: function() { }
 });
 
 PlanView = Backbone.View.extend({
 
-	id: 'plan',
 	req: false,
 
 	initialize: function() {
-		this.collection.bind('reset', this.render, this);
-		this.collection.bind('reset', this.checkNew, this);
-		this.selected = 'all';
-	},
-
-	checkNew: function () {
-		if(this.collection.isEmpty()) { // show the new plan dialog after new account creation
-			this.renderNewForm();
-		}
+		this.collection.bind('reset', this.renderInitial, this);
 	},
 
 	events: {
 		'click #new-plan-submit': 'create',
 		'click #edit-plan-submit': 'update',
+		'click #remove-plan-submit': 'destroy',
+
 		'click .dropdown-item': 'selectPlan',
+
 		'click #new-plan-button': 'renderNewForm',
 		'click #edit-plan-button': 'renderEditForm',
 		'click .share-plan-button': 'renderShareForm',
 		'click #remove-plan-button': 'renderRemoveForm',
-		'click #remove-plan-submit': 'destroy',
 		'click #new-subscription-button': 'renderNewSubscriptionForm',
 	},
 
+	renderInitial: function() {
+		this.collection.selected = this.collection.first();
+		this.renderHeader();
+	},
+
+	renderHeader: function() {
+		/* This will run on page load, instantiating the selected plan and rendering the initial templates.
+		 */
+		if(this.collection.isEmpty()) { // show the new plan dialog after new account creation
+			this.renderNewForm();
+		} else {
+			var self = this;
+			var unselected = this.collection.filter(function(p) { return p != self.collection.selected });
+			var list = _.template(this.$('#plan-nav-tmpl').html());
+			this.$('#plan-nav').html(list({plans: unselected, selected: this.collection.selected}));
+			var desc = _.template(this.$('#plan-desc-tmpl').html());
+			this.$('#plan-desc').html(desc({plan: this.collection.selected}));
+
+			// jquery fluff (dependent on template being rendered)
+			$('.auto-tooltip').tooltip({placement: 'bottom'});
+			$('.auto-tooltip-top').tooltip({placement: 'top'});
+			$('.plan-actions').hover(function() {$(this).children('i').addClass('icon-white');}, function() {$(this).children('i').removeClass('icon-white');});
+
+			return this;
+		}
+	},
+
 	renderRemoveForm: function(e) {
-		e.preventDefault();
-		$('div#edit-plan').modal('hide');
-		$('p#remove-plan-error').html('');
+		if(e) e.preventDefault();
+		$('div#edit-plan').modal('hide'); // remove dialog arises from edit dialog
+		$('p#remove-plan-error').html(''); // clear errors
 		$('div#remove-plan').modal('show');
 	},
 
 	renderNewForm: function(e) {
 		if(e) e.preventDefault();
-		$('form#new-plan-form input').val(''); // clear inputs
 		$('p#new-plan-error').html(''); // clear errors
-		$('div#new-plan').modal('show'); // display dialog
-	},
-
-	// XXX I could probably split this view out into dropdown, desc, table, etc
-	render: function() {
-		var self = this;
-
-		if(this.selected == 'all') {
-			this.collection.selected = null;
-			var active_name = 'Everyone'; // user selected all plans (default)
-			var active_id = ''; // no plan id
-			$('.plan-actions').hide();
-		} else { // user selected a plan
-			var active_name = this.selected.get('name'); // get selected plan name
-			var active_id = this.selected.id; // get selected plan id
-			this.collection.selected = this.collection.get(active_id);
-			$('.plan-actions').show();
-		}
-		this.$('#dropdown-active').html(active_name); // write out active plan name to the top of the dropdown
-		this.$('span.active-plan-id').attr('id',active_id); // write out active plan id into the page
-
-		var list = _.template(this.$('#plan-header-tmpl').html()); // compile template for plan name/dropdown
-		var notSelected = self.collection.filter(function(plan) { // filter out the selected plan for the dropdown items
-			return plan.get('name') != active_name;
-		});
-		this.$('.dropdown-menu').html(list({plans: notSelected})); // render dropdown template
-
-		var desc = _.template(this.$('#plan-desc-tmpl').html()); // compile template for the plan description
-		this.$('.plan-desc').html(desc({plan: this.selected})); // render tmpl
-
-		return this; // for chaining methods on this view
+		$('div#new-plan').modal('show');
+		var tmpl = _.template($('#plan-new-tmpl').html());
+		$('#new-plan .modal-body').html(tmpl());
 	},
 	
 	create: function(e) {
-		e.preventDefault();
+		if(e) e.preventDefault();
 		if(this.req == false) {
 			var self = this;
 			$('input#new-plan-submit').toggleSubmit();
@@ -103,13 +92,11 @@ PlanView = Backbone.View.extend({
 					// render blank tables for profiles and charges
 					var table = _.template($('#profile-table-tmpl').html());
 					$('#profile-table').html(table({profiles: {}}));
-					var table = _.template($('#charge-table-tmpl').html());
-					$('#charge-table').html(table({charges: {}}));
 
-					self.collection.add(model); // add newly created model to collection
-					self.selected = model; // make the selected field point to the new model
+					self.collection.add(model);
+					self.collection.selected = model;
 					self.req = false; // release the request lock
-					self.render(); // render the plan dropdown and description
+					self.renderHeader();
 					self.renderShareForm();
 				},
 				error: function(model, response) {
@@ -126,13 +113,12 @@ PlanView = Backbone.View.extend({
 			var self = this; // preserve scope
 			$('a#remove-plan-submit').addClass('disabled'); // disable button
 			this.req = true; // set request lock
-			var plan = this.collection.get(this.selected.id); // get selected plan
-			plan.destroy({
+			this.collection.selected.destroy({
 				success: function(model, response) {
 					window.location = '/'; // refresh page.
 					// Note: this could be dynamic, without a page reload. We'd have to:
 					// 1. Update all the profiles who subscribe to this plan.
-					// 2. Re-render this (this.render())
+					// 2. Re-render header (this.renderHeader())
 					// 3. Re-render the profile table
 					// Also we'd need to remove request lock for this view, close modal, and enable button.
 				},
@@ -146,19 +132,19 @@ PlanView = Backbone.View.extend({
 	},
 
 	// XXX create and update are pretty redundant as separate funcs
-	update: function() {
+	update: function(e) {
+		if(e) e.preventDefault();
 		if(this.req == false) {
 			var self = this;
 			$('input#edit-plan-submit').toggleSubmit();
 			this.req = true;
-			var plan = this.collection.get(this.selected.id);
 			var data = $('form#edit-plan-form').serializeObject();
-			plan.save(data, {
+			this.collection.selected.save(data, {
 				success: function(model, response) {
 					$('input#edit-plan-submit').toggleSubmit();
 					$('div#edit-plan').modal('hide');
 					self.req = false;
-					self.render();
+					self.renderHeader();
 				},
 				error: function(model, response) {
 					$('p#edit-plan-error').html(response.responseText);
@@ -170,14 +156,11 @@ PlanView = Backbone.View.extend({
 	},
 
 	renderEditForm: function(e) {
-		e.preventDefault();
+		if(e) e.preventDefault();
 		$('p#edit-plan-error').html(''); // Make sure form errors are blank
 		$('div#edit-plan').modal('show');
-		// populate edit form - XXX use template
-		this.$('.plan-name').val(this.selected.get('name'));
-		this.$('.plan-amount').val(Number(this.selected.get('amount')).toFixed(2));
-		this.$('.plan-initial-charge').val(Number(this.selected.get('initial_charge')).toFixed(2));
-		this.$('.plan-cycle').val(this.selected.get('cycle'));
+		var tmpl = _.template($('#plan-edit-tmpl').html());
+		$('#edit-plan .modal-body').html(tmpl({plan: this.collection.selected}));
 	},
 
 	renderShareForm: function(e) {
@@ -188,18 +171,15 @@ PlanView = Backbone.View.extend({
 		if(url == 'http://localhost') {
 			url += ':' + document.location.port
 		}
-		this.selected != 'all'? url += this.selected.get('url') : url += '/share';
+		this.collection.selected != 'all' ? url += this.collection.selected.get('url') : url += '/share';
 		this.$('.plan-url').html(url);
 		this.$('.plan-url').attr('href',url);
 	},
 
 	selectPlan: function(e) {
 		e.preventDefault();
-		if($(e.currentTarget).attr('id') == 'all-plans-select') {
-			this.selected = 'all';
-		} else {
-			this.selected = this.collection.get($(e.currentTarget).attr('id'));
-		} this.render();
+		this.collection.selected = this.collection.get($(e.currentTarget).attr('data-id'));
+		this.renderHeader();
 	},
 
 	renderNewSubscriptionForm: function(e) {

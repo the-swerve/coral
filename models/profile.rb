@@ -12,7 +12,9 @@ class Profile
 
 	# Accessors
 
-	attr_accessor :password, :plan_id
+	attr_accessor :password,
+		:pm_pay_type, :pm_cc_number, :pm_acct_number, # Can create a nested payment method 
+		:sub_plan_id, :sub_starting, :sub_expiration  # Can create a nested subscription - XXX - maybe do this client-side
 
 	# Data
 
@@ -26,7 +28,7 @@ class Profile
 	# Validations
 
 	validates :password,
-		length: {minimum: 8}
+		length: {minimum: 8, on: :create}
 	validates :email,
 		presence: true,
 		uniqueness: true,
@@ -43,6 +45,14 @@ class Profile
 
   before_validation(:on => :create) do
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
+		if self.pm_pay_type && self.pm_pay_type != ''
+			pm = self.payment_methods.build :pay_type => pm_pay_type, :cc_number => pm_cc_number, :acct_number => pm_acct_number
+			errors.add('',pm.first_error) if !pm.save
+		end
+		if self.sub_plan_id && self.sub_plan_id != ''
+			sub = self.subscriptions.build :plan_id => sub_plan_id, :expiration => sub_expiration, :starting => sub_starting
+			errors.add('', sub.first_error) if !sub.save
+		end
 	end
 
   before_validation do
@@ -54,12 +64,6 @@ class Profile
 		# Capitalize each word of the name
 		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
   end
-
-	after_create do
-		if self.plan_id && self.plan_id != ''
-			p = Plan.find(self.plan_id)
-		end
-	end
 
 	# States
 
@@ -142,9 +146,10 @@ class Profile
 		{:name => self.name,
 		 :email => self.email,
 		 :_subscriptions => self.subscriptions.map(&:as_hash),
+		 :_transactions => self.charges.reduce([]) {|cs, c| cs.merge(c.trnsactions.map(&:as_hash))}, # merge all charge transactions into one list
 		 :state => self.state,
 		 :id => self.id.to_s,
-		 :plan_id => self.subscriptions.map {|s| s.plan.id.to_s}.first || '',
+		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},
 		 :_payment_methods => self.payment_methods.map(&:as_hash),
 		 :created_at => self.created_at.to_date.to_s }
 	end

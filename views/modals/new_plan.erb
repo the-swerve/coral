@@ -1,15 +1,11 @@
-	<div class="modal hide" id="new-plan">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">x</button>
-			<h3>Create a Plan</h3>
-		</div>
-		<div class="modal-body">
-			<p id="new-plan-error"></p>
-				<form class="form form-inline" method="post" action="/plans" id="new-plan-form">
-					<%= erb :'forms/new_plan' %>
-				</form>
-		</div>
-		<div class="modal-footer">
-			<input id="new-plan-submit" class="btn" name="commit" type="submit" value="Save" />
-		</div>
+<%= erb :'forms/new_plan' %>
+<div class="modal hide" id="new-plan">
+
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Create a Plan</h3>
 	</div>
+
+	<div class="modal-body"> </div>
+
+</div>

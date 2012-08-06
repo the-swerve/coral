@@ -19,8 +19,6 @@ ChartView = Backbone.View.extend({
 		var ticks = ['February','March','April','May','June','July']
 		this.chart = $.jqplot('chart', [], {
 			title: 'All plans',
-			animate: true,
-			animateReplot: true,
 			dataRenderer: self.myRenderer,
 
 			series: [

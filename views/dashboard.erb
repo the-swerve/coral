@@ -87,9 +87,9 @@
 
 	<div class="data drop-shadow">
 		<div id="plan">
-			<%= erb :'templates/plan_template' %>
-			<%= erb :'forms/new_plan' %>
-			<%= erb :'forms/edit_plan' %>
+			<%= erb :'meta/plans' %>
+			<%= erb :'modals/new_plan' %>
+			<%= erb :'modals/edit_plan' %>
 			<%= erb :'modals/share_plan' %>
 		</div>
 
@@ -99,7 +99,7 @@
 		</div>
 		<%= erb :'modals/new_profile' %>
 		<%= erb :'modals/edit_profile' %>
-		<%= erb :'templates/profile_table_template' %>
+		<%= erb :'tables/profiles' %>
 
 		<div id='charge' class='hide'>
 			<h3>Payments</h3>
@@ -107,7 +107,6 @@
 		</div>
 		<%= erb :'modals/new_charge' %>
 		<%= erb :'modals/edit_charge' %>
-		<%= erb :'templates/charge_table_template' %>
 	</div>
 
 </div>

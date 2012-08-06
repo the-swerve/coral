@@ -30,14 +30,16 @@ class PaymentMethod
 
 	before_validation(:on => :create) do
 		self.name ||= self.pay_type + ' *' if self.pay_type
+		n = self.cc_number != '' ? self.cc_number : self.acct_number != '' ? self.acct_number : ''
+		self.last4 = n.to_s[-4..-1]
+		self.name += self.last4 if self.last4
+
 		if self.cc_number == '' && self.pay_type == 'Credit Card'
 			self.errors.add('', 'missing credit card number')
 		elsif self.acct_number == '' && self.pay_type == 'E-check'
 			self.errors.add('', 'missing bank account number')
 		end
-		n = self.cc_number != '' ? self.cc_number : self.acct_number != '' ? self.acct_number : ''
-		self.last4 = n.to_s[-4..-1]
-		self.name += self.last4
+		errors.add('', 'invalid credit card or bank account number') if !last4
 	end
 
 	def as_hash

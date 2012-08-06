@@ -1,27 +1,48 @@
-<div class="modal hide" id="edit-plan">
-	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
-		<h3>Edit Plan</h3>
-	</div>
-	<div class="modal-body">
-		<p id="edit-plan-error"></p>
-			<form class="form form-inline" method="post" action="/plans" id="edit-plan-form">
-			<%= erb :'forms/plan_form' %>
-			</form>
-	</div>
-	<div class="modal-footer">
-		<input id="edit-plan-submit" class="btn" name="commit" type="submit" value="Save" />
-		<a id="remove-plan-button" href="#" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove</a>
-	</div>
-</div>
+<script id='plan-edit-tmpl' type='text/template' class='hide'>
 
-<div class="modal hide" id="remove-plan">
-	<div class="modal-body">
-		<p id="remove-plan-error"></p>
-		<p>Are you sure you wish to remove this plan? Note: your payment history
-		and existing customers will not be removed.</p>
+	<p id='edit-plan-error' class='form-error'></p>
 
-		<a id="remove-plan-submit" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove</a>
-		<a data-dismiss="modal" class="btn btn-info">Cancel</a>
-	</div>
-</div>
+	<form class='form-horizontal' id='edit-plan-form'>
+
+		<div class='control-group'>
+			<label class='control-label'>Name</label>
+			<div class='controls'>
+				<input type='text' name='name' value='{{ plan.get("name") }}' /> 
+			</div>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Recurring charge of</label>
+			<div class='controls'>
+				<div class='input-prepend'>
+					<span class='add-on'>$</span>
+					<input type='text' name='amount' style='width:4em;' value='{{ plan.get("amount") }}'/>
+				</div>
+				<span>&nbsp; every &nbsp;</span>
+				<select style='width:8em;' name='cycle'>
+					<option>{{ plan.get("cycle") }}</option>
+					<option>1 month</option>
+					<option>2 weeks</option>
+					<option>2 months</option>
+					<option>3 months</option>
+					<option>6 months</option>
+					<option>1 year</option>
+				</select>
+			</div>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Initial charge</label>
+			<div class='controls'>
+				<div class='input-prepend'>
+					<span class='add-on'>$</span>
+					<input type='text' name='initial_charge' style='width:4em;' value='{{ plan.get("initial_charge") }}' />
+				</div>
+			</div>
+		</div>
+
+		<div class='modal-form-actions'>
+			<input id='edit-plan-submit' class='btn' name='commit' type='submit' value='Save' />
+		</div>
+	</form>
+</script>

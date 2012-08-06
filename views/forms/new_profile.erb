@@ -1,7 +1,81 @@
-	<form method="post" action="/profile/create" id="new-profile-form">
-		<label>Email Address</label>
-		<input type="text" name="email" />
-		<label>Name</label>
-		<input type="text" name="name" />
-		<br /><br /><input class="btn" name="commit" type="submit" value="Create" />
-	</form>
+<p id="new-profile-error" class='form-error'></p>
+<form method="post" action="/profiles" id="new-profile-form" class='form-horizontal'>
+	<div class='control-group'>
+		<label class='control-label'>Name</label>
+		<div class='controls'><input type="text" name="name" /></div>
+	</div>
+	<div class='control-group'>
+		<label class='control-label'>Email</label>
+		<div class='controls'><input type="text" name="email" /></div>
+	</div>
+
+	<div class='control-group'>
+		<label class='control-label'></label>
+		<div class='controls'>
+			<select id='new-payment-method-type' name='pm_pay_type'>
+				<option label='Payment Method'></option>
+				<option id='new-credit-card'>Credit Card</option>
+				<option id='new-echeck'>E-check</option>
+			</select>
+		</div>
+	</div>
+
+	<div class='credit-card-selected' class='hide'>
+		<div class='control-group'>
+			<label class='control-label'>Card Number</label>
+			<div class='controls'>
+				<input id="" type="text" name='pm_cc_number' value=''/>
+			</div>
+		</div>
+		<div class='control-group'>
+			<label class='control-label'>Expiration</label>
+			<div class='controls'>
+				<input id="" type="text" name='' value=""/>
+			</div>
+		</div>
+	</div>
+
+	<div class='echeck-selected' class='control-group hide'>
+		<label class='control-label'>Account Number</label>
+		<div class='controls'>
+			<input id="" type="text" name="pm_acct_number" value=""/>
+		</div>
+	</div>
+
+	<div id='new-profile-sub'> </div>
+
+	<div class='modal-form-actions'>
+		<input id="new-profile-submit" class="btn" name="commit" type="submit" value="Save" />
+	</div>
+</form>
+
+<script id='new-profile-sub-tmpl' type='text/template' class='hide'>
+<div class='control-group'>
+	<div class='controls'>
+		<select id='new-sub-selector' name='sub_plan_id'>
+			[[ if(selected) { ]]
+				<option label="{{ selected.get('name') }}">{{ selected.id }}</option>
+			[[ } else { ]]
+				<option label="Subscription"></option>
+			[[ } ]]
+			[[ _.each(plans, function(p) { ]]
+				<option label='{{p.get('name')}}'>{{p.id}}</option>
+			[[ }); ]]
+		</select>
+	</div>
+</div>
+<div id='new-sub-dates' class={{ selected ? '' : 'hide'}}>
+	<div class='control-group'>
+		<label class='control-label'>Starting on</label>
+		<div class='controls'>
+			<input type="date" name='sub_starting' />
+		</div>
+	</div>
+	<div class='control-group'>
+		<label class='control-label'>Ending on</label>
+		<div class='controls'>
+			<input type="date" name='sub_expiration' />
+		</div>
+	</div>
+</div>
+</script>

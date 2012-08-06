@@ -28,7 +28,7 @@ class Subscription
 	# Validations
 
 	validate  :must_not_be_overdue
-	validates :plan_id, presence: true
+	validate :valid_plan_id
 
 	# Callbacks
 
@@ -84,8 +84,7 @@ class Subscription
 	end
 
 	def as_hash
-		{:expiration_date => self.expiration_date.to_s,
-		 :plan => self.plan.as_hash}
+		{:expiration_date => self.expiration_date.to_s}
 	end
 
 	def balance
@@ -138,6 +137,11 @@ class Subscription
 		if self.profile.state == 'Overdue'
 			errors.add(:base, "This person has unpaid charges.")
 		end
+	end
+
+	def valid_plan_id
+		p = Plan.find(self.plan_id) if self.plan_id
+		errors.add('', 'plan not chosen for subscription') if !p || !self.plan_id
 	end
 
 end

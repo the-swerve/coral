@@ -18,14 +18,9 @@ ChargeView = Backbone.View.extend({
 	req: false,
 
 	initialize: function() {
-		this.collection.bind('reset', this.renderTable, this);
 	},
 
 	events: {
-			'click #new-profile-submit': 'renderTable',
-			'click .dropdown-item': 'renderTable',
-			'click #new-profile-submit': 'fetchCharges',
-			'click #share-plan-submit': 'fetchCharges',
 			'click .edit-charge-button': 'renderEditForm',
 			'click #new-charge-button': 'renderNewForm',
 			'click #new-charge-submit': 'create',
@@ -46,7 +41,6 @@ ChargeView = Backbone.View.extend({
 					$('div#new-charge').modal('hide');
 					self.collection.add(model);
 					self.req = false;
-					self.renderTable();
 					// show the charges table XXX bleh
 					$('a.view-people-button').css('backgroundColor', 'transparent');
 					$('a.view-people-button').children('i').removeClass('icon-white');
@@ -77,7 +71,6 @@ ChargeView = Backbone.View.extend({
 			charge.save(data, {
 				success: function(model, response) {
 					$('input#edit-charge-submit').toggleSubmit();
-					self.renderTable();
 					$('div#edit-charge').modal('hide');
 					self.req = false;
 				},
@@ -88,28 +81,6 @@ ChargeView = Backbone.View.extend({
 				}
 			});
 		}
-	},
-
-	fetchCharges: function() {
-		this.collection.fetch();
-	},
-
-	renderBlankTable: function() {
-	},
-
-	renderTable: function(newCharges) {
-		// Filter charges by the selected plan - XXX redundant with profile renderTable
-		var activePlanID = $('span.active-plan-id').attr('id');
-		if(activePlanID == '') { // No plan selected, show all charges
-			var filtered_charges = this.collection.toJSON();
-		} else { // a plan has been selected. Filter out charges
-			var filtered_charges = this.collection.filter(function(c) {
-				return c.get('plan').id == activePlanID;
-			}); filtered_charges = (new ChargeCollection(filtered_charges)).toJSON();
-		}
-		var table = _.template($('#charge-table-tmpl').html());
-		$('#charge-table').html(table({charges: filtered_charges}));
-
 	},
 
 	renderEditForm: function(e) {
@@ -142,17 +113,5 @@ ChargeView = Backbone.View.extend({
 		this.$('div#new-charge h3').html('Charging ' + ($('#edit-profile-name').val() || $('#edit-profile-email').val())); // inject payee name into charge form
 		this.$('div#new-charge').modal('show'); // display charge creation dialog
 	},
-
-//	renderEditForm: function(e) {
-//		e.preventDefault();
-//		this.$('p#edit-charge-error').html(''); // clear errors
-//		this.$('form#edit-charge-form input').val(''); // clear form
-//		var selectedcharge = this.collection.get($(e.currentTarget).attr('id'));
-//		this.$('input#edit-charge-id').val(selectedcharge.id); // get the charge id and insert it into a field
-//		// populate form fields. XXX use a template
-//		this.$('input#edit-charge-name').val(selectedcharge.get('name'));
-//		this.$('input#edit-charge-email').val(selectedcharge.get('email'));
-//		this.$('div#edit-charge').modal('show'); // display new charge dialog
-//	}
 
 });

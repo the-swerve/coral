@@ -2,9 +2,7 @@
 
 Profile = Backbone.Model.extend({
 	urlRoot: '/profiles',
-	initialize: function() {
-		this.set({plan_ids: new Array()});
-	}
+	initialize: function() { }
 });
 
 ProfileCollection = Backbone.Collection.extend({
@@ -136,15 +134,11 @@ ProfileView = Backbone.View.extend({
 	},
 
 	renderTable: function() {
-		var activePlanID = $('span.active-plan-id').attr('id');
-		if(activePlanID == '') { // No plan selected, show all plans
-			var filtered_profiles = this.collection.toJSON();
-		} else { // a plan has been selected. Filter out subscribers
-			var filtered_profiles = this.collection.filter(function(p) {
-				return p.get('plan_id') == activePlanID;
-			});
-			filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
-		}
+		var self = this;
+		var filtered_profiles = this.collection.filter(function(p) {
+			return _.include(p.get('plan_ids'), self.plans.selected.id);
+		});
+		filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
 		var table = _.template($('#profile-table-tmpl').html());
 		$('#profile-table').slideUp();
 		$('#profile-table').html(table({profiles: filtered_profiles}));
@@ -154,8 +148,8 @@ ProfileView = Backbone.View.extend({
 	renderNewForm: function(e) {
 		if(e) e.preventDefault();
 		var self = this;
-		$('p#profile-error').html(''); // clear errors
-		$('form#new-profile-form input').val(''); // clear form
+		$('p#new-profile-error').html(''); // clear errors
+		$('form#new-profile-form .controls input').val(''); // clear form
 		$('div#new-profile').modal('show'); // display new profile dialog
 		// render the new payment method template
 		var pm_tmpl = _.template($('#new-payment-method-tmpl').html());
@@ -215,11 +209,14 @@ PMView = Backbone.View.extend({
 	getType: function(e) {
 		var sel = $('#new-payment-method-type option:selected').text();
 		if(sel == 'Credit Card') {
-			$('#echeck-selected').hide();
-			$('#credit-card-selected').show();
+			$('.echeck-selected').hide();
+			$('.credit-card-selected').show();
 		} else if(sel == 'E-check') {
-			$('#credit-card-selected').hide();
-			$('#echeck-selected').show();
+			$('.credit-card-selected').hide();
+			$('.echeck-selected').show();
+		} else if(sel == 'Payment Method') {
+			$('.credit-card-selected').hide();
+			$('.echeck-selected').hide();
 		}
 	},
 
@@ -268,6 +265,6 @@ SubView = Backbone.View.extend({
 	},
 
 	showStarting: function() {
-		$('#new-sub-starting-date').removeClass('hide');
+		$('#new-sub-dates').removeClass('hide');
 	},
 });

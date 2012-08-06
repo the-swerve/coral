@@ -1,0 +1,19 @@
+<%= erb :'forms/edit_plan' %>
+<div class="modal hide" id="edit-plan">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>Edit Plan</h3>
+	</div>
+	<div class="modal-body"> </div>
+</div>
+
+<div class="modal hide" id="remove-plan">
+	<div class="modal-body">
+		<p id="remove-plan-error"></p>
+		<p>Are you sure you wish to remove this plan? Note: your payment history
+		and existing customers will not be removed.</p>
+
+		<a id="remove-plan-submit" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove</a>
+		<a data-dismiss="modal" class="btn btn-info">Cancel</a>
+	</div>
+</div>
