@@ -163,3 +163,19 @@ input[type="submit"], .submit-btn {
 	-moz-border-radius: 9px;
 	border-radius: 9px
 }
+
+.pm-list {
+	list-style: none;
+	height: 8em;
+}
+
+.pm-block {
+	float: left;
+	clear: right;
+	padding: 1em;
+	margin: 1em;
+	background-color: whiteSmoke;
+	-webkit-border-radius: 9px;
+	-moz-border-radius: 9px;
+	border-radius: 9px;
+}

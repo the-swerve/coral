@@ -31,7 +31,19 @@ class Trnsaction
 
 	# Callbacks
 
-	before_validation :defaults, :on => :create
+	before_validation(:on => :create) do
+		self.action ||= 'Payment'
+		self.message = 'Test transaction'
+		self.successful ||= 'true'
+
+		if self.successful == 'true'
+			self.amount = self.charge.amount
+			self.amount = -self.amount if self.action == 'Void'
+		else
+			self.amount = 0
+		end
+
+	end
 
 	def as_hash
 		{:amount => self.amount.to_s,
@@ -42,18 +54,5 @@ class Trnsaction
 	end
 
 	private
-
-	# Callbacks
-	def defaults
-		self.action ||= 'Payment'
-		self.message = "Test transaction"
-		self.successful ||= 'true'
-		if self.successful == 'true'
-			self.amount = self.charge.amount
-			self.amount = -self.amount if self.action == 'Void'
-		else
-			self.amount = 0
-		end
-	end
 
 end

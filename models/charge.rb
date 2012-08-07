@@ -31,8 +31,8 @@ class Charge
 	# Associations
 
 	has_many :trnsactions
-	belongs_to :subscription
 	belongs_to :profile
+	belongs_to :payment_method
 	belongs_to :plan
 	belongs_to :account
 
@@ -43,40 +43,51 @@ class Charge
 		self.due_date ||= DateTime.now
 	end
 
-	state_machine :state, :initial => 'Unpaid' do
+	after_create do
+		self.pay_if_due
+	end
 
-		event :pay do
-			transition ['Unpaid','Overdue'] => 'Paid',
-				:if => lambda {|c| c.due_date <= Date.today && c.trnsactions.create}
+	state_machine :state, initial: 'Pending' do
+
+		# this fucking shit right here doesn't work for no goddamn reason whatsoever.
+		# i'm using Charge#settle, which works fine, and which makes me question
+		# why i am even using this half-assed state_machine plugin.
+		event :settled do
+			transition ['Pending','Overdue'] => 'Paid', if: ->(c){c.balance == 0}
+		end
+
+		event :oversettled do
+			transition ['Pending','Overdue'] => 'Overpaid', if: ->(c){c.balance < 0}
 		end
 
 		event :void do
-			transition 'Paid' => 'Voided',
-				:if => lambda {|c| c.trnsactions.create(:action => 'Void')}
+			transition 'Paid' => 'Voided', if: ->(c){c.trnsactions.create action: 'Void'}
 		end
 
 		event :past_due do
-			transition 'Pending' => 'Overdue',
-				:if => lambda {|c| c.due_date <= DateTime.now}
+			transition 'Pending' => 'Overdue', if: ->(c){c.due_date <= DateTime.now}
 		end
 
 	end
 
+	def settle
+		self.state = 'Paid' if self.balance == 0
+	end
+
 	def balance
-		self.trnsactions.map(&:amount).sum || 0
+		self.amount - self.trnsactions.map(&:amount).sum || 0
 	end
 
 	def as_hash
-		plan_hash = self.plan ? self.plan.as_hash : {}
 		{:amount => self.amount.to_s,
 		 :name => self.name,
 		 :due_date => self.due_date.to_s,
 		 :state => self.state,
 		 :transactions => self.trnsactions.map(&:as_hash),
-		 :my_profile => self.profile.as_hash,
-		 :my_plan => plan_hash,
+		 :_plan => self.plan ? self.plan.as_hash : {},
 		 :id => self.id.to_s,
-		 :created_at => self.created_at.to_s}
+		 :created_at => self.created_at.strftime('%B %d, %Y %I:%M%P'),
+		 :_payment_method => self.payment_method.name}
 	end
 
 	def first_error
@@ -85,6 +96,13 @@ class Charge
 		# then get the message for the field name of the first error
 		self.errors.to_hash.first.first.to_s +
 			' ' + self.errors.to_hash.first.second.first.to_s
+	end
+
+	def pay_if_due
+		if self.due_date <= Date.today && (self.state == 'Pending' || self.state == 'Overdue') && self.balance > 0
+			self.trnsactions.create
+			self.settle
+		end
 	end
 
 	private

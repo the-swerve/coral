@@ -23,7 +23,7 @@
 					<input id="edit-profile-email" type="text" name="address" value=""/>
 					<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
 
-					<div style="border-top:1px solid #DDD; padding-top: 1em; margin-top: 1em;">
+					<div class='modal-form-actions'>
 						<input class="btn" id="edit-profile-submit" name="commit" type="submit" value="Save" />
 					</div>
 				</form>
@@ -33,23 +33,33 @@
 <script id='edit-profile-payments-tmpl' type='text/template' class='hide'>
 			<div class="tab-pane" id="edit-profile-payments">
 
-				<h4> Payment Methods</h4>
-				<ul>
-					[[ _.each(_payment_methods, function(p) { ]]
-						<li>{{p.name}} <a href='#' class='unemph remove-pm-button' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> </a></li>
-					[[ }); ]]
-						<li><a id='new-payment-method-button' href="#"><i class='icon-plus'></i> new</a></li>
-				</ul>
+				<h4 style='float:left'> Payment Methods</h4>
+				<a style='float:right' id='new-pm-button' class='btn' href="#"><i class='icon-plus'></i> new</a>
+				[[ _.each(_payment_methods, function(p) { ]]
+					<div class='pm-block'>
+						<p>{{p.name}}</p>
+						<p>
+							<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
+							<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
+						</p>
+				</div>
+				[[ }); ]]
 
-				<h4> Payment History</h4>
-				<table>
+				<h4 style='clear:left'> Payment History</h4>
+				<table class='table table-stribed clickable-rows'>
 					<thead><th></th></thead>
 					<tbody>
-						[[if(_.isEmpty(_transactions)) { ]]
-							<p><em>No transactions yet</em></p>
+						[[if(_.isEmpty(_charges)) { ]]
+							<p><em>No charges yet</em></p>
 						[[ } else { ]]
-							[[_.each(_transactions, function(t) { ]]
-								<td>{{t.amount}}</td>
+							[[_.each(_charges, function(c) { ]]
+								<tr class='edit-charge-button' data-id="{{ c.id }}">
+									<td>{{ c.name }}</td>
+									<td>{{ c._payment_method }}</td>
+									<td>${{ c.amount }}</td>
+									<td>{{ c.state }}</td>
+									<td>{{ c.created_at }}</td>
+								</tr>
 							[[ }); ]]
 						[[ } ]]
 					</tbody>
@@ -68,5 +78,4 @@
 		<a class='btn btn-danger' href='#' id='remove-pm-submit'>Remove</a>
 		<a style='float:right' href='#' class='back-to-profile btn'>Back</a>
 	</div>
-
 </script>

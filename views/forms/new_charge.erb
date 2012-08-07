@@ -1,17 +1,36 @@
-<p id="charge-error"></p>
-<p id='new-charge-payee'></p>
-<p id='new-charge-towards'></p>
-<form method="post" action="/charges" id="new-charge-form">
-	<input id="new-charge-id" type="hidden" />
-	<label>Label</label>
-	<input class="auto-tooltip" rel="tooltip" title="What is this charge for?" id="new-charge-name" type="text" name="name" />
-	<label>Amount</label>
-	<div class="input-prepend">
-		<span class="add-on">$</span>
-		<input id="new-charge-amount" type="text" name="amount" style="width:4em;" />
-	</div>
-	<label>Pay Date</label>
-	<input class="auto-tooltip" id="new-charge-due-date" type="date" name="due_date" title="Delay this charge to a future date (optional)."/> 
-	<input id="new-charge-profile-id" type="hidden" name="profile_id"/> 
-	<input id="new-charge-plan-id" type="hidden" name="ignore"/> 
-</form>
+<script id='new-charge-tmpl' type='text/template' class='hide'>
+	<h4>New Charge</h4>
+	<p id="new-charge-error"></p>
+
+	<form method="post" action="/charges" id="new-charge-form" class='form-horizontal'>
+		<div class='control-group'>
+			<label class='control-label'>Label</label>
+			<div class='controls'>
+				<input rel="tooltip" title="What is this charge for?" type="text" name="name" class='charge-form-tt' />
+			</div>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Amount</label>
+			<div class='controls'>
+				<div class="input-prepend">
+					<span class="add-on">$</span>
+					<input type="text" name="amount" style="width:4em;" />
+				</div>
+			</div>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Pay Date</label>
+			<div class='controls'>
+				<input type="date" name="due_date" title="Delay this charge to a future date (optional)." class='charge-form-tt' /> 
+			</div>
+		</div>
+
+		<div class='modal-form-actions'>
+			<input class="btn" id="new-charge-submit" name="commit" type="submit" value="Save" />
+			<a class='btn back-to-profile' style='float:right'>Back</a>
+		</div>
+
+	</form>
+</script>

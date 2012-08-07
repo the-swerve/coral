@@ -195,7 +195,7 @@ PMView = Backbone.View.extend({
 	},
 
 	events: {
-		'click #new-payment-method-button': 'render',
+		'click #new-pm-button': 'render',
 		'click #new-payment-method-submit': 'create',
 		'click .back-to-profile': 'goBack',
 		'change .new-payment-method-type': 'getType',

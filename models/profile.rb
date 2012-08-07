@@ -146,7 +146,7 @@ class Profile
 		{:name => self.name,
 		 :email => self.email,
 		 :_subscriptions => self.subscriptions.map(&:as_hash),
-		 :_transactions => self.charges.reduce([]) {|cs, c| cs.merge(c.trnsactions.map(&:as_hash))}, # merge all charge transactions into one list
+		 :_charges => self.charges.map(&:as_hash),
 		 :state => self.state,
 		 :id => self.id.to_s,
 		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},

@@ -2,32 +2,18 @@ require './controllers/application.rb'
 
 class Application < Sinatra::Base
 
-	post '/profiles/:id/charges', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['id'].to_i)
+	# Create charge scoped by profile and payment method
+	post '/profiles/:profile_id/payment_methods/:pm_id/charges', :auth => :account do
+		@profile = @account.profiles.find params['profile_id']
 		if @profile
-			@charge = @profile.charges.build params[:charge]
-			if @charge.save
-				json :success => true, :charge => @charge.as_hash
-			else
-				json :success => false, :errors => @charge.errors.to_hash
-			end
-		else
-			json :success => false, :message => 'not found'
-		end
-	end
-
-	post '/charges', :auth => :account do
-		@profile = @account.profiles.find @params['profile_id']
-		if @profile
-			@charge = @profile.charges.build @params
-			if @charge.save
-				json @charge.as_hash
-			else
-				halt 400, @charge.first_error
-			end
-		else
-			halt 400, 'profile not found'
-		end
+			@payment_method = @profile.payment_methods.find params['pm_id']
+			if @payment_method
+				@charge = @payment_method.charges.build @params
+				if @charge.save
+					json @charge.as_hash
+				else ; halt 400, @charge.first_error ; end
+			else ; halt 400, 'payment method not found' ; end
+		else ; halt 400, 'profile not found' ; end
 	end
 
 	get '/charges', :auth => :account do
@@ -58,34 +44,13 @@ class Application < Sinatra::Base
 		end
 	end
 
+	# update charge, scoped by profile
 	put '/profiles/:profile_id/charges/:charge_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.find params['profile_id']
 		if @profile
-			@charge = @profile.charges.first(:short_id => params['charge_id'].to_i)
+			@charge = @profile.charges.find params['charge_id']
 			if @charge
-				if @charge.update_attributes params[:charge]
-					json :success => true, :charge => @charge.as_hash
-				else
-					json :success => false, :errors => @charge.errors.to_hash
-				end
-			else
-				json :success => false, :errors => 'charge not found'
-			end
-		else
-			json :success => false, :errors => 'profile not found'
-		end
-	end
-
-	put '/charges/:charge_id', :auth => :account do
-		@profile = @account.profiles.find @params['profile_id']
-		if @profile
-			@charge = @profile.charges.find @params['id']
-			if @charge
-				puts 'yoyoyo'
-				if @charge.state == 'Paid'
-					halt 400, 'charge already paid, cannot update'
-				elsif @charge.update_attributes @params
-					puts 'hihihi'
+				if @charge.update_attributes @params
 					json @charge.as_hash
 				else
 					halt 400, @charge.first_error

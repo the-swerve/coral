@@ -1,28 +1,14 @@
-<script id='charge-form-tmpl' type='text/template' class='hide'>
-	<p id="edit-charge-error"></p>
-	[[ if(state != 'Paid') {]]
-	<form method="post" action="/charges" id="edit-charge-form">
-		<label>Charge Label</label>
-		<input id="charge-name" type="text" name="name" value="{{name}}"/> 
-		<label>Amount</label>
-		<div class="input-prepend">
-			<span class="add-on">$</span>
-			<input id="charge-amount" type="text" name="amount" style="width:4em;" value="{{amount}}" /> 
-		</div>
-		<label>Pay Date</label>
-		<input id="edit-charge-due-date" type="date" name="due_date" value="{{due_date}}" /> 
-		<input id="edit-charge-id" type="hidden" name="charge_id" value="{{id}}" /> 
-		<input id="edit-charge-profile-id" type="hidden" name="profile_id" value="{{my_profile.id}}" /> 
-	</form>
-	[[ } ]]
+<script id='edit-charge-tmpl' type='text/template' class='hide'>
+	<h4>Charge Details</h4>
 	<div class="well">
-		<p><strong>Payee:</strong> {{my_profile.name || my_profile.email}}</p>
-		[[ if(my_plan.name) { ]]
-			<p><strong>Towards:</strong> {{my_plan.name}}</p>
+		<p><strong>Label:</strong> {{name}}</p>
+		<p><strong>Created:</strong> {{created_at}}</p>
+		[[ if(_plan.name) { ]]
+			<p><strong>Towards:</strong> {{_plan.name}}</p>
 		[[ } ]]
 		<p><strong>Total amount:</strong> ${{amount}}</p>
 		<p><strong>Status:</strong> {{state}} </p>
-		[[ if(state == 'Unpaid') { ]]
+		[[ if(state == 'Pending') { ]]
 			<a href="#" id="pay-charge" class="btn btn-success">Pay Now</a>
 			<a href="#" id="void-charge" class="btn btn-warning">Cancel Charge</a>
 		[[ } else if(state == 'Paid') {]]
@@ -47,4 +33,40 @@
 			<a href="#" id="void-charge" class="btn btn-danger"><i class="icon-remove icon-white"></i> Void</a>
 		[[ } ]]
 	</div>
+
+	<p id="edit-charge-error"></p>
+	[[ if(state != 'Paid') { ]]
+		<form method="post" action="/charges" id="edit-charge-form" class='form-horizontal'>
+
+			<div class='control-group'>
+				<label class='control-label'>Charge Label</label>
+				<div class='controls'>
+					<input id="charge-name" type="text" name="name" value="{{name}}"/> 
+				</div>
+			</div>
+
+			<div class='control-group'>
+				<label class='control-label'>Amount</label>
+				<div class='controls'>
+					<div class="input-prepend">
+						<span class="add-on">$</span>
+						<input id="charge-amount" type="text" name="amount" style="width:4em;" value="{{amount}}" /> 
+					</div>
+				</div>
+			</div>
+
+			<div class='control-group'>
+				<label class='control-label'>Pay Date</label>
+				<div class='controls'>
+					<input id="edit-charge-due-date" type="date" name="due_date" value="{{due_date}}" /> 
+				</div>
+			</div>
+
+			<div class='modal-form-actions'>
+				<input class="btn" id="edit-charge-submit" name="commit" type="submit" value="Save" />
+				<a class='btn back-to-profile' style='float:right'>Back</a>
+			</div>
+
+		</form>
+	[[ } ]]
 </script>
