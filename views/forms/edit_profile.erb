@@ -12,15 +12,28 @@
 		<div class="tab-content">
 			<div class="tab-pane active" id="edit-profile-info">
 				<p id="edit-profile-error"></p>
-				<form method="post" action="/profiles" id="edit-profile-form">
-					<label>Name</label>
-					<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
-					<label>Email</label>
-					<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
-					<label>Phone</label>
-					<input id="edit-profile-email" type="text" name="phone" value=""/>
-					<label>Address</label>
-					<input id="edit-profile-email" type="text" name="address" value=""/>
+				<form method="post" action="/profiles" id="edit-profile-form" class='form-horizontal'>
+					<div class='control-group'>
+						<label class='control-label'>Name</label>
+						<div class='controls'>
+							<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
+						</div>
+					</div>
+
+					<div class='control-group'>
+						<label class='control-label'>Email</label>
+						<div class='controls'>
+							<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
+						</div>
+					</div>
+
+					<div class='control-group'>
+						<label class='control-label'>Extra Info</label>
+						<div class='controls'>
+							<textarea name='info' id="edit-profile-info" placeholder="Any additional details for this subscriber, such as address and phone number" style="width:24em;height:6em;">{{info}}</textarea>
+						</div>
+					</div>
+
 					<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
 
 					<div class='modal-form-actions'>
@@ -35,15 +48,19 @@
 
 				<h4 style='float:left'> Payment Methods</h4>
 				<a style='float:right' id='new-pm-button' class='btn' href="#"><i class='icon-plus'></i> new</a>
-				[[ _.each(_payment_methods, function(p) { ]]
-					<div class='pm-block'>
-						<p>{{p.name}}</p>
-						<p>
-							<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
-							<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
-						</p>
-				</div>
-				[[ }); ]]
+				[[ if(_.isEmpty(_payment_methods)) { ]]
+					<p style='clear:left'><em>None yet.</em></p>
+				[[ } else { ]]
+					[[ _.each(_payment_methods, function(p) { ]]
+						<div class='pm-block'>
+							<p>{{p.name}}</p>
+							<p>
+								<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
+								<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
+							</p>
+					</div>
+					[[ }); ]]
+				[[ } ]]
 
 				<h4 style='clear:left'> Payment History</h4>
 				<table class='table table-stribed clickable-rows'>
@@ -76,6 +93,24 @@
 	<p>Are you sure you wish to do this? Note: the payment history will remain intact</p>
 	<div class='modal-form-actions'>
 		<a class='btn btn-danger' href='#' id='remove-pm-submit'>Remove</a>
+		<a style='float:right' href='#' class='back-to-profile btn'>Back</a>
+	</div>
+</script>
+
+<script id='remove-charge-tmpl' type='text/template' class='hide'>
+	<h4>Removing charge</h4>
+	<p>Are you sure you wish to cancel this charge?</p>
+	<div class='modal-form-actions'>
+		<a class='btn btn-danger' href='#' id='remove-charge-submit'>Remove</a>
+		<a style='float:right' href='#' class='back-to-profile btn'>Back</a>
+	</div>
+</script>
+
+<script id='void-charge-tmpl' type='text/template' class='hide'>
+	<h4>Void charge</h4>
+	<p>Are you sure you wish to void this charge? The funds will be removed from escrow and transferred to the subscriber.</p>
+	<div class='modal-form-actions'>
+		<a class='btn btn-danger' href='#' id='void-charge-submit'>Void</a>
 		<a style='float:right' href='#' class='back-to-profile btn'>Back</a>
 	</div>
 </script>

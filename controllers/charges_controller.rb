@@ -8,7 +8,7 @@ class Application < Sinatra::Base
 		if @profile
 			@payment_method = @profile.payment_methods.find params['pm_id']
 			if @payment_method
-				@charge = @payment_method.charges.build @params
+				@charge = @payment_method.charges.build @params.merge(account_id: @account.id)
 				if @charge.save
 					json @charge.as_hash
 				else ; halt 400, @charge.first_error ; end
@@ -64,18 +64,14 @@ class Application < Sinatra::Base
 	end
 
 	delete '/profiles/:profile_id/charges/:charge_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.find params['profile_id']
 		if @profile
-			@charge = @profile.charges.first(:short_id => params['charge_id'].to_i)
+			@charge = @profile.charges.find params['charge_id']
 			if @charge
 				@charge.destroy
-				json :success => true, :message => ":'("
-			else
-				json :success => false, :errors => 'charge not found'
-			end
-		else
-			json :success => false, :message => 'profile not found'
-		end
+				json @profile.as_hash
+			else ; halt 400, 'charge not found' ; end
+		else ; halt 400, 'profile not found' ; end
 	end
 
 end

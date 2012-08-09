@@ -25,8 +25,74 @@ ChargeView = Backbone.View.extend({
 	events: {
 			'click .edit-charge-button': 'renderEditForm',
 			'click .new-charge-button': 'renderNewForm',
+			'click #remove-charge-button': 'renderRemoveForm',
+			'click #void-charge-button': 'renderVoidForm',
 			'click #new-charge-submit': 'create',
 			'click #edit-charge-submit': 'update',
+			'click #remove-charge-submit': 'destroy',
+			'click #void-charge-submit': 'void',
+	},
+
+	renderRemoveForm: function(e) {
+		e.preventDefault();
+		tmpl = _.template($('#remove-charge-tmpl').html());
+		$('div#edit-profile-payments').html(tmpl());
+	},
+
+	renderVoidForm: function(e) {
+		e.preventDefault();
+		tmpl = _.template($('#void-charge-tmpl').html());
+		$('div#edit-profile-payments').html(tmpl());
+	},
+
+	void: function(e) {
+		if(e) e.preventDefault();
+		if(this.req == false) { // check request lock
+			var self = this; // preserve scope
+			$('a#void-charge-submit').addClass('disabled'); // disable button
+			this.req = true; // set request lock
+			$.ajax({
+				type: 'post',
+				url: '/profiles/' + self.profiles.selected.id + '/charges/' + self.selected_charge.id + '/void',
+				dataType: 'json',
+				success: function(d) {
+					self.profiles.selected.set(d);
+					$('a#void-charge-submit').removeClass('disabled');
+					self.goBack();
+					self.req = false;
+				},
+				error: function(d) {
+					$('p#void-charge-error').html(d.responseText);
+					$('a#void-charge-submit').removeClass('disabled');
+					self.req = false;
+				}
+			});
+		}
+	},
+
+	destroy: function(e) {
+		if(e) e.preventDefault();
+		if(this.req == false) { // check request lock
+			var self = this; // preserve scope
+			$('a#remove-charge-submit').addClass('disabled'); // disable button
+			this.req = true; // set request lock
+			$.ajax({
+				type: 'delete',
+				url: '/profiles/' + self.profiles.selected.id + '/charges/' + self.selected_charge.id,
+				dataType: 'json',
+				success: function(d) {
+					self.profiles.selected.set(d);
+					$('a#remove-charge-submit').removeClass('disabled');
+					self.goBack();
+					self.req = false;
+				},
+				error: function(d) {
+					$('p#remove-charge-error').html(d.responseText);
+					$('a#remove-charge-submit').removeClass('disabled');
+					self.req = false;
+				}
+			});
+		}
 	},
 
 	create: function(e) {

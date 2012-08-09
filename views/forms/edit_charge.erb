@@ -9,9 +9,8 @@
 		<p><strong>Total amount:</strong> ${{amount}}</p>
 		<p><strong>Status:</strong> {{state}} </p>
 		[[ if(state == 'Pending') { ]]
-			<a href="#" id="pay-charge" class="btn btn-success">Pay Now</a>
-			<a href="#" id="void-charge" class="btn btn-warning">Cancel Charge</a>
-		[[ } else if(state == 'Paid') {]]
+			<a href="#" id="remove-charge-button" class="btn btn-warning">Cancel Charge</a>
+		[[ } if(!_.isEmpty(transactions)) {]]
 			<h4>Transactions</h4>
 			<table id="transaction-table" class="table table-striped">
 				<thead>
@@ -30,7 +29,7 @@
 				</tbody>
 			</table>
 
-			<a href="#" id="void-charge" class="btn btn-danger"><i class="icon-remove icon-white"></i> Void</a>
+			<a href="#" id="void-charge-button" class="btn btn-danger"><i class="icon-remove icon-white"></i> Void</a>
 		[[ } ]]
 	</div>
 
@@ -68,5 +67,9 @@
 			</div>
 
 		</form>
+	[[ } else {]]
+		<div class='modal-form-actions'>
+			<a class='btn back-to-profile' style='float:right'>Back</a>
+		</div>
 	[[ } ]]
 </script>

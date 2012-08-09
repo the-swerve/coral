@@ -1,5 +1,4 @@
 require 'mongoid'
-require 'state_machine'
 require 'active_support/core_ext'
 
 class Charge
@@ -41,37 +40,15 @@ class Charge
 	before_validation(on: :create) do
 		self.name ||= "Charge (" + DateTime.now.to_s + ")"
 		self.due_date ||= DateTime.now
+		self.state = 'Pending'
+	end
+
+	before_validation(on: :update) do
+		self.errors.add('', 'Cannot edit a paid charge') if self.state == 'paid'
 	end
 
 	after_create do
-		self.pay_if_due
-	end
-
-	state_machine :state, initial: 'Pending' do
-
-		# this fucking shit right here doesn't work for no goddamn reason whatsoever.
-		# i'm using Charge#settle, which works fine, and which makes me question
-		# why i am even using this half-assed state_machine plugin.
-		event :settled do
-			transition ['Pending','Overdue'] => 'Paid', if: ->(c){c.balance == 0}
-		end
-
-		event :oversettled do
-			transition ['Pending','Overdue'] => 'Overpaid', if: ->(c){c.balance < 0}
-		end
-
-		event :void do
-			transition 'Paid' => 'Voided', if: ->(c){c.trnsactions.create action: 'Void'}
-		end
-
-		event :past_due do
-			transition 'Pending' => 'Overdue', if: ->(c){c.due_date <= DateTime.now}
-		end
-
-	end
-
-	def settle
-		self.state = 'Paid' if self.balance == 0
+		self.pay
 	end
 
 	def balance
@@ -87,7 +64,7 @@ class Charge
 		 :_plan => self.plan ? self.plan.as_hash : {},
 		 :id => self.id.to_s,
 		 :created_at => self.created_at.strftime('%B %d, %Y %I:%M%P'),
-		 :_payment_method => self.payment_method.name}
+		 :_payment_method => self.payment_method ? self.payment_method.name : ''}
 	end
 
 	def first_error
@@ -98,10 +75,25 @@ class Charge
 			' ' + self.errors.to_hash.first.second.first.to_s
 	end
 
-	def pay_if_due
-		if self.due_date <= Date.today && (self.state == 'Pending' || self.state == 'Overdue') && self.balance > 0
+	def pay
+		if self.due_date <= Date.today && self.state == 'Pending'
 			self.trnsactions.create
-			self.settle
+			if self.balance == 0
+				self.state = 'Paid'
+				self.account.in_escrow += self.amount
+				self.save
+				self.account.save
+			end
+		end
+	end
+
+	def void
+		if self.state == 'Paid'
+			self.trnsactions.create action: 'Void'
+			self.state = 'Voided'
+			self.account.in_escrow -= self.amount
+			self.save
+			self.account.save
 		end
 	end
 
@@ -116,7 +108,7 @@ class Charge
 	end
 
 	def must_be_unpaid
-		if self.state == 'Paid'
+		if self.state == 'paid'
 			errors.add(:base, "Cannot edit a charge that's already been paid")
 		end
 	end

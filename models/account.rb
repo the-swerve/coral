@@ -16,6 +16,8 @@ class Account
 	field :session_token, type: String
 	field :name, type: String
 	field :bank_name, type: String
+	field :in_escrow, type: Float
+	field :received, type: Float
 
 	# Validations
 
@@ -37,6 +39,8 @@ class Account
 
   before_validation do
 		self.pass_hash = Password.create(self.password) if self.password
+		self.in_escrow ||= 0
+		self.received ||= 0
 	end
 
 	after_create :generate_session_token
@@ -61,7 +65,9 @@ class Account
 		{:name => self.name.to_s,
 		 :email => self.email,
 		 :id => self.id.to_s,
-		 :bank_name => self.bank_name || 'none'}
+		 :bank_name => self.bank_name || 'none',
+		 :in_escrow => self.in_escrow.to_s,
+		 :received => self.received.to_s}
 	end
 
 	def first_error

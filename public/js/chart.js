@@ -20,6 +20,8 @@ ChartView = Backbone.View.extend({
 		this.chart = $.jqplot('chart', [], {
 			title: 'All plans',
 			dataRenderer: self.myRenderer,
+			animate: true,
+			animateReplot: true,
 
 			series: [
 				{

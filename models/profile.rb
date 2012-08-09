@@ -19,6 +19,7 @@ class Profile
 	# Data
 
 	field :email, type: String
+	field :info, type: String
 	field :pass_hash, type: String
 	field :name, type: String
 	field :state, type: String
@@ -151,7 +152,8 @@ class Profile
 		 :id => self.id.to_s,
 		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},
 		 :_payment_methods => self.payment_methods.map(&:as_hash),
-		 :created_at => self.created_at.to_date.to_s }
+		 :created_at => self.created_at.to_date.to_s,
+		 :info => self.info || ''}
 	end
 
 	def subscription_list
