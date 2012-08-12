@@ -54,7 +54,6 @@ PlanView = Backbone.View.extend({
 
 			// jquery fluff (dependent on template being rendered)
 			$('.dropdown-toggle, .plan-actions').tooltip();
-			$('.plan-actions').hover(function() {$(this).children('i').addClass('icon-white');}, function() {$(this).children('i').removeClass('icon-white');});
 
 			return this;
 		}
@@ -166,13 +165,7 @@ PlanView = Backbone.View.extend({
 		if(e) e.preventDefault();
 		$('div#share-plan').modal('show');
 		// populate share form - XXX maybe use template
-		var url = 'http://' + document.location.hostname
-		if(url == 'http://localhost') {
-			url += ':' + document.location.port
-		}
 		this.collection.selected != 'all' ? url += this.collection.selected.get('url') : url += '/share';
-		this.$('.plan-url').html(url);
-		this.$('.plan-url').attr('href',url);
 	},
 
 	selectPlan: function(e) {

@@ -89,6 +89,11 @@ a#logo-teeny {
 	background: url('../img/cog-icon.png') no-repeat;
 }
 
+.plan-actions {
+	float: left;
+	margin-left: 1em;
+}
+
 /*
  * Plan selection dropdown
  */

@@ -1,0 +1,55 @@
+body { text-align: center} 
+
+#profile {
+	width: 320px;
+	height: 3em;
+	margin: 1em auto 0 auto;
+	background-color: whiteSmoke;
+	padding: 1em;
+
+	-webkit-border-radius: 14px 14px 0 0;
+	-moz-border-radius: 14px 14px 0 0;
+	border-radius: 14px 14px 0 0;
+
+	z-index: 1;
+
+}
+
+#profile-actions {
+	width: 320px;
+	height: 2em;
+	list-style: none;
+	margin: 0 auto;
+	padding: 0.5em;
+}
+
+#profile-actions li {
+	padding-left: 0.5em;
+	float: right;
+}
+
+#profile h2 {
+}
+
+.subscriptions {
+	width: 310px;
+	margin: 0 auto;
+	background-color: whiteSmoke;
+	padding: 1em;
+	margin-top: 1px;
+	position: relative;
+	z-index: -2;
+}
+
+.new-sub {
+	width: 320px;
+	height: 3em;
+	margin: 0 auto;
+	background-color: whiteSmoke;
+	padding: 1em;
+
+	-webkit-border-radius: 0 0 14px 14px;
+	-moz-border-radius: 0 0 14px 14px;
+	border-radius: 0 0 14px 14px;
+
+}

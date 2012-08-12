@@ -5,10 +5,7 @@ class Application < Sinatra::Base
 	post '/account' do
 		@account = Account.new @params
 		if @account.save
-			puts 'saved account'
-			puts @account.as_hash
 			json @account.as_hash
-			json @account.as_hash.merge(:session_token => @account.generate_session_token)
 		else
 			halt 400, @account.first_error
 		end

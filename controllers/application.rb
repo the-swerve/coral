@@ -50,7 +50,6 @@ class Application < Sinatra::Base
 		puts request.request_method + ' '+ request.fullpath
 		puts request.cookies['coral.session_token']
 		toke = request.cookies['coral.session_token'] || @params['session_token']
-		puts 'toke: ' + toke.to_s
 		if toke
 			@account = Account.where(session_token: toke).first
 			@profile_user = Profile.where(session_token: toke).first

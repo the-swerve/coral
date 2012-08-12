@@ -1,39 +1,57 @@
+var req = false; // request blocker
 $(document).ready(function() {
 
 	// Sign up form submit
-	$('input#signup-submit').bind('click',function(event) {
+	$('input#share-signup-submit').bind('click',function(event) {
 		event.preventDefault();
-		// Signing in
-		$('input#signup-submit').attr('value','Signing Up...');
-		$('input#signup-submit').attr('class','btn disabled');
-		var account = $('input#account-id').attr('value');
-		$.ajax({
-			type: 'POST',
-			url: '/account/' + account + '/profiles',
-			dataType: 'json',
-			data: {profile: $('form#signup-form').serializeObject()},
-			success: function(data) {
-				if(data.session_token) {
+		if (req == false) {
+			req = true;
+			// Signing in
+			$('input#share-signup-submit').attr('value','Signing Up...');
+			$('input#share-signup-submit').addClass('disabled');
+			var account = $('input#account-id').attr('value');
+			$.ajax({
+				type: 'POST',
+				url: '/account/' + account + '/profiles',
+				dataType: 'json',
+				data: $('form#share-signup-form').serializeObject(),
+				success: function(data) {
 					$.cookie('coral.session_token', data.session_token);
 					window.location = '/';
-				} else if (data.error) {
-					$('p#form-error').html(data.error);
-					$('p#form-error').css('color', '#944E4E');
-					$('input#signup-submit').attr('value','Sign Up');
-					$('input#signup-submit').attr('class','btn');
-				} else {
-					$('p#form-error').html('There was an error. :/');
-					$('p#form-error').css('color', '#944E4E');
-					$('input.signup-submit').attr('value','Sign Up');
-					$('input.signup-submit').attr('class','btn');
+					req = false;
+				},
+				error: function(d) {
+					$('p#share-plan-error').html(d.responseText);
+					$('input#share-signup-submit').attr('value','Sign Up'); // XXX redundant
+					$('input#share-signup-submit').removeClass('disabled');
+					req = false;
 				}
-			},
-			error: function() {
-				$('p#form-error').html('There was an error. :(');
-				$('p#form-error').css('color', '#944E4E');
-				$('input#signup-submit').attr('value','Sign Up'); // XXX redundant
-				$('input#signup-submit').attr('class','btn');
-			}
-		});
+			});
+		}
 	});
+
+	$('#signup-title').toggle(function(e) {
+		e.preventDefault();
+		$('#share-signup').slideDown('slow');
+		$(this).slideUp('slow');
+	}, function(e) {
+		e.preventDefault();
+	});
+
+	$('.new-payment-method-type').change(function(e) {
+		var sel = $('.new-payment-method-type option:selected').text();
+		if(sel == 'Credit Card') {
+			$('.echeck-selected').hide(function() {
+				$('.credit-card-selected').slideDown('slow');
+			});
+		} else if(sel == 'E-check') {
+			$('.credit-card-selected').hide(function() {
+				$('.echeck-selected').slideDown('slow');
+			});
+		} else if(sel == '') {
+			$('.credit-card-selected').hide();
+			$('.echeck-selected').hide();
+		}
+	});
+
 });

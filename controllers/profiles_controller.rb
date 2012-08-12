@@ -17,21 +17,17 @@ class Application < Sinatra::Base
 	end
 
 	# The unauthorized endpoint for allowing random people to sign up for subscriptions
-	post '/account/:short_id/profiles' do
-		@acct = Account.find(params["short_id"])
+	post '/account/:account_id/profiles' do
+		@acct = Account.find params['account_id']
 		if @acct
-			@profile = @acct.profiles.build params[:profile]
+			@profile = @acct.profiles.build @params
 			if @profile.save
-				json :success => true, :profile => @profile.as_hash,
-					:session_token => @profile.generate_session_token
+				json @profile.as_hash
 			else
-				json :success => false,
-					:error => @profile.errors.to_hash.first.first.to_s +
-						' ' + @profile.errors.to_hash.first.second.first.to_s # lol
+				halt 400, @profile.first_error
 			end
 		else
-			json :success => false,
-				:error => 'account not found'
+			halt 400, 'account not found'
 		end
 	end
 

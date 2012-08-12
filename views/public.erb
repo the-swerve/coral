@@ -7,6 +7,7 @@
 	<link rel="stylesheet" media="screen,projection" href="/css/bootstrap.css">
 	<link rel="stylesheet" media="screen,projection" href="/css/bootstrap-responsive.css">
 	<link rel="stylesheet" media="screen,projection" href="/css/style.css">
+	<link rel="stylesheet" media="screen,projection" href="/css/public.css">
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="/js/jquery.js"></script>
 	<script type="text/javascript" src="/js/jquery.cookie.js"></script>
@@ -18,14 +19,17 @@
 
 <body>
 
-<div id="share" class="container drop-shadow" style="padding:2em; margin-top:1em; background-color:white;">
+	<ul id='profile-actions'>
+		<li><a href='#' class='btn'><i class='icon-wrench'></i> Settings</a></li>
+		<li><a class='btn' href="/logout"><i class='icon-off'></i> Logout</a></li>
+	</ul>
 
-	<% if @profile_user %>
-		<h1><%= @profile_user.name %>'s Subscriptions and Memberships</h1>
+	<div id='profile' class='drop-shadow'>
+		<h2><%= @profile_user.name %></h2>
+	</div>
 
-	<% if @profile_user.subscriptions.empty? %>
-		<p><em>No subscriptions yet.</em></p>
-	<% else %>
+	<div class='subscriptions'>
+
 		<table class="table table-striped">
 			<thead>
 				<tr> <th></th></tr>
@@ -45,19 +49,35 @@
 				</tr>
 			<% end %>
 			</tbody>
+		</table>
+
+	</div>
+
+	<div class='new-sub drop-shadow'>
+		<td><a class='btn' href='#'><i class='icon-plus'></i> New recurring payment</a></td>
+	</div>
+
+
+	<table id='payment-method-table' class='table table-striped hide'>
+		<thead> <th></th> </thead>
+		<tbody>
+			<% @profile_user.payment_methods.each do |p| %>
+				<tr>
+					<td><%= p.name %></td>
+				</tr>
+			<% end %>
+			<tr>
+				<td>
+					<a id='new-payment-method-button' class='btn'><i class='icon-plus'></i> New payment method</a>
+				</td>
+			</tr>
+		<tr> </tr>
+		</tbody>
+
 	</table>
 
-	<a class='btn btn-success' href="#">Payment Method</a>
-	<a class='btn' href="/logout">Logout</a>
 
-	<% end %>
-
-	<% else %>
-		<p>Person not found</p>
-	<% end %>
-
-
-</div>
+	<div id='footer'></div>
 
 </body>
 </html>
