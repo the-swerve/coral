@@ -8,3 +8,4 @@ production:
   sessions:
     default:
       uri: <%= ENV['MONGOHQ_URL'] %>
+      fuck_you: <%= ENV['MONGOHQ_URL'] %>
