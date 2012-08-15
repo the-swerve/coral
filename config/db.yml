@@ -10,5 +10,5 @@ production:
       database: 'app5975660'
       hosts:
        - alex.mongohq.com:10066
-      username: admin
+      username: heroku
       password: 'deep sea creature'
