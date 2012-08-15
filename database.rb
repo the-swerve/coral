@@ -15,11 +15,7 @@ require 'logger'
 class Database
 
 	def initialize
-		if ENV['MONGOHQ_URL']
 			Mongoid.load! './config/db.yml', :production
-		else
-			Mongoid.load! './config/db.yml', :development
-		end
 	end
 
 	def clear
