@@ -8,6 +8,7 @@ production:
   sessions:
       default:
             database: 'app5975660'
-            host: alex.mongohq.com:10066
+            hosts:
+             - alex.mongohq.com:10066
             username: admin
             password: 'deep sea creature'
