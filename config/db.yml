@@ -7,6 +7,7 @@ development:
 production:
   sessions:
     default:
-      uri: <%= ENV['MONGOHQ_URL'] %>
+      host: <%= URI(ENV['MONGOHQ_URL']).host %>
+      port: <%= URI(ENV['MONGOHQ_URL']).port %>
       username: heroku
       password: deep sea creature
