@@ -6,9 +6,5 @@ development:
         - localhost:27017
 production:
   sessions:
-    default:
-      database: 'app5975660'
-      username: 'heroku'
-      password: 'deep sea creature'
-      hosts:
-       - alex.mongohq.com:10066
+      default:
+            uri: <%= ENV['MONGOHQ_URL'] %>
