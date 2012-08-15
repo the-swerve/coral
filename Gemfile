@@ -18,6 +18,7 @@ gem 'whenever'
 
 # db
 gem 'mongoid'
+gem 'mongo'
 gem 'bson_ext'
 gem 'log_buddy'
 
