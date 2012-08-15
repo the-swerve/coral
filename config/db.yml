@@ -6,9 +6,9 @@ development:
         - localhost:27017
 production:
   sessions:
-      default:
-            database: 'app5975660'
-            hosts:
-             - alex.mongohq.com:10066
-            username: admin
-            password: 'deep sea creature'
+    default:
+      database: 'app5975660'
+      hosts:
+       - alex.mongohq.com:10066
+      username: admin
+      password: 'deep sea creature'
