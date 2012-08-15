@@ -14,22 +14,19 @@ require 'logger'
 
 class Database
 
-	# All possible environments
-	ENVS = ['dev','prod','test']
-
-	def initialize(env)
-		env = 'dev' unless ENVS.include? env # Fall back to dev if given invalid env
-
+	def initialize
 		if ENV['MONGOHQ_URL']
 			Mongoid.load! './config/db.yml', :production
 		else
 			Mongoid.load! './config/db.yml', :development
 		end
+		puts 'HI'
+		puts '--==--==--=='
+		puts ENV['MONGOHQ_URL']
 	end
 
 	def clear
 		Mongoid.purge!
 	end
-
 
 end # end class Database

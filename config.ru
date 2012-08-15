@@ -5,7 +5,7 @@ Dir['./controllers/*.rb'].each {|f| require f}
 
 # Initialize the db
 
-DB = Database.new 'dev'
+DB = Database.new
 
 # Initialize the app
 
