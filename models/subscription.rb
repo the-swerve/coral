@@ -23,6 +23,7 @@ class Subscription
 
 	has_many :charges
 	belongs_to :profile
+	has_one :payment_method
 	belongs_to :plan
 
 	# Validations

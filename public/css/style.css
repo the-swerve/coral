@@ -47,3 +47,12 @@ div.form-actions {
   -moz-box-shadow: 0 0 14px 3px #aaa;
   box-shadow: 0 0 14px 3px #aaa;
 }
+
+.sunk {
+  -webkit-box-shadow: inset 0 0 14px #aaa;
+  -moz-box-shadow: inset 0 0 14px #aaa;
+  box-shadow: inset 0 0 14px #aaa;
+	padding: 1em;
+	width: 90%
+	margin: 0 auto;
+}

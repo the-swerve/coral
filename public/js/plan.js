@@ -36,21 +36,20 @@ PlanView = Backbone.View.extend({
 
 	renderInitial: function() {
 		this.collection.selected = this.collection.first();
-		this.renderHeader();
+		this.renderNav();
 	},
 
-	renderHeader: function() {
+	renderNav: function() {
 		/* This will run on page load, instantiating the selected plan and rendering the initial templates.
 		 */
 		if(this.collection.isEmpty()) { // show the new plan dialog after new account creation
 			this.renderNewForm();
 		} else {
 			var self = this;
-			var unselected = this.collection.filter(function(p) { return p != self.collection.selected });
 			var list = _.template(this.$('#plan-nav-tmpl').html());
-			this.$('#plan-nav').html(list({plans: unselected, selected: this.collection.selected}));
+			this.$('#plan-nav-container').html(list({plans: this.collection, selected: this.collection.selected}));
 			var desc = _.template(this.$('#plan-desc-tmpl').html());
-			this.$('#plan-desc').html(desc({plan: this.collection.selected}));
+			this.$('#plan-desc-container').html(desc({plan: this.collection.selected}));
 
 			// jquery fluff (dependent on template being rendered)
 			$('.dropdown-toggle, .plan-actions').tooltip();
@@ -94,7 +93,7 @@ PlanView = Backbone.View.extend({
 					self.collection.add(model);
 					self.collection.selected = model;
 					self.req = false; // release the request lock
-					self.renderHeader();
+					self.renderNav();
 					self.renderShareForm();
 				},
 				error: function(model, response) {
@@ -116,7 +115,7 @@ PlanView = Backbone.View.extend({
 					window.location = '/'; // refresh page.
 					// Note: this could be dynamic, without a page reload. We'd have to:
 					// 1. Update all the profiles who subscribe to this plan.
-					// 2. Re-render header (this.renderHeader())
+					// 2. Re-render nav (this.renderNav())
 					// 3. Re-render the profile table
 					// Also we'd need to remove request lock for this view, close modal, and enable button.
 				},
@@ -142,7 +141,7 @@ PlanView = Backbone.View.extend({
 					$('input#edit-plan-submit').toggleSubmit();
 					$('div#edit-plan').modal('hide');
 					self.req = false;
-					self.renderHeader();
+					self.renderNav();
 				},
 				error: function(model, response) {
 					$('p#edit-plan-error').html(response.responseText);
@@ -171,7 +170,7 @@ PlanView = Backbone.View.extend({
 	selectPlan: function(e) {
 		e.preventDefault();
 		this.collection.selected = this.collection.get($(e.currentTarget).attr('data-id'));
-		this.renderHeader();
+		this.renderNav();
 	},
 
 	renderNewSubscriptionForm: function(e) {

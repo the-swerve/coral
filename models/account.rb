@@ -18,6 +18,7 @@ class Account
 	field :bank_name, type: String
 	field :in_escrow, type: Float
 	field :received, type: Float
+	field :revenue, type: Hash
 
 	# Validations
 
@@ -44,6 +45,10 @@ class Account
 	end
 
 	after_create :generate_session_token
+
+	def transaction_history
+		[self.profiles.reduce([]) {|ps, p| ps + p.charges.reduce([]) {|cs, c| cs + c.trnsactions.map {|t| [t.created_at.to_s, t.amount]}}}]
+	end
 
 	def authenticate pass
 		Password.new(self.pass_hash) == pass

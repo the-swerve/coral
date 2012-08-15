@@ -1,5 +1,23 @@
+
+<script id='new-profile-tmpl' type='text/template' class='hide'>
+	<tr id='new-profile-form'>
+		<td>
+			<form id='new-profile-form' class='form-inline' style='margin:0'>
+				<input type='text' name='name' placeholder='Name' style='width:12em;margin:0;' />
+				<input type='text' name='email' placeholder='Email' style='width:12em;margin: 0 1em 0 1em;' />
+				<input type='hidden' name='sub_plan_id' class='sub-plan-id' val='none' />
+				<img class='loader hide' src='img/ajax-loader.gif' />
+				<button type='submit' id='new-profile-row' class='btn'>Save</button>
+				<a class='btn' id='remove-profile-row' href='#'>Cancel </a>
+				<span class='form-error'></span>
+			</form>
+		</td>
+	</tr>
+</script>
+
+
 <p id="new-profile-error" class='form-error'></p>
-<form method="post" action="/profiles" id="new-profile-form" class='form-horizontal'>
+<form method="post" action="/profiles" id="wat-profile-form" class='form-horizontal'>
 	<div class='control-group'>
 		<label class='control-label'>Name</label>
 		<div class='controls'><input type="text" name="name" /></div>
@@ -78,4 +96,8 @@
 		</div>
 	</div>
 </div>
+</script>
+
+<script id='profile-payments-tmpl' type='text/template' class='hide'>
+	hi
 </script>

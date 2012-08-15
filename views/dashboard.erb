@@ -54,7 +54,7 @@
 			var pm_view = new PMView({collection: Coral.profiles.coll, el: $('div.container')});
 			var sub_view = new SubView({collection: Coral.profiles.coll, el: $('div.container')});
 			var charge_view = new ChargeView({collection: Coral.charges.coll, el: $('div.container'), profiles: Coral.profiles.coll});
-			var chart_view = new ChartView({el: $('div.container')});
+			var chart_view = new ChartView({el: $('div.container'), trnsHistory: <%= @account.transaction_history.to_json %> });
 
 			// Load in bootstrapped data served by sinatra
 			Coral.account.model.set(<%= @account.as_hash.to_json %>);
@@ -66,7 +66,6 @@
 			$('.auto-tooltip-top').tooltip({placement: 'top'});
 		});
 	</script>
-
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -86,20 +85,26 @@
 	</div>
 
 	<div class="data drop-shadow">
-		<div id="plan">
+
+		<div class='row data-row'>
 			<%= erb :'meta/plans' %>
 			<%= erb :'modals/new_plan' %>
 			<%= erb :'modals/edit_plan' %>
 			<%= erb :'modals/share_plan' %>
+			<%= erb :'modals/new_profile' %>
+			<%= erb :'modals/edit_profile' %>
+			<%= erb :'tables/profiles' %>
+			<div class='span2'>
+				<div id='plan-nav-container'> </div>
+			</div>
+			<div class='span9'>
+				<div id='profiles-container'>
+					<div id='plan-desc-container'></div>
+					<div id='profile-table-container'></div>
+				</div>
+			</div>
 		</div>
-
-
-		<div id="profile">
-			<div id="profile-table"></div>
-		</div>
-		<%= erb :'modals/new_profile' %>
-		<%= erb :'modals/edit_profile' %>
-		<%= erb :'tables/profiles' %>
+	</div>
 
 		<div id='charge' class='hide'>
 			<h3>Payments</h3>

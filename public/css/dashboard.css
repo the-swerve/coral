@@ -25,7 +25,7 @@ a.logo:hover {
 
 div.data {
 	background-color: whiteSmoke;
-	padding: 12px;
+	padding: 12px 12px 12px 40px;
 	margin-bottom: 3em;
 	-webkit-border-radius: 0 0 0 0;
 	-moz-border-radius: 0 0 9px 9px;
@@ -106,19 +106,26 @@ select#plan-select {
 }
 
 ul#plan-nav {
-	font-size: 1.2em;
+	font-size: 1em;
 	border-bottom: 1px solid #DDD;
 	padding-bottom: 4px;
 	padding-top: 2px;
+	width: 100%;
 }
-ul#plan-nav li a {
-	padding: 0.5em;
+
+.nav-tabs.nav-stacked > li > a {
+	border: none;
 	color: black;
 }
-ul#plan-nav li a:hover {
-	background-color: gray;
-	color: white;
+
+.nav-tabs > .active > a, .nav-tabs > .active > a {
+	font-weight: bold;
 }
+
+.nav-tabs.nav-stacked > li > a:hover {
+	border: none;
+}
+
 
 a.view-people-button {
 	background-color: gray;
@@ -140,8 +147,12 @@ div#more-plan-options {
 	display: none;
 }
 
-p.form-error {
+.form-error {
 	color: #944E4E;
+}
+
+#profiles-table {
+	margin: 0;
 }
 
 /*
@@ -156,6 +167,7 @@ input[type="submit"], .submit-btn {
 	border-top:1px solid #DDD;
 	padding-top: 1em;
 	margin-top: 1em;
+	clear: left;
 }
 
 .profile-tile {
@@ -183,4 +195,46 @@ input[type="submit"], .submit-btn {
 	-webkit-border-radius: 9px;
 	-moz-border-radius: 9px;
 	border-radius: 9px;
+}
+
+#profile-table-container {
+}
+
+#profiles-container {
+	background-color: white;
+	border-top: 1px solid #DDD;
+	border-bottom: 1px solid #DDD;
+}
+
+#plan-desc-container {
+	padding: 1em;
+}
+
+
+.edit-profile {
+}
+
+table.table tr.edit-profile {
+	cursor: default;
+}
+
+.table tbody tr:hover td,
+.table tbody tr:hover th {
+	background-color: white;
+}
+
+.form-horizontal .control-label {
+	width: 60px;
+}
+
+.form-horizontal .controls {
+	margin-left: 80px;
+}
+
+.edit-profile-info {
+	margin-right: 1em;
+}
+
+.profile-name-woot {
+	margin-bottom: 1em;
 }

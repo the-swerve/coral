@@ -1,3 +1,78 @@
+<script id='edit-profile-tmpl' type='text/template' class='hide'>
+
+	<form class="edit-profile-form" class='form-horizontal'>
+		<div class='edit-profile-info' style='float:left;margin;1em;padding-right:1em;'>
+			<p id="edit-profile-error"></p>
+				<div class='control-group'>
+					<label class='control-label'>Name</label>
+					<div class='controls'>
+						<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
+					</div>
+				</div>
+
+				<div class='control-group'>
+					<label class='control-label'>Email</label>
+					<div class='controls'>
+						<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
+					</div>
+				</div>
+
+				<div class='control-group'>
+					<label class='control-label'>Phone</label>
+					<div class='controls'>
+						<input id="edit-profile-phone" type="text" name="phone" value="{{phone}}"/>
+					</div>
+				</div>
+
+				<div class='control-group'>
+					<label class='control-label'>Extra Info</label>
+					<div class='controls'>
+						<textarea name='info' id="edit-profile-info" placeholder="Any additional details for this subscriber" style="height:6em;">{{info}}</textarea>
+					</div>
+				</div>
+
+				<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
+
+		</div>
+
+		
+		<div class='edit-profile-payments' style='float:left'>
+			[[ if(false) { ]]
+					<div class='pm-block'>
+						<p>{{payment_method.name}}</p>
+						<p>
+							<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{payment_method.id}}'><i class='icon-remove'></i> remove</a>
+							<a href='#' class='unemph new-charge-button btn' data-id='{{payment_method.id}}'><strong style='color:black'>$</strong> charge</a>
+						</p>
+				</div>
+			[[ } ]]
+				<h4>Payment Method</h4>
+				<p id="new-payment-method-error" class='form-error'></p>
+				<select class='new-payment-method-type' name='pay_type'>
+					<option id='new-credit-card'>Credit Card</option>
+					<option id='new-echeck'>E-check</option>
+				</select>
+				<div class='credit-card-selected'>
+					<label>Card Number</label>
+					<input id="" type="text" name="cc_number" value=""/>
+					<label>Expiration</label>
+					<input id="" type="text" name="expiration" value=""/>
+				</div>
+				<div class='echeck-selected hide'>
+					<label>Account Number</label>
+					<input id="" type="text" name="acct_number" value=""/>
+				</div>
+		</div>
+
+		<div class='modal-form-actions'>
+			<input class="btn" id="edit-profile-submit" name="commit" type="submit" value="Save" />
+			<img class='loader hide' src='img/ajax-loader.gif' />
+		</div>
+	</form>
+
+
+</script>
+
 <script id='edit-profile-header-tmpl' type='text/template' class='hide'>
 	<div class="tabbable">
 		<h3 style="float:left;padding-right:1em;">{{name}}</h3>
@@ -11,35 +86,6 @@
 <script id='edit-profile-info-tmpl' type='text/template' class='hide'>
 		<div class="tab-content">
 			<div class="tab-pane active" id="edit-profile-info">
-				<p id="edit-profile-error"></p>
-				<form method="post" action="/profiles" id="edit-profile-form" class='form-horizontal'>
-					<div class='control-group'>
-						<label class='control-label'>Name</label>
-						<div class='controls'>
-							<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
-						</div>
-					</div>
-
-					<div class='control-group'>
-						<label class='control-label'>Email</label>
-						<div class='controls'>
-							<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
-						</div>
-					</div>
-
-					<div class='control-group'>
-						<label class='control-label'>Extra Info</label>
-						<div class='controls'>
-							<textarea name='info' id="edit-profile-info" placeholder="Any additional details for this subscriber, such as address and phone number" style="width:24em;height:6em;">{{info}}</textarea>
-						</div>
-					</div>
-
-					<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
-
-					<div class='modal-form-actions'>
-						<input class="btn" id="edit-profile-submit" name="commit" type="submit" value="Save" />
-					</div>
-				</form>
 			</div>
 </script>
 

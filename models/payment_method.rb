@@ -25,6 +25,7 @@ class PaymentMethod
 	# Associations
 
 	belongs_to :profile
+	belongs_to :subscription
 	has_many :charges
 
 	# Callbacks

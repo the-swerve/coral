@@ -92,6 +92,7 @@ class Charge
 			self.trnsactions.create action: 'Void'
 			self.state = 'Voided'
 			self.account.in_escrow -= self.amount
+			self.account.revenue_history
 			self.save
 			self.account.save
 		end

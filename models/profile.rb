@@ -12,13 +12,14 @@ class Profile
 
 	# Accessors
 
-	attr_accessor :password,
+	attr_accessor :password, :plan_id,
 		:pm_pay_type, :pm_cc_number, :pm_acct_number, # Can create a nested payment method 
 		:sub_plan_id, :sub_starting, :sub_expiration  # Can create a nested subscription - XXX - maybe do this client-side
 
 	# Data
 
 	field :email, type: String
+	field :phone, type: String, default: ''
 	field :info, type: String
 	field :pass_hash, type: String
 	field :name, type: String
@@ -47,7 +48,9 @@ class Profile
   before_validation(:on => :create) do
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
 		if self.pm_pay_type && self.pm_pay_type != ''
-			pm = self.payment_methods.build :pay_type => pm_pay_type, :cc_number => pm_cc_number, :acct_number => pm_acct_number
+			pm = self.payment_methods.build :pay_type => pm_pay_type,
+				:cc_number => pm_cc_number,
+				:acct_number => pm_acct_number
 			errors.add('',pm.first_error) if !pm.save
 		end
 		if self.sub_plan_id && self.sub_plan_id != ''
@@ -146,6 +149,7 @@ class Profile
 	def as_hash
 		{:name => self.name,
 		 :email => self.email,
+		 :phone => self.phone,
 		 :_subscriptions => self.subscriptions.map(&:as_hash),
 		 :_charges => self.charges.map(&:as_hash),
 		 :state => self.state,

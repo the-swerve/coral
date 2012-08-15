@@ -20,7 +20,7 @@ body { text-align: center}
 	height: 2em;
 	list-style: none;
 	margin: 0 auto;
-	padding: 0.5em;
+	padding: 1em 0 0.5em 0;
 }
 
 #profile-actions li {
@@ -52,4 +52,8 @@ body { text-align: center}
 	-moz-border-radius: 0 0 14px 14px;
 	border-radius: 0 0 14px 14px;
 
+}
+
+tr {
+	background-color: white;
 }

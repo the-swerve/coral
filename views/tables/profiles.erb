@@ -1,25 +1,28 @@
 <script id='profile-table-tmpl' type='text/template' class='hide'>
-	[[ if(!_.isEmpty(profiles)) { ]]
-	<table id="profiles-table" class="table table-striped clickable-rows">
+	<table id="profiles-table" class="table clickable-rows">
 			<thead> <tr> <th></th> </tr> </thead>
 			<tbody>
+				[[ var colors = {'Gray': '#f0f0f0', 'Green': '#d2e6d0', 'Red': '#ddc2c2'} ]]
 				[[ _.each(profiles, function(profile) { ]]
-					<tr id="{{profile.id}}" class="edit-profile-button">
-						<td class="profile-table-name-email">{{ profile.name ? profile.name + ' (' + profile.email + ')' : profile.email }} &#x2012; <em>{{profile.state}}</em></td>
-
-						<td class="profile-table-subs">{{profile.subscription_names ? profile.subscription_names : '' }}</td>
+					<tr id="{{profile.id}}" class="edit-profile-button" style='background-color:{{colors[profile.state]}}'>
+						<td class="profile-table-data">
+							{{ profile.name ? profile.name + ' (' + profile.email + ')' : 
+									profile.email }}
+								&nbsp; <a class='hide btn' href='#' id='edit-profile-info'><i class='icon-pencil'></i> Edit</a>
+								<a class='' href='#' style='float:right'><i class='icon-remove'></i></a>
+						</td>
+					</tr>
+					<tr class='edit-profile hide'>
+						<td> </td>
+					</tr>
 				[[ }); ]]
+
 			<tr id="new-profile-button">
 				<td>
-				<a id="new-profile-button" href="#"><i class="icon-plus"></i> Add Someone</a>
-				</td><td></td>
+				<a href="#"><i class="icon-plus"></i> Add Someone</a>
+				</td>
 			</tr>
+
 			</tbody>
-	[[ } else { ]]
-		<p>
-			<em>No subscribers yet.</em>
-			<a id="new-profile-button" href="#"><i class="icon-plus"></i> Add Someone</a>
-		</p>
-	</table>
-	[[ } ]]
-</script>
+		</table>
+	</script>
