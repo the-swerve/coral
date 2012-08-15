@@ -7,8 +7,4 @@ development:
 production:
   sessions:
     default:
-      database: <%= URI.parse(ENV['MONGOHQ_URL']).path.gsub(/^\//, '') %>
-      hosts:
-       - <%= URI.parse(ENV['MONGOHQ_URL']).host + ':' + URI.parse(ENV['MONGOHQ_URL']).port.to_s %>
-      username: heroku
-      password: 'deep sea creature'
+      uri: <%= ENV['MONGOHQ_URL'] %>
