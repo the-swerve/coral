@@ -7,4 +7,8 @@ development:
 production:
   sessions:
     default:
-      uri: <%= ENV['MONGOHQ_URLxxx'] %>
+      database: 'app5975660'
+      username: 'heroku'
+      password: 'deep sea creature'
+      hosts:
+       - alex.mongohq.com:10066
