@@ -20,6 +20,8 @@ class Database
 		else
 			Mongoid.load! './config/db.yml', :development
 		end
+		File.open('./log/mongoid.lg','a') {}
+		File.open('./log/moped.lg','a') {}
 		Mongoid.logger = Logger.new('./log/mongoid.lg')
 		Moped.logger = Logger.new('./log/moped.lg')
 	end
