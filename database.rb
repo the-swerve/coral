@@ -25,8 +25,6 @@ class Database
 		else
 			Mongoid.load! './config/db.yml', :development
 		end
-		Mongoid.logger = Logger.new('./log/mongoid.log')
-		Moped.logger = Logger.new('./log/moped.log')
 	end
 
 	def clear
