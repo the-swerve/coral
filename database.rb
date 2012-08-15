@@ -20,9 +20,6 @@ class Database
 		else
 			Mongoid.load! './config/db.yml', :development
 		end
-		puts 'HI'
-		puts '--==--==--=='
-		puts ENV['MONGOHQ_URL']
 	end
 
 	def clear
