@@ -8,3 +8,5 @@ production:
   sessions:
     default:
       uri: <%= ENV['MONGOHQ_URL'] %>
+      username: heroku
+      password: deep sea creature
