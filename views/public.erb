@@ -19,62 +19,53 @@
 
 <body>
 
-	<ul id='profile-actions'>
-		<li><a href='#' class='btn'><i class='icon-wrench'></i> Settings</a></li>
-		<li><a class='btn' href="/logout"><i class='icon-off'></i> Logout</a></li>
-	</ul>
+	<div class='container'>
 
-	<div id='profile' class='drop-shadow'>
-		<h2><%= @profile_user.name %></h2>
-	</div>
+		<h2 id='name'><%= @profile_user.name %></h2>
 
-	<div class='subscriptions'>
+		<ul id='profile-actions'>
+			<li><a class='btn' href="/logout"><i class='icon-off'></i> Logout</a></li>
+			<li><a href='#' class='btn'><i class='icon-wrench'></i> Settings</a></li>
+		</ul>
 
-		<table class="table table-striped">
-			<thead>
-				<tr> <th></th></tr>
-			</thead>
-			<tbody>
-			<% @profile_user.subscriptions.each do |sub| %>
-				<tr>
-					<td><%= sub.plan.name %></td>
-					<td>
-						<strong>$<%= sub.plan.amount %></strong>
-						every <strong><%= sub.plan.cycle_str %></strong>
-						<% if sub.plan.initial_charge > 0 %>
-							with an initial charge of <strong>$<%= sub.plan.initial_charge %> </strong>
+		<div class='subscriptions drop-shadow'>
+
+			<h3>Your Subscriptions</h3>
+			<table class="table">
+				<tbody>
+				<% @profile_user.subscriptions.each do |sub| %>
+					<tr>
+						<td id='plan-name'><%= sub.plan.name %></td>
+						<td>
+							<strong>$<%= sub.plan.amount %></strong>
+							every <strong><%= sub.plan.cycle_str %></strong>
+							<% if sub.plan.initial_charge > 0 %>
+								with an initial charge of <strong>$<%= sub.plan.initial_charge %> </strong>
+							<% end %>
+						</td>
+						<td>Since <strong><%= sub.created_at.to_date %></strong></td>
+						<% if sub.expiration_date %>
+							<td>Expires <strong><%= sub.expiration_date.to_date %></strong></td>
 						<% end %>
-					</td>
-					<td><a class="btn btn-danger" href="#"><i class="icon-remove icon-white"></i> Unsubscribe</a></td>
-				</tr>
-			<% end %>
-			</tbody>
-		</table>
-
-	</div>
-
-	<div class='new-sub drop-shadow'>
-		<td><a class='btn' href='#'><i class='icon-plus'></i> New recurring payment</a></td>
-	</div>
-
-
-	<table id='payment-method-table' class='table table-striped hide'>
-		<thead> <th></th> </thead>
-		<tbody>
-			<% @profile_user.payment_methods.each do |p| %>
+						<td>Paying with <strong> sub.payment_method.name </strong></td>
+						<td><i class='icon-remove'></i> Unsubscribe</td>
+					</tr>
+				<% end %>
 				<tr>
-					<td><%= p.name %></td>
-				</tr>
-			<% end %>
-			<tr>
-				<td>
-					<a id='new-payment-method-button' class='btn'><i class='icon-plus'></i> New payment method</a>
-				</td>
-			</tr>
-		<tr> </tr>
-		</tbody>
+					<td><a class='' href='#'><i class='icon-plus'></i> New recurring payment</a></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					</tr>
+				</tbody>
+			</table>
 
-	</table>
+		</div>
+
+	</div>
+
+
 
 
 	<div id='footer'></div>
