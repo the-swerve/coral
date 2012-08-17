@@ -11,8 +11,7 @@ function modalize(prefix) {
 		$('p#' + prefix + '-error').html(''); // Make sure form errors are blank
 		$('div#' + prefix).modal('show');
 	});
-};
-
+}; 
 
 $(document).ready(function() {
 

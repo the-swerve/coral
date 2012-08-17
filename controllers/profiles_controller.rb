@@ -31,6 +31,14 @@ class Application < Sinatra::Base
 		end
 	end
 
+	put '/profile', :auth => :profile do
+		if @profile_user.update_attributes @params
+			json @profile_user.as_hash
+		else
+			halt 400, @profile_user.first_error
+		end
+	end
+
 	put '/profiles/:profile_id', :auth => :account do
 		@profile = @account.profiles.find(params['profile_id'])
 		if @profile
