@@ -46,8 +46,8 @@
 		$(document).ready(function() {
 
 			// Initialize backbone views
-			var account_view = new AccountView({model: Coral.account.model, el: $('div#account')});
-			var ba_view = new BAView({model: Coral.account.model, el: $('div#account')});
+			var account_view = new AccountView({model: Coral.account.model, el: $('div.container')});
+			var ba_view = new BAView({model: Coral.account.model, el: $('div.container')});
 			var plan_view = new PlanView({collection: Coral.plans.coll, el: $('div.container')});
 
 			var profile_view = new ProfileView({collection: Coral.profiles.coll, el: $('div.container'), plans: Coral.plans.coll});
@@ -74,30 +74,28 @@
 
 <div class="container">
 
-	<div id="account">
+	<div id="account" class='row'>
 		<%= erb :nav %>
 		<h2 id="account-name"><%= @account.name %></h2>
+	</div>
+
+	<div class='row'>
 		<%= erb :'modals/edit_account' %>
 	</div>
 
-	<div class="visualization drop-shadow">
+	<div class="visualization drop-shadow row">
 		<div id="chart"> </div>
 	</div>
 
-	<div class="data drop-shadow">
+	<div class="data drop-shadow row">
 
 		<div class='row data-row'>
 			<%= erb :'meta/plans' %>
-			<%= erb :'modals/new_plan' %>
-			<%= erb :'modals/edit_plan' %>
-			<%= erb :'modals/share_plan' %>
-			<%= erb :'modals/new_profile' %>
-			<%= erb :'modals/edit_profile' %>
 			<%= erb :'tables/profiles' %>
-			<div class='span2'>
+			<div class='span3'>
 				<div id='plan-nav-container'> </div>
 			</div>
-			<div class='span9'>
+			<div class='span9 plus-half'>
 				<div id='profiles-container'>
 					<div id='plan-desc-container'></div>
 					<div id='profile-table-container'></div>
@@ -118,6 +116,11 @@
 	<div id='footer'>
 		<!-- <a class="logo" href="/">coral</a> -->
 	</div>
+	<%= erb :'modals/new_plan' %>
+	<%= erb :'modals/edit_plan' %>
+	<%= erb :'modals/share_plan' %>
+	<%= erb :'modals/new_profile' %>
+	<%= erb :'modals/edit_profile' %>
 
 </body>
 </html>

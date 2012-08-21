@@ -42,8 +42,21 @@
 		</div>
 
 		<div class='modal-form-actions'>
-			<input id='edit-plan-submit' class='btn' name='commit' type='submit' value='Save' />
+			<input id='edit-plan-submit' class='btn' name='commit' type='submit' value='Save' />&nbsp; &nbsp;
+			<button id='cancel-edit-plan' class='btn'>Cancel</button>
 			<a id='remove-plan-button' class='btn btn-danger' style='float:right'><i class='icon-remove icon-white'></i> Remove</a>
+			<img id='edit-plan-loader' class='hide' src='img/ajax-loader.gif' />
 		</div>
 	</form>
 </script>
+
+<div class="modal hide" id="remove-plan">
+	<div class="modal-body">
+		<p id="remove-plan-error"></p>
+		<p>Are you sure you wish to remove this plan? Note: your payment history
+		and existing customers will not be removed.</p>
+
+		<a id="remove-plan-submit" class="btn btn-danger"><i class="icon-remove icon-white"></i> Remove</a>
+		<a data-dismiss="modal" class="btn btn-info">Cancel</a>
+	</div>
+</div>

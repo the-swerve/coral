@@ -31,7 +31,7 @@ class Trnsaction
 
 	# Callbacks
 
-	before_validation(:on => :create) do
+	before_validation(on: :create) do
 		self.action ||= 'Payment'
 		self.message = 'Test transaction'
 		self.successful ||= 'true'

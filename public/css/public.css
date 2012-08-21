@@ -1,6 +1,5 @@
 body {
 	padding-top: 2em;
-	text-align: center
 } 
 
 #profile {
@@ -92,4 +91,12 @@ td#plan-name {
 }
 
 div#meta {
+}
+
+tr.new-plan-button {
+	cursor: pointer;
+}
+
+tr#new-plan-form td {
+	background-color: white;
 }

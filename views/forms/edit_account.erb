@@ -4,7 +4,7 @@
 			<h3 style="float:left;padding-right:1em;">Account Settings</h3>
 			<li class="active auto-tooltip" title="Edit info"><a href="#account-info" data-toggle="tab"><i class="icon-user"></i> Your Info</a></li>
 			<li><a href="#account-money" data-toggle="tab"><i class="icon-lock"></i> Your Money</a></li>
-			<button type="button" class="close" data-dismiss="modal" style="float:right">x</button>
+			<li style='float:right'><a id='close-account-settings' href='x'><i class='icon-remove'></i> Close</a></li>
 		</ul>
 
 	<div class="tab-content">
@@ -21,29 +21,22 @@
 					<div class="controls"><input type="text" name="email" value="{{email}}" /></div>
 				</div>
 
-				<div class="control-group">
-					<label class="control-label">Phone Number</label>
-					<div class="controls"><input type="text" name="phone" value="" /></div>
-				</div>
-
-				<div class="control-group">
-					<label class="control-label">Address</label>
-					<div class="controls"><input type="text" name="address" value="" /></div>
-				</div>
-
 				<div class='modal-form-actions'>
-					<input class="btn" id="edit-account-submit" name="commit" type="submit" value="Save" />
+					<input class="btn" id="edit-account-submit" name="commit" type="submit" value="Update" />
+					<img id='edit-account-loader' class='hide' src='img/ajax-loader.gif' />
 				</div>
 			</form>
 		</div>
+
 		<div class="tab-pane" id="account-money">
-			<div class="well">
-				<p>In escrow: ${{in_escrow}}</p>
-				<p>Total received: ${{received}}</p>
-				<p><a href="#" class="btn btn-success">Pay out</a></p>
-			</div>
-			[[ if(bank_name == 'none') { ]]
 			<form method="post" id="new-bank-account-form" class="form-horizontal">
+
+				<div class='control-group'>
+					<label class='control-label'>Total Revenue</label>
+					<div class='controls'>
+						<input type='text' disabled='disabled' value='${{in_escrow}}' />
+					</div>
+				</div>
 
 				<div class="control-group"> <label class="control-label">Bank Name</label>
 					<div class="controls"> <input type="text" name="name" /></div>
@@ -54,12 +47,9 @@
 				</div>
 
 				<div class='modal-form-actions'>
-					<input class="btn" id="new-bank-account-submit" name="commit" type="submit" value="Save" />
+					<input class="btn" id="new-bank-account-submit" name="commit" type="submit" value="Update" />
 				</div>
 			</form>
-			[[ } else { ]]
-				<p>Connected bank account: {{bank_name}}</p>
-			[[ } ]]
 		</div>
 	</div>
 </div>

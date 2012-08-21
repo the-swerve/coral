@@ -10,6 +10,7 @@
 	<link rel="stylesheet" media="screen,projection" href="/css/public.css">
 	<script type="text/javascript" src="/js/jquery.js"></script>
 	<script type="text/javascript" src="/js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/bootstrap-modal.js"></script>
 	<script type="text/javascript" src="/js/app.js"></script>
 	<script type="text/javascript" src="/js/public.js"></script>
 
@@ -64,8 +65,9 @@
 
 		<div class='subscriptions drop-shadow row'>
 
-			<h3>Your Subscriptions</h3>
-			<table class="table">
+			<h3 id='table-title'>Subscriptions</h3>
+			<a href='#' id='table-toggler' style='float:right'>Payments</a>
+			<table class="table" id='subscription-table'>
 				<tbody>
 				<% @profile_user.subscriptions.each do |sub| %>
 					<tr>
@@ -77,29 +79,133 @@
 								with an initial charge of <strong>$<%= sub.plan.initial_charge %> </strong>
 							<% end %>
 						</td>
-						<td>Since <strong><%= sub.created_at.to_date %></strong></td>
+						<td>Since <strong style='white-space:nowrap;'><%= sub.created_at.to_date %></strong></td>
 						<% if sub.expiration_date %>
 							<td>Expires <strong><%= sub.expiration_date.to_date %></strong></td>
 						<% end %>
-						<td>Paying with <strong> sub.payment_method.name</strong> (change)</td>
-						<td><i class='icon-remove'></i> Unsubscribe</td>
+						<td>Paying with <strong> x</strong> <a class='change-pm-btn' href='#'>(change)</a></td>
+						<td><a id='unsubscribe-btn' class='btn' href='#' style='white-space:nowrap;'><i class='icon-remove'></i> Unsubscribe</a></td>
 					</tr>
 				<% end %>
-				<tr>
-					<td><a class='' href='#'><i class='icon-plus'></i> New recurring payment</a></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
+				<tr id='new-plan-form' class='hide'>
+					<td colspan='5'>
+						<p id='new-plan-error' class='form-error'></p>
+
+						<form class='form-horizontal' id='new-plan-form'>
+
+							<div class='control-group'>
+								<label class='control-label'>Receiver's Email</label>
+								<div class='controls'>
+									<input type='text' name='name' /> 
+									<p class='help-block'>An invitation email will be sent to the person whom you would like to pay</p>
+								</div>
+							</div>
+
+							<div class='control-group'>
+								<label class='control-label'>Name of Recurring Payment</label>
+								<div class='controls'>
+									<input type='text' name='name' /> 
+								</div>
+							</div>
+
+							<div class='control-group'>
+								<label class='control-label'>Recurring charge of</label>
+								<div class='controls'>
+									<div class='input-prepend'>
+										<span class='add-on'>$</span>
+										<input type='text' name='amount' style='width:4em;' />
+									</div>
+									<span>&nbsp; every &nbsp;</span>
+									<select style='width:8em;' name='cycle'>
+										<option>1 month</option>
+										<option>2 weeks</option>
+										<option>2 months</option>
+										<option>3 months</option>
+										<option>6 months</option>
+										<option>1 year</option>
+									</select>
+								</div>
+							</div>
+
+							<div class='control-group'>
+								<label class='control-label'>Initial charge</label>
+								<div class='controls'>
+									<div class='input-prepend'>
+										<span class='add-on'>$</span>
+										<input type='text' name='initial_charge' style='width:4em;' />
+									</div>
+								</div>
+							</div>
+
+							<div class='control-group'>
+								<label class='control-label'>Starting date</label>
+								<div class='controls'>
+									<input type="date" placeholder="Today" />
+								</div>
+							</div>
+
+							<div class='modal-form-actions'>
+								<button class='btn' id="new-plan-submit">Save</button>
+								<button class='btn' id="cancel-new-plan">Cancel</button>
+								<span style='float:right'><a href='#'>Looking to receive recurring payments?</span>
+							</div>
+						</form>
+					</td>
+				</tr>
+				<tr class='new-plan-button'>
+					<td colspan='5'><a href='#'><i class='icon-plus'></i> New recurring payment</a></td>
 					</tr>
 				</tbody>
 			</table>
 
-		</div>
+			<table id='payments-table' class="table hide">
+				<tbody>
+					<tr>
+						<td>x</td>
+					</tr>
+				</tbody>
+			</table>
 
 	</div>
 
 
+	<div id='confirm-unsubscribe' class='modal hide'>
+		<div class='modal-body'>
+			<p>Are you sure you wish to end this recurring payment? Your payment history will remain intact.</p>
+		</div>
+		<div class='modal-footer'>
+			<button class='btn-danger' id="unsubscribe-submit">Unsubscribe</button>
+			<button class='btn' id="cancel-unsubscribe" data-dismiss='modal'>Cancel</button>
+		</div>
+	</div>
+
+	<div id='new-payment-method' class='modal hide'>
+		<div class='modal-body'>
+			<h4>New Payment Method</h4>
+			<p id="new-payment-method-error" class='form-error'></p>
+			<form id='new-payment-method-form'>
+				<select class='new-payment-method-type' name='pay_type'>
+					<option id='new-credit-card'>Credit Card</option>
+					<option id='new-echeck'>E-check</option>
+				</select>
+				<div class='credit-card-selected'>
+					<label>Card Number</label>
+					<input id="" type="text" name="cc_number" value=""/>
+					<label>Expiration</label>
+					<input id="" type="text" name="expiration" value=""/>
+				</div>
+				<div class='echeck-selected hide'>
+					<label>Account Number</label>
+					<input id="" type="text" name="acct_number" value=""/>
+				</div>
+
+				<div class="modal-form-actions">
+					<button class='btn' id="cancel-unsubscribe">Save</button>
+					<button class='btn' id="cancel-unsubscribe" data-dismiss='modal'>Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
 
 	<div id='footer'></div>
