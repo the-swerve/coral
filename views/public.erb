@@ -75,9 +75,6 @@
 						<td>
 							<strong>$<%= sub.plan.amount %></strong>
 							every <strong><%= sub.plan.cycle_str %></strong>
-							<% if sub.plan.initial_charge > 0 %>
-								with an initial charge of <strong>$<%= sub.plan.initial_charge %> </strong>
-							<% end %>
 						</td>
 						<td>Since <strong style='white-space:nowrap;'><%= sub.created_at.to_date %></strong></td>
 						<% if sub.expiration_date %>

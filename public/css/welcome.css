@@ -36,12 +36,19 @@ form#welcome-form {
 	margin-right: auto;
 }
 
-form#initial-plan {
-	width: 340px;
+form#first-plan-form {
+	width: 360px;
 	margin-left: auto;
 	margin-right: auto;
-	display: none;
-}	
+}
+
+form#first-plan-form .control-group .control-label {
+	width: 80px;
+}
+
+form#first-plan-form .control-group .controls {
+	margin-left: 100px;
+}
 
 input.welcome-submit, input#initial-plan-submit {
   height: 2.7em;

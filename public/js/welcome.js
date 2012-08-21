@@ -77,9 +77,10 @@ $(document).ready(function() {
 				url: '/account',
 				dataType: 'json',
 				data: $('form#welcome-form').serialize(),
-				success: function(data) {
-					$.cookie('coral.session_token', data.session_token);
-					window.location = '/';
+				success: function(d) {
+					$.cookie('coral.session_token', d.session_token);
+					$('form#welcome-form').fadeOut(function() {$('form#first-plan-form').fadeIn()});
+					$('a#switch-contexts').fadeOut();
 				},
 				error: function(data) {
 					$('p#greetings-message').html(data.responseText);
@@ -90,6 +91,27 @@ $(document).ready(function() {
 				}
 			});
 		}
+	});
+
+	// Submit first plan
+	$('#first-plan-submit').click(function(e) {
+		e.preventDefault();
+		$(this).hide();
+		$('#first-plan-loader').show();
+		$.ajax({
+			type: 'post',
+			url: '/plans',
+			dataType: 'json',
+			data: $('form#first-plan-form').serializeObject(),
+			success: function(d) {
+				window.location = '/';
+			},
+			error: function(d) {
+				$('p#first-plan-error').html(d.responseText);
+				$('#first-plan-loader').hide();
+				$('#first-plan-submit').show();
+			}
+		});
 	});
 
 	// A little logo hover fade effect

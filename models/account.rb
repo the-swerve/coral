@@ -72,7 +72,8 @@ class Account
 		 :id => self.id.to_s,
 		 :bank_name => self.bank_name || 'none',
 		 :in_escrow => self.in_escrow.to_s,
-		 :received => self.received.to_s}
+		 :received => self.received.to_s,
+		 :session_token => self.session_token}
 	end
 
 	def first_error

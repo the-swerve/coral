@@ -23,7 +23,7 @@
 
 <a class="logo" href="/">coral</a>
 
-<form method="post" action="/signin" class="well drop-shadow" id="welcome-form">
+<form class="well drop-shadow" id="welcome-form">
 
 	<p class="centered greetings"><strong>Welcome to Coral</strong></p>
 	<p class="centered" id="greetings-message">Please sign in</p>
@@ -35,6 +35,59 @@
 	<div class="form-actions centered">
 		<input class="btn welcome-submit" id="welcome-submit" name="commit" type="submit" value="Sign In" />
 	</div>
+
+</form>
+
+<form class="well drop-shadow form-horizontal hide" id="first-plan-form">
+
+	<p id='first-plan-error' class='form-error'></p>
+
+	<form class='form-horizontal' id='new-plan-form'>
+
+		<h3>Create Your First Plan</h3>
+		<div class='hline'></div>
+
+		<div class='control-group'>
+			<label class='control-label'>Name</label>
+			<div class='controls'>
+				<input type='text' name='name' /> 
+			</div>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Charge </label>
+			<div class='controls'>
+				<div class='input-prepend'>
+					<span class='add-on'>$</span>
+					<input type='text' name='amount' style='width:4em;' />
+				</div>
+				<span>&nbsp; every &nbsp;</span>
+				<select style='width:8em;' name='cycle'>
+					<option>1 month</option>
+					<option>2 weeks</option>
+					<option>2 months</option>
+					<option>3 months</option>
+					<option>6 months</option>
+					<option>1 year</option>
+				</select>
+			</div>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Initial charge</label>
+			<div class='controls'>
+				<div class='input-prepend'>
+					<span class='add-on'>$</span>
+					<input type='text' name='initial_charge' style='width:4em;' />
+				</div>
+			</div>
+		</div>
+
+		<div class='modal-form-actions'>
+			<button id='first-plan-submit' class='btn'>Continue</button>
+			<img id='first-plan-loader' class='hide' src='img/ajax-loader.gif' />
+		</div>
+	</form>
 
 </form>
 

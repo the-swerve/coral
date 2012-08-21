@@ -67,3 +67,8 @@ div.form-actions {
 .form-error {
 	color: #944E4E;
 }
+
+.hline {
+	border-top: 1px solid #DDD;
+	height: 1em;
+}
