@@ -36,4 +36,50 @@ $(document).ready(function() {
 		});
 	});
 
+	$('.new-plan-button').click(function(e) {
+		$(this).hide();
+		$('#new-plan-form input').val(''); // clear form inputs
+		$('#new-plan-form').show();
+	});
+
+	$('#cancel-new-plan').click(function(e) {
+		$('#new-plan-form').hide();
+		$('.new-plan-button').show();
+	});
+
+	$('#unsubscribe-btn').click(function(e) {
+		$('#confirm-unsubscribe').modal('show');
+	});
+
+	$('.change-pm-btn').click(function(e) {
+		$('#new-payment-method').modal('show');
+	});
+	
+	$('.new-payment-method-type').change(function(e) {
+		var sel = $('.new-payment-method-type option:selected').text();
+		if(sel == 'Credit Card') {
+			$('.echeck-selected').hide();
+			$('.credit-card-selected').show();
+		} else if(sel == 'E-check') {
+			$('.credit-card-selected').hide();
+			$('.echeck-selected').show();
+		} else if(sel == '') {
+			$('.credit-card-selected').hide();
+			$('.echeck-selected').hide();
+		}
+	});
+
+	$('#table-toggler').toggle(function(e) {
+		$('#table-title').html('Payments');
+		$(this).html('Subscriptions');
+		$('#subscription-table').hide();
+		$('#payments-table').slideDown();
+	}, function(e) {
+		$('#table-title').html('Subscriptions');
+		$(this).html('Payments');
+		$('#payments-table').hide();
+		$('#subscription-table').slideDown();
+	});
+
+
 });

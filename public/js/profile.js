@@ -21,35 +21,6 @@ ProfileView = Backbone.View.extend({
 
 	},
 
-	initJquery: function() {
-		var self = this;
-		$('.edit-profile-button').click( // XXX wat bleh put in events hash
-			function() {
-				var clicked = self.collection.get($(this).attr('id'));
-				if(clicked == self.collection.selected) {
-					$('.edit-profile').hide();
-					$('.edit-profile-button').css('fontWeight','normal');
-					self.collection.selected = null;
-				} else {
-					self.collection.selected = self.collection.get($(this).attr('id'));
-					$('.edit-profile-button').show();
-					$('.edit-profile-button').css('fontWeight','normal');
-					$(this).css('fontWeight','bold');
-					var row = $(this).next();
-					$('.edit-profile').hide();
-					$(this).children('.edit-profile-info').show();
-					$('p#edit-profile-error').html(''); // clear form errors
-					// Compile and render form template
-					var tmpl = _.template($('#edit-profile-tmpl').html());
-					attrs = self.collection.selected.attributes;
-					editView = '<td>' + tmpl(attrs) + '</td>';
-					row.html(editView);
-					row.show();
-				}
-			}
-		);
-	},
-
 	events: {
 		'click #new-profile-button': 'renderNewForm',
 		'click #new-profile-submit': 'create',
@@ -210,10 +181,25 @@ ProfileView = Backbone.View.extend({
 		});
 		filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
 		var table = _.template($('#profile-table-tmpl').html());
-		$('#profile-table-container').hide();
+		$('#profiles-table-container').hide();
 		$('#profile-table-container').html(table({profiles: filtered_profiles}));
 		$('#profile-table-container').slideDown('slow');
-		this.initJquery();
+		this.compileEditForm();
+	},
+
+	compileEditForm: function(e) {
+		if(e) e.preventDefault();
+		var self = this;
+		$('.edit-profile-button').click(function() {
+			var clicked = self.collection.get($(this).attr('id'));
+			self.collection.selected = self.collection.get($(this).attr('id'));
+			self.plans.selected = null;
+			$('#plan-nav li').removeClass('active');
+			// Compile and render form template
+			var tmpl = _.template($('#edit-profile-tmpl').html());
+			$('p#edit-profile-error').html(''); // clear form errors
+			$('#profiles-container').html(tmpl(self.collection.selected.attributes));
+		});
 	},
 
 	renderNewForm: function(e) {

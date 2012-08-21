@@ -23,6 +23,7 @@ PlanView = Backbone.View.extend({
 	events: {
 		'click #new-plan-submit': 'create',
 		'click #edit-plan-submit': 'update',
+		'click #cancel-edit-plan': 'renderNav',
 		'click #remove-plan-submit': 'destroy',
 
 		'click .dropdown-item': 'selectPlan',
@@ -39,9 +40,10 @@ PlanView = Backbone.View.extend({
 		this.renderNav();
 	},
 
-	renderNav: function() {
+	renderNav: function(e) {
 		/* This will run on page load, instantiating the selected plan and rendering the initial templates.
 		 */
+		if(e) e.preventDefault();
 		if(this.collection.isEmpty()) { // show the new plan dialog after new account creation
 			this.renderNewForm();
 		} else {
@@ -60,30 +62,36 @@ PlanView = Backbone.View.extend({
 
 	renderRemoveForm: function(e) {
 		if(e) e.preventDefault();
-		$('div#edit-plan').modal('hide'); // remove dialog arises from edit dialog
 		$('p#remove-plan-error').html(''); // clear errors
 		$('div#remove-plan').modal('show');
 	},
 
 	renderNewForm: function(e) {
 		if(e) e.preventDefault();
+
+		$(e.currentTarget).parent().addClass('active');
+		$(e.currentTarget).parent().siblings().removeClass('active');
+		this.collection.selected = null;
+		// render blank tables for profiles and charges
+		$('#profiles-table').html('');
+
 		$('p#new-plan-error').html(''); // clear errors
-		$('div#new-plan').modal('show');
 		var tmpl = _.template($('#plan-new-tmpl').html());
-		$('#new-plan .modal-body').html(tmpl());
+		$('#plan-desc-container').html(tmpl());
 	},
 	
 	create: function(e) {
 		if(e) e.preventDefault();
 		if(this.req == false) {
 			var self = this;
-			$('input#new-plan-submit').toggleSubmit();
+			$('input#new-plan-submit').hide();
+			$('input#new-plan-submit').siblings().hide();
+			$('#new-plan-loader').show();
 			this.req = true;
 			var data = $('form#new-plan-form').serializeObject();
 			var plan = new Plan();
 			plan.save(data, {
 				success: function(model, response) {
-					$('input#new-plan-submit').toggleSubmit(); // return the save button to normal
 					$('div#new-plan').modal('hide'); // hide the new plan dialog
 
 					// render blank tables for profiles and charges
@@ -94,7 +102,6 @@ PlanView = Backbone.View.extend({
 					self.collection.selected = model;
 					self.req = false; // release the request lock
 					self.renderNav();
-					self.renderShareForm();
 				},
 				error: function(model, response) {
 					$('p#new-plan-error').html(response.responseText);
@@ -106,6 +113,7 @@ PlanView = Backbone.View.extend({
 	},
 
 	destroy: function() {
+		alert('hi');
 		if(this.req == false) { // check request lock
 			var self = this; // preserve scope
 			$('a#remove-plan-submit').addClass('disabled'); // disable button
@@ -133,7 +141,9 @@ PlanView = Backbone.View.extend({
 		if(e) e.preventDefault();
 		if(this.req == false) {
 			var self = this;
-			$('input#edit-plan-submit').toggleSubmit();
+			$('input#edit-plan-submit').hide();
+			$('input#edit-plan-submit').siblings().hide();
+			$('#edit-plan-loader').show();
 			this.req = true;
 			var data = $('form#edit-plan-form').serializeObject();
 			this.collection.selected.save(data, {
@@ -155,16 +165,13 @@ PlanView = Backbone.View.extend({
 	renderEditForm: function(e) {
 		if(e) e.preventDefault();
 		$('p#edit-plan-error').html(''); // Make sure form errors are blank
-		$('div#edit-plan').modal('show');
 		var tmpl = _.template($('#plan-edit-tmpl').html());
-		$('#edit-plan .modal-body').html(tmpl({plan: this.collection.selected}));
+		$('#plan-desc-container').html(tmpl({plan: this.collection.selected}));
 	},
 
 	renderShareForm: function(e) {
 		if(e) e.preventDefault();
 		$('div#share-plan').modal('show');
-		// populate share form - XXX maybe use template
-		this.collection.selected != 'all' ? url += this.collection.selected.get('url') : url += '/share';
 	},
 
 	selectPlan: function(e) {
