@@ -9,7 +9,7 @@ class Application < Sinatra::Base
 		if @profile
 			@payment_method = @profile.payment_methods.build @params
 			if @payment_method.save
-				json @payment_method.as_hash
+				json @profile.as_hash
 			else
 				halt 400, @payment_method.first_error
 			end

@@ -31,7 +31,22 @@ ProfileView = Backbone.View.extend({
 		'click #share-plan-submit': 'invitePeople',
 		'click #remove-profile-row': 'removeRow',
 		'click #new-profile-row': 'addRow',
-		'click #payments-button': 'showPayments'
+		'click #payments-button': 'showPayments',
+		'click .view-profile-button': 'renderProfileView',
+		'click #edit-profile-button': 'renderEditForm',
+		'click #cancel-edit-profile': 'renderEditForm',
+
+		'click .remove-pm-button': 'renderRemovePMForm',
+		'click #new-pm-submit': 'createPM',
+		'click #remove-pm-submit': 'destroyPM',
+	},
+
+	renderEditForm: function(e) {
+		e.preventDefault();
+		$('#new-payment-method-form').hide();
+		$('#new-pm-button').removeClass('disabled');
+		$('#edit-profile-button').toggleClass('disabled');
+		$('#edit-profile-form').toggle();
 	},
 
 	showPayments: function(e) {
@@ -126,29 +141,81 @@ ProfileView = Backbone.View.extend({
 		}
 	},
 
-	update: function(e) {
+	createPM: function(e) {
+		if(e) e.preventDefault();
+		var self = this;
+		$('#new-pm-submit').hide();
+		$('#cancel-new-pm').hide();
+		$('#new-pm-loader').fadeIn();
+		var profile = this.collection.selected;
+		$.ajax({
+			type: 'post',
+			url: '/profiles/' + profile.id + '/payment_methods',
+			dataType: 'json',
+			data: $('#new-payment-method-form').serializeObject(),
+			success: function(d) {
+				profile.set(d);
+				self.renderProfileView();
+			},
+			error: function(d) {
+				$('p#new-payment-method-error').html(d.responseText);
+				$('#new-pm-submit').show();
+				$('#cancel-new-pm').show();
+				$('#new-pm-loader').hide();
+			}
+		});
+	},
+
+	renderRemovePMForm: function(e) {
 		e.preventDefault();
-		if(this.req == false) {
-			this.req = true;
-			$(e.currentTarget).hide();
-			$(e.currentTarget).siblings('.loader').fadeIn();
-			var self = this;
-			var data = $('.edit-profile-form').serializeObject();
-			var profile = this.collection.selected;
-			profile.save(data, {
-				success: function(model, response) {
-					$('.edit-profile').hide();
-					$('.edit-profile-button').show();
+		this.selected_id = $(e.currentTarget).attr('data-id');
+		$('#remove-pm-modal').modal('show');
+	},
+
+	destroyPM: function(e) {
+		if(e) e.preventDefault();
+		if(this.req == false) { // check request lock
+			var self = this; // preserve scope
+			$('a#remove-pm-submit').addClass('disabled'); // disable button
+			this.req = true; // set request lock
+			$.ajax({
+				type: 'delete',
+				url: '/profiles/' + self.collection.selected.id + '/payment_methods/' + self.selected_id,
+				dataType: 'json',
+				success: function(d) {
 					self.req = false;
-					self.renderTable();
+					self.collection.selected.set(d);
+					$('a#remove-pm-submit').removeClass('disabled');
+					$('#remove-pm-modal').modal('hide');
+					self.renderProfileView();
 				},
-				error: function(model, response) {
-					$('p#edit-profile-error').html(response.responseText);
-					$('input#edit-profile-submit').toggleSubmit();
+				error: function(d) {
+					$('p#remove-pm-error').html(d.responseText);
+					$('a#remove-pm-submit').removeClass('disabled');
 					self.req = false;
 				}
 			});
 		}
+	},
+
+	update: function(e) {
+		e.preventDefault();
+		$('#edit-profile-submit').hide();
+		$('#cancel-edit-profile').hide();
+		$('#edit-profile-loader').fadeIn();
+		$(e.currentTarget).siblings('.loader').fadeIn();
+		var self = this;
+		var data = $('#edit-profile-form').serializeObject();
+		this.collection.selected.save(data, {
+			success: function(model, response) {
+				self.renderProfileView(); // toggle it off
+			},
+			error: function(model, response) {
+				$('p#edit-profile-error').html(response.responseText);
+				$('input#edit-profile-submit').toggleSubmit();
+				self.req = false;
+			}
+		});
 	},
 
 	destroy: function() {
@@ -180,26 +247,26 @@ ProfileView = Backbone.View.extend({
 			return _.include(p.get('plan_ids'), self.plans.selected.id);
 		});
 		filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
+
 		var table = _.template($('#profile-table-tmpl').html());
+		var desc = _.template($('#plan-desc-tmpl').html());
+
 		$('#profiles-table-container').hide();
+		$('#profiles-container').html(desc({plan: self.plans.selected}) + table({profiles: filtered_profiles}));
 		$('#profile-table-container').html(table({profiles: filtered_profiles}));
 		$('#profile-table-container').slideDown('slow');
-		this.compileEditForm();
 	},
 
-	compileEditForm: function(e) {
-		if(e) e.preventDefault();
-		var self = this;
-		$('.edit-profile-button').click(function() {
-			var clicked = self.collection.get($(this).attr('id'));
-			self.collection.selected = self.collection.get($(this).attr('id'));
-			self.plans.selected = null;
+	renderProfileView: function(e) {
+		if(e) { // changing selection by clicking on row
+			e.preventDefault();
+			this.collection.selected = this.collection.get($(e.currentTarget).attr('id'));
+			this.plans.selected = null;
 			$('#plan-nav li').removeClass('active');
-			// Compile and render form template
-			var tmpl = _.template($('#edit-profile-tmpl').html());
-			$('p#edit-profile-error').html(''); // clear form errors
-			$('#profiles-container').html(tmpl(self.collection.selected.attributes));
-		});
+		}
+		// Compile and render form template
+		var tmpl = _.template($('#edit-profile-tmpl').html());
+		$('#profiles-container').html(tmpl(this.collection.selected.attributes));
 	},
 
 	renderNewForm: function(e) {
@@ -227,18 +294,18 @@ PMView = Backbone.View.extend({
 	},
 
 	events: {
-		'click #new-pm-button': 'render',
-		'click #new-payment-method-submit': 'create',
+		'click #new-pm-button': 'renderNewForm',
+		'click #cancel-new-pm': 'renderNewForm',
 		'click .back-to-profile': 'goBack',
 		'change .new-payment-method-type': 'getType',
-		'click .remove-pm-button': 'renderRemoveForm',
-		'click #remove-pm-submit': 'destroy',
 	},
 
-	render: function(e) {
+	renderNewForm: function(e) {
 		if(e) e.preventDefault();
-		var tmpl = _.template($('#new-payment-method-tmpl').html());
-		$('div#edit-profile-payments').html(tmpl(this.collection.selected.toJSON()));
+		$('#edit-profile-form').hide();
+		$('#edit-profile-button').removeClass('disabled');
+		$('#new-payment-method-form').toggle();
+		$('#new-pm-button').toggleClass('disabled');
 	},
 
 	getType: function(e) {
@@ -259,66 +326,6 @@ PMView = Backbone.View.extend({
 		if(e) e.preventDefault();
 		var payments = _.template($('#edit-profile-payments-tmpl').html());
 		$('div#edit-profile-payments').html(payments(this.collection.selected.attributes));
-	},
-
-	create: function(e) {
-		if(e) e.preventDefault();
-		if(this.req == false) {
-			this.req = true;
-			var self = this;
-			$(e.currentTarget).hide();
-			$(e.currentTarget).siblings('.loader').show();
-			var profile = this.collection.selected;
-			$.ajax({
-				type: 'post',
-				url: '/profiles/' + profile.id + '/payment_methods',
-				dataType: 'json',
-				data: $('#new-payment-method-form').serializeObject(),
-				success: function(d) {
-					$('input#new-payment-method-submit').toggleSubmit();
-					profile.get('_payment_methods').push(d);
-					self.goBack();
-					self.req = false;
-				},
-				error: function(d) {
-					$('p#new-payment-method-error').html(d.responseText);
-					$('input#new-payment-method-submit').toggleSubmit();
-					self.req = false;
-				}
-			});
-		}
-	},
-
-	renderRemoveForm: function(e) {
-		e.preventDefault();
-		this.selected_id = $(e.currentTarget).attr('data-id');
-		tmpl = _.template($('#remove-pm-tmpl').html());
-		$('div#edit-profile-payments').html(tmpl());
-	},
-
-	destroy: function(e) {
-		if(e) e.preventDefault();
-		if(this.req == false) { // check request lock
-			var self = this; // preserve scope
-			$('a#remove-pm-submit').addClass('disabled'); // disable button
-			this.req = true; // set request lock
-			$.ajax({
-				type: 'delete',
-				url: '/profiles/' + self.collection.selected.id + '/payment_methods/' + self.selected_id,
-				dataType: 'json',
-				success: function(d) {
-					self.req = false;
-					self.collection.selected.set(d);
-					$('a#remove-pm-submit').removeClass('disabled');
-					self.goBack();
-				},
-				error: function(d) {
-					$('p#remove-pm-error').html(d.responseText);
-					$('a#remove-pm-submit').removeClass('disabled');
-					self.req = false;
-				}
-			});
-		}
 	},
 
 });

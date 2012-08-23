@@ -4,7 +4,7 @@
 			<tbody>
 				[[ var colors = {'Gray': '#f0f0f0', 'Green': '#d2e6d0', 'Red': '#ddc2c2'} ]]
 				[[ _.each(profiles, function(profile) { ]]
-					<tr id="{{profile.id}}" class="edit-profile-button" style='background-color:{{colors[profile.state]}}'>
+					<tr id="{{profile.id}}" class="view-profile-button" style='background-color:{{colors[profile.state]}}'>
 						<td class="profile-table-data">
 							{{ profile.name ? profile.name + ' (' + profile.email + ')' : 
 									profile.email }}

@@ -74,6 +74,12 @@
 
 <div class="container">
 
+	<%= erb :'modals/new_plan' %>
+	<%= erb :'modals/edit_plan' %>
+	<%= erb :'modals/share_plan' %>
+	<%= erb :'modals/new_profile' %>
+	<%= erb :'modals/edit_profile' %>
+
 	<div id="account" class='row'>
 		<%= erb :nav %>
 		<h2 id="account-name"><%= @account.name %></h2>
@@ -97,8 +103,6 @@
 			</div>
 			<div class='span9 plus-half'>
 				<div id='profiles-container'>
-					<div id='plan-desc-container'></div>
-					<div id='profile-table-container'></div>
 				</div>
 			</div>
 		</div>
@@ -111,16 +115,12 @@
 		<%= erb :'modals/edit_charge' %>
 	</div>
 
+
 </div>
 
 	<div id='footer'>
 		<!-- <a class="logo" href="/">coral</a> -->
 	</div>
-	<%= erb :'modals/new_plan' %>
-	<%= erb :'modals/edit_plan' %>
-	<%= erb :'modals/share_plan' %>
-	<%= erb :'modals/new_profile' %>
-	<%= erb :'modals/edit_profile' %>
 
 </body>
 </html>

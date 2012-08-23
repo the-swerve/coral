@@ -26,7 +26,7 @@ div.data {
 	background-color: whiteSmoke;
 	padding: 12px 0 12px 0;
 	margin-bottom: 3em;
-	-webkit-border-radius: 0 0 0 0;
+	-webkit-border-radius: 0 0 9px 9px;
 	-moz-border-radius: 0 0 9px 9px;
 	border-radius: 0 0 9px 9px;
 }
@@ -146,10 +146,6 @@ div#more-plan-options {
 	display: none;
 }
 
-#profiles-table {
-	margin: 0;
-}
-
 /*
  * Modal forms
  */
@@ -185,16 +181,16 @@ input[type="submit"], .submit-btn {
 	border-radius: 9px;
 }
 
-#profile-table-container {
-}
-
 #profiles-container {
 	background-color: white;
 	border-top: 1px solid #DDD;
 	border-bottom: 1px solid #DDD;
+	-webkit-border-radius: 0 0 9px 9px;
+	-moz-border-radius: 0 0 9px 9px;
+	border-radius: 0 0 9px 9px;
 }
 
-#plan-desc-container {
+#plan-desc {
 	padding: 1em;
 }
 
@@ -244,3 +240,13 @@ div#edit-account {
 div#account-info {
 }
 
+#new-plan-button {
+	background-color: #D9EBDC;
+}
+#new-plan-button:hover {
+	background-color: #B9CFBD;
+}
+
+#edit-profile-form, #new-payment-method-form {
+	margin: 0 1em;
+}

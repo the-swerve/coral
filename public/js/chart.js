@@ -45,7 +45,6 @@ ChartView = Backbone.View.extend({
 				pointLabels: {show: true},
 				renderer: $.jqplot.BarRenderer,
 				rendererOptions: {
-					barWidth: 30,
 					barPadding: 8,
 					highlightMouseOver: false
 				}
@@ -54,7 +53,8 @@ ChartView = Backbone.View.extend({
 			axes: {
 				yaxis: {
 					tickOptions: {
-						formatString: "$%'d"
+						formatString: "$%'d",
+						showGridline: false,
 					},
 					min: 0,
 				},
@@ -68,7 +68,6 @@ ChartView = Backbone.View.extend({
 			},
 
 			grid: {
-				backgroundColor: 'transparent',
 			},
 		});
 	},

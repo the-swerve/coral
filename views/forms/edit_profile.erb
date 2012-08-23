@@ -1,113 +1,127 @@
 <script id='edit-profile-tmpl' type='text/template' class='hide'>
 
-	<h3>{{name}}</h3>
-	<form class="edit-profile-form" class='form-horizontal'>
-		<div class='edit-profile-info' style='float:left;margin;1em;padding-right:1em;'>
-			<p id="edit-profile-error"></p>
-				<div class='control-group'>
-					<label class='control-label'>Name</label>
-					<div class='controls'>
-						<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
-					</div>
-				</div>
+	<h3 style='padding:0.5em;float:left;'>{{name}}</h3>
 
-				<div class='control-group'>
-					<label class='control-label'>Email</label>
-					<div class='controls'>
-						<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
-					</div>
-				</div>
+	<a id='edit-profile-button' class='btn' style='float:left;margin-top:0.6em;'><i class='icon-pencil'></i> Info</a>
+	&nbsp;
+	<a id='new-pm-button' class='btn' href="#" style='margin-top:0.6em;'><i class='icon-plus'></i> Payment Method</a>
 
-				<div class='control-group'>
-					<label class='control-label'>Phone</label>
-					<div class='controls'>
-						<input id="edit-profile-phone" type="text" name="phone" value="{{phone}}"/>
-					</div>
-				</div>
+	<div class='hline' style='clear:left;'></div>
 
-				<div class='control-group'>
-					<label class='control-label'>Extra Info</label>
-					<div class='controls'>
-						<textarea name='info' id="edit-profile-info" placeholder="Any additional details for this subscriber" style="height:6em;">{{info}}</textarea>
-					</div>
-				</div>
-
-				<input id="edit-profile-id" type="hidden" name="short_id" value="{{id}}" />
-
-		</div>
-
-		
-		<div class='edit-profile-payments' style='float:left'>
-			[[ if(false) { ]]
-					<div class='pm-block'>
-						<p>{{payment_method.name}}</p>
-						<p>
-							<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{payment_method.id}}'><i class='icon-remove'></i> remove</a>
-							<a href='#' class='unemph new-charge-button btn' data-id='{{payment_method.id}}'><strong style='color:black'>$</strong> charge</a>
-						</p>
-				</div>
-			[[ } ]]
-				<h4>Payment Method</h4>
-				<p id="new-payment-method-error" class='form-error'></p>
+	<form id='new-payment-method-form' class='form-horizontal hide'>
+		<p id='new-payment-method-error' class='form-error'></p>
+		<div class='control-group'>
+			<div class='controls'>
 				<select class='new-payment-method-type' name='pay_type'>
 					<option id='new-credit-card'>Credit Card</option>
 					<option id='new-echeck'>E-check</option>
 				</select>
-				<div class='credit-card-selected'>
-					<label>Card Number</label>
-					<input id="" type="text" name="cc_number" value=""/>
-					<label>Expiration</label>
-					<input id="" type="text" name="expiration" value=""/>
-				</div>
-				<div class='echeck-selected hide'>
-					<label>Account Number</label>
-					<input id="" type="text" name="acct_number" value=""/>
-				</div>
+			</div>
 		</div>
 
-		<div class='modal-form-actions'>
-			<input class="btn" id="edit-profile-submit" name="commit" type="submit" value="Save" />
-			<img class='loader hide' src='img/ajax-loader.gif' />
+		<div class='credit-card-selected'>
+			<div class='control-group'>
+				<label class='control-label'>Card Number</label>
+				<div class='controls'>
+					<input id="" type="text" name="cc_number" value=""/>
+				</div>
+			</div>
+
+			<div class='control-group'>
+				<label class='control-label'>Expiration</label>
+				<div class='controls'>
+					<input id="" type="text" name="expiration" value=""/>
+				</div>
+			</div>
+		</div>
+
+		<div class='echeck-selected hide'>
+			<div class='control-group'>
+				<label class='control-label'>Account Number</label>
+				<div class='controls'>
+						<input id="" type="text" name="acct_number" value=""/>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal-form-actions">
+			<button id='new-pm-submit' class='btn'>Save</button> &nbsp;
+			<button id='cancel-new-pm' class='btn'>Cancel</button>
+			<img id='new-pm-loader' class='hide' src='img/ajax-loader.gif' />
 		</div>
 	</form>
 
-
-</script>
-
-<script id='edit-profile-header-tmpl' type='text/template' class='hide'>
-	<div class="tabbable">
-		<h3 style="float:left;padding-right:1em;">{{name}}</h3>
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#edit-profile-info" data-toggle="tab"><i class="icon-user"></i> Info</a></li>
-			<li><a href="#edit-profile-payments" data-toggle="tab"><i class="icon-lock"></i> Payments</a></li>
-			<button type="button" class="close" data-dismiss="modal" style="float:right">x</button>
-		</ul>
-</script>
-
-<script id='edit-profile-info-tmpl' type='text/template' class='hide'>
-		<div class="tab-content">
-			<div class="tab-pane active" id="edit-profile-info">
+	<form id='edit-profile-form' class='hide form-horizontal'>
+		<p id="edit-profile-error"></p>
+		<div class='control-group'>
+			<label class='control-label'>Name</label>
+			<div class='controls'>
+				<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
 			</div>
-</script>
+		</div>
 
-<script id='edit-profile-payments-tmpl' type='text/template' class='hide'>
-			<div class="tab-pane" id="edit-profile-payments">
+		<div class='control-group'>
+			<label class='control-label'>Email</label>
+			<div class='controls'>
+				<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
+			</div>
+		</div>
 
-				<h4 style='float:left'> Payment Methods</h4>
-				<a style='float:right' id='new-pm-button' class='btn' href="#"><i class='icon-plus'></i> new</a>
-				[[ if(_.isEmpty(_payment_methods)) { ]]
-					<p style='clear:left'><em>None yet.</em></p>
-				[[ } else { ]]
-					[[ _.each(_payment_methods, function(p) { ]]
-						<div class='pm-block'>
-							<p>{{p.name}}</p>
-							<p>
-								<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
-								<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
-							</p>
-					</div>
-					[[ }); ]]
-				[[ } ]]
+		<div class='control-group'>
+			<label class='control-label'>Extra Info</label>
+			<div class='controls'>
+				<textarea name='info' id="edit-profile-info" placeholder="Any additional details for this subscriber" style="height:6em;">{{info}}</textarea>
+			</div>
+		</div>
+
+		<div class='modal-form-actions'>
+			<button id='edit-profile-submit' class='btn'>Save</button> &nbsp;
+			<button id='cancel-edit-profile' class='btn'>Cancel</button>
+			<img id='edit-profile-loader' class='hide' src='img/ajax-loader.gif' />
+		</div>
+
+	</form>
+
+	[[ _.each(_payment_methods, function(p) { ]]
+		<div class='pm-block'>
+			<p>{{p.name}}</p>
+			<p>
+				<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
+				<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
+			</p>
+	</div>
+	[[ }); ]]
+
+
+	<h4 style='padding:0.5em;clear:left;'>Subscriptions</h4>
+	<table class='table table-striped' style='padding:1em;'>
+		[[ _.each(_subscriptions, function(s) { ]]
+			<td>{{s.plan_name}}</td>
+			[[ if(s.state == 'Invited') { ]]
+				<td>Invited {{s.created_at}}</td>
+				<td><a href='#'>Add Payment Method</a></td>
+			[[ } else {  ]]
+				<td>Paid {{s.total_paid}} since {{s.created_at}}</td>
+				<td><a href='#' class='btn'><i class='icon-remove'></i> Unsubscribe</a>
+				<a href='#' class='btn'><strong>$</strong> New Charge</a></td>
+			[[ } ]]
+		[[ }) ]]
+		<tr>
+		</tr>
+	</table>
+
+	[[ if(!_.isEmpty(_charges)) { ]]
+		<h4 style='padding:0.5em;'>Payments</h4>
+		<table class='table' style='padding:1em;'>
+			[[ _.each(_charges, function(c) { ]]
+				<td>{{c.name}}</td>
+				<td>{{c.amount}}</td>
+				<td>{{c.state}}</td>
+			[[ }) ]]
+			<tr>
+			</tr>
+		</table>
+	[[ } ]]
 
 				<h4 style='clear:left'> Payment History</h4>
 				<table class='table table-stribed clickable-rows'>
@@ -135,14 +149,18 @@
 	</div>
 </script>
 
-<script id='remove-pm-tmpl' type='text/template' class='hide'>
-	<h4>Removing payment method</h4>
-	<p>Are you sure you wish to do this? Note: the payment history will remain intact</p>
-	<div class='modal-form-actions'>
-		<a class='btn btn-danger' href='#' id='remove-pm-submit'>Remove</a>
-		<a style='float:right' href='#' class='back-to-profile btn'>Back</a>
+<div id='remove-pm-modal' class='modal hide'>
+	<div class='modal-header'>
+		<h3>Removing payment method</h3>
 	</div>
-</script>
+	<div class='modal-body'>
+		<p>Are you sure you wish to do this? Note: the payment history will remain intact</p>
+		<div class='modal-form-actions'>
+			<a class='btn btn-danger' href='#' id='remove-pm-submit'>Remove</a>
+			&nbsp; <a href='#' data-dismiss='modal'>Cancel</a>
+		</div>
+	</div>
+</div>
 
 <script id='remove-charge-tmpl' type='text/template' class='hide'>
 	<h4>Removing charge</h4>

@@ -85,11 +85,19 @@ class Subscription
 	end
 
 	def as_hash
-		{:expiration_date => self.expiration_date.to_s}
+		{:expiration_date => self.expiration_date.to_s,
+		 :created_at => self.created_at.to_date.to_s,
+		 :plan_name => self.plan.name,
+		 :total_paid => self.total_paid.to_s,
+		 :state => self.state}
 	end
 
 	def balance
-		charges.where(:state => ['unpaid']).map(&:amount).sum
+		charges.where(:state => 'unpaid').map(&:amount).sum
+	end
+
+	def total_paid
+		charges.where(state: 'paid').map(&:amount).sum
 	end
 
 	def trial_end
