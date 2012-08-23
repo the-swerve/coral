@@ -82,16 +82,18 @@
 
 	</form>
 
-	<h4 style='padding-left:0.5em;'>Payment Methods</h4>
-	[[ _.each(_payment_methods, function(p) { ]]
-		<div class='pm-block'>
-			<p>{{p.name}}</p>
-			<p>
-				<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
-				<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
-			</p>
-	</div>
-	[[ }); ]]
+	[[ if(!_.isEmpty(_payment_methods)) { ]]
+		<h4 style='padding-left:0.5em;'>Payment Methods</h4>
+		[[ _.each(_payment_methods, function(p) { ]]
+			<div class='pm-block'>
+				<p>{{p.name}}</p>
+				<p>
+					<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
+					<a href='#' class='unemph new-charge-button btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
+				</p>
+		</div>
+		[[ }); ]]
+	[[ } ]]
 
 
 	<h4 style='padding:0.5em;clear:left;'>Subscriptions</h4>
