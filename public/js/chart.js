@@ -4,7 +4,7 @@ ChartView = Backbone.View.extend({
 
 	myRenderer: function(userData, plotObject, options) {
 		if(userData = []) {
-			var s1 = [22, 23, 26, 29, 32, 40];
+			var s1 = [62, 63, 66, 59, 82, 100];
 			var s2 = [145, 155, 159, 189, 191, 210];
 			var s3 = [199, 312, 381, 380, 387, 390];
 			var totals = [(s1[0]+s2[0]+s3[0]),(s1[1]+s2[1]+s3[1]),(s1[2]+s2[2]+s3[2]),(s1[3]+s2[3]+s3[3]),(s1[4]+s2[4]+s3[4]),(s1[5]+s2[5]+s3[5])];
@@ -16,8 +16,9 @@ ChartView = Backbone.View.extend({
 
 	initialize: function() {
 		var self = this;
-		var ticks = ['February','March','April','May','June','July']
+		var ticks = ['February','March','April','May','June','July'];
 		this.chart = $.jqplot('chart', [], {
+			seriesColors: [ "#4bb2c5", "#ffb22f", "#3570ce", "#00c618", "#0085cc"],
 			title: 'Your revenue',
 			dataRenderer: self.myRenderer,
 			animate: true,
