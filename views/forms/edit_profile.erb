@@ -82,6 +82,7 @@
 
 	</form>
 
+	<h4 style='padding-left:0.5em;'>Payment Methods</h4>
 	[[ _.each(_payment_methods, function(p) { ]]
 		<div class='pm-block'>
 			<p>{{p.name}}</p>
@@ -123,30 +124,28 @@
 		</table>
 	[[ } ]]
 
-				<h4 style='clear:left'> Payment History</h4>
-				<table class='table table-stribed clickable-rows'>
-					<thead><th></th></thead>
-					<tbody>
-						[[if(_.isEmpty(_charges)) { ]]
-							<p><em>No charges yet</em></p>
-						[[ } else { ]]
-							[[_.each(_charges, function(c) { ]]
-								<tr class='edit-charge-button' data-id="{{ c.id }}">
-									<td>{{ c.name }}</td>
-									<td>{{ c._payment_method }}</td>
-									<td>${{ c.amount }}</td>
-									<td>{{ c.state }}</td>
-									<td>{{ c.created_at }}</td>
-								</tr>
-							[[ }); ]]
-						[[ } ]]
-					</tbody>
-				</table>
-			</div>
-
-		</div>
-
+	<div style='padding-left:0.5em'>
+		<h4 style='clear:left'> Payment History</h4>
+		<table class='table table-stribed clickable-rows'>
+			<thead><th></th></thead>
+			<tbody>
+				[[if(_.isEmpty(_charges)) { ]]
+					<p><em>No charges yet</em></p>
+				[[ } else { ]]
+					[[_.each(_charges, function(c) { ]]
+						<tr class='edit-charge-button' data-id="{{ c.id }}">
+							<td>{{ c.name }}</td>
+							<td>{{ c._payment_method }}</td>
+							<td>${{ c.amount }}</td>
+							<td>{{ c.state }}</td>
+							<td>{{ c.created_at }}</td>
+						</tr>
+					[[ }); ]]
+				[[ } ]]
+			</tbody>
+		</table>
 	</div>
+
 </script>
 
 <div id='remove-pm-modal' class='modal hide'>
