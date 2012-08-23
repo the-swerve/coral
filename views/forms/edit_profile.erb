@@ -95,21 +95,13 @@
 
 
 	<h4 style='padding:0.5em;clear:left;'>Subscriptions</h4>
-	<table class='table table-striped' style='padding:1em;'>
-		[[ _.each(_subscriptions, function(s) { ]]
-			<td>{{s.plan_name}}</td>
-			[[ if(s.state == 'Invited') { ]]
-				<td>Invited {{s.created_at}}</td>
-				<td><a href='#'>Add Payment Method</a></td>
-			[[ } else {  ]]
-				<td>Paid {{s.total_paid}} since {{s.created_at}}</td>
-				<td><a href='#' class='btn'><i class='icon-remove'></i> Unsubscribe</a>
-				<a href='#' class='btn'><strong>$</strong> New Charge</a></td>
-			[[ } ]]
-		[[ }) ]]
-		<tr>
-		</tr>
-	</table>
+	[[ _.each(_subscriptions, function(s) { ]]
+		<div class='pm-block'>
+			<p><strong>{{s.plan_name}}</strong> <br />
+			Invited {{s.created_at}}</td>
+			</p>
+		</div>
+	[[ }) ]]
 
 	[[ if(!_.isEmpty(_charges)) { ]]
 		<h4 style='padding:0.5em;'>Payments</h4>
