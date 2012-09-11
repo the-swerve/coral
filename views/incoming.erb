@@ -1,0 +1,136 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <title>Coral - Dashboard</title>
+	<link rel="stylesheet" media="screen,projection" href="css/bootstrap.css">
+	<link rel="stylesheet" media="screen,projection" href="css/bootstrap-responsive.css">
+	<link rel="stylesheet" media="screen,projection" href="css/jquery.jqplot.css">
+	<link rel="stylesheet" media="screen,projection" href="css/style.css">
+	<link rel="stylesheet" media="screen,projection" href="css/dashboard.css">
+
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+
+	<script type="text/javascript" src="js/jquery.jqplot.js"></script>
+	<script type="text/javascript" src="js/jqplot.barRenderer.js"></script>
+	<script type="text/javascript" src="js/jqplot.categoryAxisRenderer.min.js"></script>
+	<script type="text/javascript" src="js/jqplot.pointLabels.min.js"></script>
+
+	<script type="text/javascript" src="js/underscore.js"></script>
+	<script type="text/javascript" src="js/backbone.js"></script>
+
+	<script type="text/javascript" src="https://js.balancedpayments.com/v1/balanced.js"></script>
+
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/bootstrap-modal.js"></script>
+	<script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+
+	<script type="text/javascript" src="js/app.js"></script>
+	<script type="text/javascript" src="js/incoming.js"></script>
+	<script type="text/javascript" src="js/account.js"></script>
+	<script type="text/javascript" src="js/plan.js"></script>
+	<script type="text/javascript" src="js/profile.js"></script>
+	<script type="text/javascript" src="js/charge.js"></script>
+	<script type="text/javascript" src="js/chart.js"></script>
+
+	<script>
+		// Initialize backbone models
+		Coral = {}; // application-level namespace
+		Coral.account = {};
+		Coral.plans = {};
+		Coral.profiles = {};
+		Coral.charges = {};
+
+		Coral.account.model = new Account();
+		Coral.plans.coll = new PlanCollection();
+		Coral.profiles.coll = new ProfileCollection();
+		Coral.charges.coll = new ChargeCollection();
+		Coral.ev = _.extend({}, Backbone.Events); // app-wide event aggregator
+
+		$(document).ready(function() {
+
+			// Initialize backbone views
+			var account_view = new AccountView({model: Coral.account.model, el: $('div.container')});
+			var ba_view = new BAView({model: Coral.account.model, el: $('div.container')});
+			var plan_view = new PlanView({collection: Coral.plans.coll, el: $('div.container')});
+
+			var profile_view = new ProfileView({collection: Coral.profiles.coll, el: $('div.container'), plans: Coral.plans.coll});
+			var pm_view = new PMView({collection: Coral.profiles.coll, el: $('div.container')});
+			var sub_view = new SubView({collection: Coral.profiles.coll, el: $('div.container')});
+			var charge_view = new ChargeView({collection: Coral.charges.coll, el: $('div.container'), profiles: Coral.profiles.coll});
+			var chart_view = new ChartView({el: $('div.container'), trnsHistory: <%= @account.transaction_history.to_json %> });
+
+			// Load in bootstrapped data served by sinatra
+			Coral.account.model.set(<%= @account.as_hash.to_json %>);
+			Coral.plans.coll.reset(<%= @account.plans.map(&:as_hash).to_json %>);
+			Coral.profiles.coll.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
+
+			// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
+			$('.auto-tooltip').tooltip({placement: 'bottom'});
+			$('.auto-tooltip-top').tooltip({placement: 'top'});
+		});
+	</script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+<div class="progress progress-striped active hide" id='ajax-loader'>
+	<div class="bar" style="width: 100%;"></div>
+</div>
+
+<div class="container">
+
+	<%= erb :'modals/new_plan' %>
+	<%= erb :'modals/edit_plan' %>
+	<%= erb :'modals/share_plan' %>
+	<%= erb :'modals/new_profile' %>
+	<%= erb :'modals/edit_profile' %>
+
+	<div id="account" class='row'>
+		<%= erb :'meta/nav' %>
+		<h2 id="account-name"><%= @account.name %></h2>
+	</div>
+
+	<div class='row'>
+		<%= erb :'modals/edit_account' %>
+	</div>
+
+	<div class="visualization drop-shadow row">
+		<div id="chart"></div>
+	</div>
+
+	<div class="data drop-shadow row">
+
+		<div class='row data-row'>
+			<%= erb :'meta/plans' %>
+			<%= erb :'tables/profiles' %>
+			<div class='span3'>
+				<div id='plan-nav-container'> </div>
+			</div>
+			<div class='span9 plus-half'>
+				<div id='profiles-container'>
+				</div>
+			</div>
+		</div>
+	</div>
+
+		<div id='charge' class='hide'>
+			<h3>Payments</h3>
+			<div id="charge-table"></div>
+		</div>
+		<%= erb :'modals/edit_charge' %>
+	</div>
+
+
+</div>
+
+	<div id='footer'>
+		<!-- <a class="logo" href="/">coral</a> -->
+	</div>
+
+</body>
+</html>

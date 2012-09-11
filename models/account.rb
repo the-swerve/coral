@@ -15,9 +15,6 @@ class Account
 	field :pass_hash, type: String
 	field :session_token, type: String
 	field :name, type: String
-	field :bank_name, type: String
-	field :in_escrow, type: Float
-	field :received, type: Float
 	field :revenue, type: Hash
 
 	# Validations
@@ -34,14 +31,13 @@ class Account
   # Associations
 
 	has_many :plans, :dependent => :destroy
+	has_one :bank_account, :dependent => :destroy
   has_and_belongs_to_many :profiles
 
   # Callbacks
 
   before_validation do
 		self.pass_hash = Password.create(self.password) if self.password
-		self.in_escrow ||= 0
-		self.received ||= 0
 	end
 
 	after_create :generate_session_token
@@ -70,10 +66,8 @@ class Account
 		{:name => self.name.to_s,
 		 :email => self.email,
 		 :id => self.id.to_s,
-		 :bank_name => self.bank_name || 'none',
-		 :in_escrow => self.in_escrow.to_s,
-		 :received => self.received.to_s,
-		 :session_token => self.session_token}
+		 :session_token => self.session_token,
+		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}}
 	end
 
 	def first_error

@@ -47,4 +47,3 @@ jQuery.fn.serializeObject = function() {
 };
 
 // Backbone event aggregator
-

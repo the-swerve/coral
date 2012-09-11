@@ -21,8 +21,6 @@ ChartView = Backbone.View.extend({
 			seriesColors: [ "#4bb2c5", "#ffb22f", "#3570ce", "#00c618", "#0085cc"],
 			title: 'Your revenue',
 			dataRenderer: self.myRenderer,
-			animate: true,
-			animateReplot: true,
 
 			series: [
 				{

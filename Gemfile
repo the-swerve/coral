@@ -11,6 +11,9 @@ gem 'bcrypt-ruby'
 gem 'sinatra-resources'
 gem 'state_machine'
 
+# transactions
+gem 'balanced'
+
 #server
 gem 'thin'
 

@@ -1,56 +1,82 @@
 <script id='edit-account-form-tmpl' type='text/template' class='hide'>
-	<div class="tabbable">
-		<ul class="nav nav-tabs">
-			<h3 style="float:left;padding-right:1em;">Account Settings</h3>
-			<li class="active auto-tooltip" title="Edit info"><a href="#account-info" data-toggle="tab"><i class="icon-user"></i> Your Info</a></li>
-			<li><a href="#account-money" data-toggle="tab"><i class="icon-lock"></i> Your Money</a></li>
-			<li style='float:right'><a id='close-account-settings' href='x'><i class='icon-remove'></i> Close</a></li>
-		</ul>
 
-	<div class="tab-content">
-		<div class="tab-pane active" id="account-info">
-			<p id="edit-account-error"></p>
-			<form method="post" action="/account/update" id="edit-account-form" class="form-horizontal">
-				<div class="control-group">
-					<label class="control-label">Account Name</label>
-					<div class="controls"><input type="text" name="name" value="{{name}}" /></div>
-				</div>
+	<h3>Info</h3>
+	<div class='hline'></div>
 
-				<div class="control-group">
-					<label class="control-label">Email Address</label>
-					<div class="controls"><input type="text" name="email" value="{{email}}" /></div>
-				</div>
-
-				<div class='modal-form-actions'>
-					<input class="btn" id="edit-account-submit" name="commit" type="submit" value="Update" />
-					<img id='edit-account-loader' class='hide' src='img/ajax-loader.gif' />
-				</div>
-			</form>
+	<div class='alert alert-error hide' id="edit-account-error"></div>
+	<form method="post" action="/account/update" id="edit-account-form" class="form-horizontal">
+		<div class="control-group">
+			<label class="control-label">Account Name</label>
+			<div class="controls"><input class='account-input' type="text" name="name" value="{{name}}" /></div>
 		</div>
 
-		<div class="tab-pane" id="account-money">
-			<form method="post" id="new-bank-account-form" class="form-horizontal">
-
-				<div class='control-group'>
-					<label class='control-label'>Total Revenue</label>
-					<div class='controls'>
-						<input type='text' disabled='disabled' value='${{in_escrow}}' />
-					</div>
-				</div>
-
-				<div class="control-group"> <label class="control-label">Bank Name</label>
-					<div class="controls"> <input type="text" name="name" /></div>
-				</div>
-
-				<div class="control-group"> <label class="control-label">Account Number</label>
-					<div class="controls"> <input type="text" name="number" placeholder="Any number" /> </div>
-				</div>
-
-				<div class='modal-form-actions'>
-					<input class="btn" id="new-bank-account-submit" name="commit" type="submit" value="Update" />
-				</div>
-			</form>
+		<div class="control-group">
+			<label class="control-label">Email Address</label>
+			<div class="controls"><input class='account-input' type="text" name="email" value="{{email}}" /></div>
 		</div>
+
+	</form>
+
+	<h3 style='clear:left'>Bank Account</h3>
+
+	[[ if(!_.isEmpty(_bank_account)) { ]]
+		<table class='table' style='margin:1em auto 2em auto;'>
+			<tbody>
+				<tr>
+					<td><strong>{{_bank_account.bank_name}}</strong></td>
+					<td>{{_bank_account.name}}</td>
+					<td>*{{_bank_account.last_four}}</td>
+					<td><a id='remove-bank-account-btn' class='btn'><i class='icon-remove'></i> Remove</a></td>
+				</tr>
+				<tr>
+					<td><a id='new-bank-account-btn' class='btn'><i class='icon-plus'></i> New Bank Account</a></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	[[ } else { ]]
+	<div class='hline'></div>
+		<p> You do not yet have a bank account associated with Coral. In order to accept payments, you need to enter your bank account information below</p>
+	[[ } ]]
+
+	<form id="new-bank-account-form" class="form-horizontal {{ !_.isEmpty(_bank_account) ? 'hide' : '' }}">
+
+		<div class='alert alert-error hide'>
+		</div>
+
+		<div class='control-group'>
+			<label class='control-label'>Name</label>
+			<div class='controls'>
+				<input type='text' value='{{name}}' name='name'/>
+				<span class='help-block'>The name of the person associated with this bank account</span>
+			</div>
+		</div>
+
+		<div class="control-group"> <label class="control-label">Account Number</label>
+			<div class="controls"> <input type="text" name="account_number" /></div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label">Routing Number</label>
+			<div class="controls"> <input type="text" name="bank_code" />
+			<span class='help-block'>The 9-digit number found near the bottom left of your checks</span> </div>
+		</div>
+
+		<div class='modal-form-actions'>
+			<input class="btn" id="new-bank-account-submit" name="commit" type="submit" value="Save" />
+		</div>
+	</form>
+
+<div class='modal hide' id='remove-ba-modal'>
+	<div class='modal-body'>
+		<p>Are you sure you wish to remove this bank account? Your transaction history will remain intact.</p>
+
+		<p>
+		<a id='remove-bank-account-submit' class='btn btn-danger'><i class='icon-remove icon-white'></i> Remove</a>
+		<a class='btn' data-dismiss='modal'>Cancel</a>
+		</p>
 	</div>
 </div>
 

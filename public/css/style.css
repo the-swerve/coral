@@ -61,6 +61,7 @@ div.form-actions {
 	border-top:1px solid #DDD;
 	padding-top: 1em;
 	margin-top: 1em;
+	padding-bottom: 2em;
 	clear: left;
 }
 
@@ -71,4 +72,12 @@ div.form-actions {
 .hline {
 	border-top: 1px solid #DDD;
 	height: 1em;
+}
+
+#ajax-loader, #ajax-loader div {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	height: 2em;
+	z-index: 99;
 }

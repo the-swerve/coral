@@ -63,8 +63,8 @@ class Application < Sinatra::Base
 	not_found { halt 404, 'not found  (404)' }
 
 	get '/' do
-		if @account ; erb :dashboard
-		elsif @profile_user ; erb :public
+		if @account ; erb :incoming
+		elsif @profile_user ; erb :outgoing
 		else ; erb :welcome ; end
 	end
 
