@@ -153,22 +153,24 @@ ProfileView = Backbone.View.extend({
 		$('#cancel-new-pm').hide();
 		$('#new-pm-loader').fadeIn();
 		var profile = this.collection.selected;
-		$.ajax({
-			type: 'post',
-			url: '/profiles/' + profile.id + '/payment_methods',
-			dataType: 'json',
-			data: $('#new-payment-method-form').serializeObject(),
-			success: function(d) {
-				profile.set(d);
-				self.renderProfileView();
-			},
-			error: function(d) {
-				$('p#new-payment-method-error').html(d.responseText);
-				$('#new-pm-submit').show();
-				$('#cancel-new-pm').show();
-				$('#new-pm-loader').hide();
-			}
-		});
+		var data = $('#new-payment-method-form').serializeObject();
+		alert(JSON.stringify(balanced.creditCard.validate(data)));
+		//$.ajax({
+		//	type: 'post',
+		//	url: '/profiles/' + profile.id + '/payment_methods',
+		//	dataType: 'json',
+		//	data: $('#new-payment-method-form').serializeObject(),
+		//	success: function(d) {
+		//		profile.set(d);
+		//		self.renderProfileView();
+		//	},
+		//	error: function(d) {
+		//		$('p#new-payment-method-error').html(d.responseText);
+		//		$('#new-pm-submit').show();
+		//		$('#cancel-new-pm').show();
+		//		$('#new-pm-loader').hide();
+		//	}
+		//});
 	},
 
 	renderRemovePMForm: function(e) {

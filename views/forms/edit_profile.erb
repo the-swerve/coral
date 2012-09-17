@@ -30,7 +30,26 @@
 			<div class='control-group'>
 				<label class='control-label'>Expiration</label>
 				<div class='controls'>
-					<input id="" type="text" name="expiration" value=""/>
+					<select name='expiration_month' style='width:6em;'>
+						<option>Month</option>
+						[[ for(var i = 1; i < 13; i++) { ]]
+							<option>{{i}}</option>
+						[[ } ]]
+					</select>
+					[[ var year = (new Date).getFullYear(); ]]
+					<select name='expiration_year' style='width:6em;'>
+						<option>Year</option>
+						[[ for(var i = year; i < year + 10; i++) { ]]
+							<option>{{ i }}</option>
+						[[ } ]]
+					</select>
+				</div>
+			</div>
+
+			<div class='control-group'>
+				<label class='control-label'>Security Code</label>
+				<div class='controls'>
+					<input id="" type="text" name="security_code" value=""/>
 				</div>
 			</div>
 		</div>
