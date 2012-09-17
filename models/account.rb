@@ -1,5 +1,6 @@
 require 'mongoid'
 require 'bcrypt'
+require 'balanced'
 
 class Account
 
@@ -11,10 +12,11 @@ class Account
 
 	# Fields
 
+	field :name, type: String
 	field :email, type: String
+	field :phone_number, type: String
 	field :pass_hash, type: String
 	field :session_token, type: String
-	field :name, type: String
 	field :revenue, type: Hash
 
 	# Validations
@@ -38,6 +40,7 @@ class Account
 
   before_validation do
 		self.pass_hash = Password.create(self.password) if self.password
+
 	end
 
 	after_create :generate_session_token
@@ -65,6 +68,7 @@ class Account
 	def as_hash
 		{:name => self.name.to_s,
 		 :email => self.email,
+		 :phone_number => self.phone_number,
 		 :id => self.id.to_s,
 		 :session_token => self.session_token,
 		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}}

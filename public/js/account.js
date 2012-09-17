@@ -11,7 +11,6 @@ AccountView = Backbone.View.extend({
 	req: false, // Keep track of whether we're currently making a server request.
 	settingsShown: false, // for toggling account settings box
 	events: {
-		'blur  .account-input': 'save',
 		'click #edit-account-submit': 'save',
 		'click #edit-account-button': 'renderForm',
 		'click #close-account-settings': 'renderForm',
@@ -36,32 +35,40 @@ AccountView = Backbone.View.extend({
 		return this;
 	},
 
-	save: function (e) {
+	save: function(e) {
 		e.preventDefault();
-		$('#edit-account-error').hide();
 		var self = this;
 		$('#ajax-loader').show();
-		this.model.save($('form#edit-account-form').serializeObject(), {
+		$('#edit-account-submit').attr('disabled',true);
+		this.model.save($('#edit-account-form').serializeObject(), {
 			success: function(model, response) {
-				$('#account-name').html(model.get('name'));
+				$('#edit-account .alert').hide(); // hide any previous alerts
+				$('#edit-account .alert-success').show();
+				$('#edit-account .alert-success').html('Saved.');
+
+				$('#account-name').html(model.get('name')); // immediately update the account name title (top left)
 				$('#ajax-loader').hide();
+				$('#edit-account-submit').attr('disabled',false); // re-enable the submit button
 			},
 			error: function(model, response) {
-				$('#edit-account-error').show();
-				$('#edit-account-error').html(response.responseText);
+				$('#edit-account .alert').hide(); // hide any previous alerts
+				$('#edit-account .alert-error').show(); // display the error option
+				$('#edit-account .alert-error').html(response.responseText);
+				$('#edit-account-submit').attr('disabled',false); // re-enable the submit button
+				$('#ajax-loader').hide();
 			}
 		});
 		return this;
 	},
+
 });
 
 // bank account updating form
 BAView = Backbone.View.extend({
 	req: false,
 	events: {
+		'click #bank-account-submit': 'validate',
 		'click #new-bank-account-btn': 'showForm',
-		'click div#new-bank-account .back-btn': 'goBack',
-		'click #new-bank-account-submit': 'validate',
 		'click #remove-bank-account-btn': 'confirmDelete',
 		'click #remove-bank-account-submit': 'destroy',
 	},
@@ -85,8 +92,8 @@ BAView = Backbone.View.extend({
 				$('div#edit-account').html(body(self.model.toJSON()));
 			},
 			error: function(d) {
-				$('#new-bank-account-form .alert').show();
-				$('#new-bank-account-form .alert').show(d.responseText);
+				$('#account-form .alert').show();
+				$('#account-form .alert').show(d.responseText);
 				$('#remove-ba-modal').modal('hide');
 			}
 		});
@@ -94,25 +101,28 @@ BAView = Backbone.View.extend({
 
 	validate: function(e) {
 		e.preventDefault();
-		var ba = $('#new-bank-account-form').serializeObject(); // will have {name: account_number: x, routing_number: x}
+		var ba = $('#bank-account-form').serializeObject(); // will have {account_number: x, bank_code: x}
 		var err = balanced.bankAccount.validate(ba);
-		var alrt = $('#new-bank-account-form .alert');
-		$('#new-bank-account-submit').hide();
+		$('#bank-account-submit').attr('disabled',true);
 		$('#ajax-loader').show();
 		if(_.isEmpty(err)) {
 			// no javascript validation error. now let's post to balanced
 			balanced.bankAccount.create(ba, this.balancedCallback.call(this));
-			// If we use balanced.js as above, I'm not sure how we can add the bank account data inside the callback to our account model in backbone
-			// this.balancedCreate(ba);
 		} else {
-			alrt.html('Invalid routing number'); // that's the only error balanced.BankAccount.validate appears to return
-			alrt.show();
-			$('#new-bank-account-submit').show();
+			$('#edit-account .alert').hide(); // hide previous alerts
+			$('#edit-account .alert-error').show();
+			$('#edit-account .alert-error').html('Invalid routing number'); // that's the only error balanced.BankAccount.validate appears to return
+			$('#bank-account-submit').attr('disabled',false); // re-enable submit button
 			$('#ajax-loader').hide();
 		}
 	},
 
 	balancedCallback: function() {
+		// This function is tricky. I need to have the account model in scope so
+		// that we can modify it inside the balanced callback. To do this, I pass
+		// it this function with this viewmodel instantiated for 'this', and then
+		// this function returns a nested function, which is the actual callback
+		// for balanced. lolwut.
 		var self = this;
 		return function(response) {
 			switch(response.status) {
@@ -121,13 +131,10 @@ BAView = Backbone.View.extend({
 					break;
 				case 400:
 					// missing field - details in response.error
-					var alrt = $('#new-bank-account-form .alert');
-					alrt.show();
-					if(~(response.error.description).indexOf('account_number')) {
-						alrt.html('Invalid account number');
-					} else if(~(response.error.description).indexOf('name')) {
-						alrt.html('Invalid name');
-					}
+					$('#edit-account .alert').hide();
+					$('#edit-account .alert-error').show();
+					$('#edit-account .alert-error').html(JSON.stringify(response));
+					$('#bank-account-submit').attr('disabled',false);
 					$('#ajax-loader').hide();
 					break;
 				case 402:
@@ -150,30 +157,6 @@ BAView = Backbone.View.extend({
 		}
 	},
 
-	// pass in the bank account data
-	balancedCreate: function(data) {
-		var self = this;
-		$.ajax({
-			type: 'post',
-			url: 'https://api.balancedpayments.com/v1/marketplaces/' + balancedUri + '/bank_accounts',
-			dataType: 'jsonp',
-			data: data,
-			username: balancedUsername,
-			success: function(d) {
-				// if the post was successful to balanced, then let's create a copy in our own database
-				alrt.hide(); // hide any errors
-				$('#ajax-loader').hide();
-				// post to our own server to create a BankAccount model, nested in an Account
-				self.create(d.data);
-			},
-			error: function(d) {
-				$('#new-bank-account-form .alert').show();
-				$('#new-bank-account-form .alert').html(d.responseText);
-				$('#ajax-loader').hide();
-			}
-		});
-	},
-
 	create: function(data) {
 		var self = this;
 		$.ajax({
@@ -190,8 +173,10 @@ BAView = Backbone.View.extend({
 				$('#ajax-loader').hide();
 			},
 			error: function(d) {
-				$('#new-bank-account-form .alert').show();
-				$('#new-bank-account-form .alert').html(d.responseText);
+				$('#edit-account .alert').hide();
+				$('#edit-account .alert-error').show();
+				$('#edit-account .alert-error').html(d.responseText);
+				$('#bank-account-submit').attr('disabled',false);
 				$('#ajax-loader').hide();
 			}
 		});
@@ -199,15 +184,10 @@ BAView = Backbone.View.extend({
 
 	showForm: function(e) {
 		if(e) e.preventDefault();
+		$('#bank-account p').hide();
 		$('#new-bank-account-btn').hide();
-		$('#new-bank-account-form').show();
+		$('#bank-account-form').show();
 		return this;
 	},
 
-	goBack: function(e) {
-		e.preventDefault();
-		$('div#new-bank-account').modal('hide');
-		$('div#edit-account').modal('show');
-		return this;
-	},
 });

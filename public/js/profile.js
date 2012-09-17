@@ -24,21 +24,26 @@ ProfileView = Backbone.View.extend({
 	events: {
 		'click #new-profile-button': 'renderNewForm',
 		'click #new-profile-submit': 'create',
+
 		'click #edit-profile-submit': 'update',
 		'click #remove-profile-button': 'renderRemoveForm',
 		'click #remove-profile-submit': 'destroy',
-		'click .dropdown-item': 'renderTable',
-		'click #share-plan-submit': 'invitePeople',
-		'click #remove-profile-row': 'removeRow',
+
 		'click #new-profile-row': 'addRow',
-		'click #payments-button': 'showPayments',
+		'click #remove-profile-row': 'removeRow',
+
+		'click .dropdown-item': 'renderTable',
+
+		'click #share-plan-submit': 'invitePeople',
+
 		'click .view-profile-button': 'renderProfileView',
 		'click #edit-profile-button': 'renderEditForm',
 		'click #cancel-edit-profile': 'renderEditForm',
 
-		'click .remove-pm-button': 'renderRemovePMForm',
+		'click #payments-button': 'showPayments',
 		'click #new-pm-submit': 'createPM',
 		'click #remove-pm-submit': 'destroyPM',
+		'click .remove-pm-button': 'renderRemovePMForm',
 	},
 
 	renderEditForm: function(e) {

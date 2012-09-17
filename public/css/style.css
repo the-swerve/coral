@@ -72,6 +72,7 @@ div.form-actions {
 .hline {
 	border-top: 1px solid #DDD;
 	height: 1em;
+	clear: left;
 }
 
 #ajax-loader, #ajax-loader div {
@@ -80,4 +81,7 @@ div.form-actions {
 	left: 0;
 	height: 2em;
 	z-index: 99;
+}
+
+#bank-account {
 }
