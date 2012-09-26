@@ -86,9 +86,10 @@ class Application < Sinatra::Base
 		end
 	end
 
-	delete '/', :auth => [:account, :profile] do
+	delete '/' do
 		@account.destroy_session_token if @account
 		@profile_user.destroy_session_token if @profile_user
+		request.cookies.delete 'coral.session_token'
 		json :success => true, :message => 'until next time...'
 	end
 

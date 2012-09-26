@@ -1,33 +1,60 @@
-var req = false; // request blocker
+var Glob = {}; // I thought I might keep globals in this hash so they're more explicit and contained
+
 $(document).ready(function() {
 
 	// Sign up form submit
 	$('input#share-signup-submit').bind('click',function(event) {
 		event.preventDefault();
-		if (req == false) {
-			req = true;
-			// Signing in
-			$('input#share-signup-submit').attr('value','Signing Up...');
-			$('input#share-signup-submit').addClass('disabled');
-			var account = $('input#account-id').attr('value');
-			$.ajax({
-				type: 'POST',
-				url: '/account/' + account + '/profiles',
-				dataType: 'json',
-				data: $('form#share-signup-form').serializeObject(),
-				success: function(data) {
-					$.cookie('coral.session_token', data.session_token);
-					window.location = '/';
-					req = false;
-				},
-				error: function(d) {
-					$('p#share-plan-error').html(d.responseText);
+		// Signing in
+		$('.alert-error').hide();
+		$('input#share-signup-submit').attr('value','Signing Up...');
+		$('input#share-signup-submit').attr('disabled',true);
+		Glob.account_id = $('input#account-id').attr('value');
+		$.ajax({
+			type: 'POST',
+			url: '/account/' + Glob.account_id + '/profiles',
+			dataType: 'json',
+			data: $('form#share-signup-form').serializeObject(),
+			success: function(data) {
+				$.ajax({type: 'delete', url: '/'}); // log out any previous sessions
+				$.cookie('coral.session_token', data.session_token);
+				Glob.profile_id = data.id;
+				Glob.sub_id = data._subscriptions[0].id;
+				$('#share-signup-form').fadeOut(function() {
+					$('#new-pm-form').fadeIn();
 					$('input#share-signup-submit').attr('value','Sign Up'); // XXX redundant
-					$('input#share-signup-submit').removeClass('disabled');
-					req = false;
-				}
-			});
-		}
+					$('input#share-signup-submit').attr('disabled',false);
+				});
+			},
+			error: function(d) {
+				$('.alert-error').html(d.responseText).show();
+				$('input#share-signup-submit').attr('value','Sign Up'); // XXX redundant
+				$('input#share-signup-submit').attr('disabled',false);
+			}
+		});
+	});
+
+	$('#new-pm-submit').click(function(e) {
+		e.preventDefault();
+		// Creation of payment method for this subscription
+		$('.alert-error').hide();	
+		$('#new-pm-submit').attr('disabled',true);
+		$('#new-pm-submit').val('Saving...');
+		$.ajax({
+			type: 'post',
+			url: '/account/' + Glob.account_id + '/profiles/' + Glob.profile_id + '/subscriptions/' + Glob.sub_id + '/payment_methods',
+			dataType: 'json',
+			data: $('#new-pm-form').serializeObject(),
+			success: function(d) {
+				window.relocate('/'); // Will bring them to their dashboard
+			},
+			error: function(d) {
+				$('#new-pm-submit');
+				$('.alert-error').html(d.responseText).show();
+				$('#new-pm-submit').attr('disabled',false);
+				$('#new-pm-submit').val('Save');
+			}
+		});
 	});
 
 	$('#signup-title').toggle(function(e) {

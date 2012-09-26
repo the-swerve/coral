@@ -1,0 +1,121 @@
+
+<script id='edit-profile-tmpl' type='text/template' class='hide'>
+
+	 <div class='span12'>
+		<a href='#' class='toggle-profile-edit-btn' style='float:right;'><i class='icon-remove'></i> Close</a>
+		<h3>Settings</h3>
+		<div style='clear:both;' class='hline'></div>
+	 </div>
+
+	 <div class='span6 profile-settings-col'><div class='profile-settings-col info-col'>
+		<form id="edit-profile-form">
+		  <div class='control-group'>
+			 <label class='control-label'>Name</label>
+				<div class='controls'>
+				  <input type="text" name="name" value="{{ profile.get('name') }}" />
+				</div>
+		  </div>
+
+		  <div class='control-group'>
+			 <label class='control-label'>Email</label>
+			 <div class='controls'>
+				<input type="text" name="email" value="{{ profile.get('email') }}" />
+			 </div>
+		  </div>
+
+		  <div class='modal-form-actions'>
+			 <button class='btn' id="edit-profile-submit">Save</button>
+		  </div>
+		</form>
+	 </div> </div>
+
+	 <div class='span6'> <div class='profile-settings-col'>
+		<h3>Payment Methods</h3>
+		[[ if(!_.isEmpty(profile.get('_payment_methods'))) { ]]
+		  <table class='table' style='margin:1em auto 2em auto;'>
+			 <tbody>
+				[[ _.each(profile.get('_payment_methods'), function(pm) { ]]
+					<tr>
+						<td><strong>{{pm.name}}</strong></td>
+						<td><a id='remove-bank-account-btn' class='btn'><i class='icon-remove'></i> Remove</a></td>
+					</tr>
+				[[ }) ]]
+				  <tr>
+					  <td><a id='new-pm-btn' class='btn'><i class='icon-plus'></i> New Payment Method</a></td>
+					  <td></td>
+				  </tr>
+			  </tbody>
+			</table>
+	  [[ } else {]]
+		  <p>You do not yet have a payment method.</p>
+		  <a id='new-pm-btn' class='btn'><i class='icon icon-plus'></i> Add payment method</a>	
+	  [[ } ]]
+
+		  <form id="new-pm-form" class="hide form-horizontal" style='float:left'>
+
+			 <div class='alert alert-error hide'></div> <div class='alert alert-success hide'></div>
+
+			 <div class='control-group'>
+				 <label class='control-label'>Type</label>
+				 <div class='controls'>
+					 <select class='new-payment-method-type' name='pay_type'>
+						 <option id='new-credit-card'>Credit Card</option>
+						 <option id='new-echeck'>E-check</option>
+					 </select>
+				 </div>
+			 </div>
+
+			 <div class='credit-card-selected'>
+				 <div class='control-group'>
+					 <label class='control-label'>Card Number</label>
+					 <div class='controls'>
+						 <input id="" type="text" name="card_number" />
+					 </div>
+				 </div>
+
+				 <div class='control-group'>
+					 <label class='control-label'>Expiration</label>
+					 <div class='controls'>
+						 <select name='expiration_month' style='width:6em;'>
+							 <option>Month</option>
+							 [[ for(var i = 1; i < 13; i++) { ]]
+								 <option>{{i}}</option>
+							 [[ } ]]
+						 </select>
+						 [[ var year = (new Date).getFullYear(); ]]
+						 <select name='expiration_year' style='width:6em;'>
+							 <option>Year</option>
+							 [[ for(var i = year; i < year + 10; i++) { ]]
+								 <option>{{ i }}</option>
+							 [[ } ]]
+						 </select>
+					 </div>
+				 </div>
+
+				 <div class='control-group'>
+					 <label class='control-label'>Security Code</label>
+					 <div class='controls'>
+						 <input id="" type="text" name="security_code" value=""/>
+					 </div>
+				 </div>
+			 </div>
+
+			<div class='echeck-selected hide'>
+				<div class='control-group'>
+					<label class='control-label'>Account Number</label>
+					<div class='controls'>
+							<input id="" type="text" name="acct_number" value=""/>
+					</div>
+				</div>
+			</div>
+
+		 <div class="modal-form-actions">
+			 <button id='new-pm-submit' class='btn'>Save</button> &nbsp;
+			 <button id='cancel-new-pm' class='btn'>Cancel</button>
+		 </div>
+
+	  </form>
+
+	</div></div> <!-- end span6 and profile-settings-col -->
+
+</script>

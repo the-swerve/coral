@@ -31,14 +31,6 @@ class Application < Sinatra::Base
 		end
 	end
 
-	put '/profile', :auth => :profile do
-		if @profile_user.update_attributes @params
-			json @profile_user.as_hash
-		else
-			halt 400, @profile_user.first_error
-		end
-	end
-
 	put '/profiles/:profile_id', :auth => :account do
 		@profile = @account.profiles.find(params['profile_id'])
 		if @profile
@@ -100,6 +92,16 @@ class Application < Sinatra::Base
 			json :message => 'profile destroyed :\'('
 		else
 			halt 400, 'profile not found'
+		end
+	end
+
+	# Outgoing dashboard actions
+
+	put '/profile', :auth => :profile do
+		if @profile_user.update_attributes @params
+			json @profile_user.as_hash
+		else
+			halt 400, @profile_user.first_error
 		end
 	end
 end

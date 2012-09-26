@@ -12,6 +12,7 @@ class BankAccount
 	field :uri, type: String
 	field :last_four, type: String
 	field :merchant_id, type: String
+	field :merchant_uri, type: String
 
 	# Validations
 
@@ -36,12 +37,14 @@ class BankAccount
 					:dob => "1842-01",
 					:phone_number => self.account.phone_number
 				},
-				nil, #self.uri,
+				self.uri,
 				self.account.name)
-			self.merchant_id = merchant.id
+				self.account.merchant_uri = merchant.uri
+				self.account.save
 		rescue Balanced::Conflict => ex
-			errors.add('', 'Balanced payments merchant account creation: conflict -- ' + ex.to_s);
-			# handle the conflict here..
+			x = Balanced::Account.construct_from_response({uri: self.account.merchant_uri})
+			x.add_bank_account(self.uri)
+			puts x.to_s
 		rescue Balanced::BadRequest => ex
 			errors.add('', 'Bad request: ' + ex.to_s)
 			puts ex

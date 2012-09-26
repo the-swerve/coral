@@ -1,9 +1,4 @@
 
-_.templateSettings = {
-	interpolate: /\{\{(.+?)\}\}/g,
-	evaluate: /\[\[(.+?)\]\]/g
-}
-
 // XXX this could probably be put into the backbone views
 function modalize(prefix) {
 	$('a#' + prefix + '-button').click(function(e) {
@@ -43,7 +38,3 @@ $(document).ready(function() {
 
 
 });
-
-balancedUri = 'TEST-MP761XGxjonKUa4HBnXOMoGy';
-balancedUsername = 'e9234bfacc5211e1bda6026ba7e239a9';
-balanced.init('/v1/marketplaces/' + balancedUri);

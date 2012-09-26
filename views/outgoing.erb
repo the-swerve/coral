@@ -8,14 +8,27 @@
 	<link rel="stylesheet" media="screen,projection" href="/css/bootstrap-responsive.css">
 	<link rel="stylesheet" media="screen,projection" href="/css/style.css">
 	<link rel="stylesheet" media="screen,projection" href="/css/public.css">
+
 	<script type="text/javascript" src="/js/jquery.js"></script>
 	<script type="text/javascript" src="/js/jquery.cookie.js"></script>
 	<script type="text/javascript" src="js/bootstrap-modal.js"></script>
+
+	<script type="text/javascript" src="js/underscore.js"></script>
+	<script type="text/javascript" src="js/backbone.js"></script>
+
+	<script type="text/javascript" src="https://js.balancedpayments.com/v1/balanced.js"></script>
+
 	<script type="text/javascript" src="/js/app.js"></script>
-	<script type="text/javascript" src="/js/public.js"></script>
+	<script type="text/javascript" src="/js/outgoing.js"></script>
 
 	<script>
 		var profile_id = '<%= @profile_user.id %>';
+		profile_model = new Profile();
+
+		$(document).ready(function() {
+			var profile_view = new ProfileView({model: profile_model, el: $('div.container')});
+			profile_model.set(<%= @profile_user.as_hash.to_json %>);
+		});
 	</script>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,47 +36,30 @@
 
 <body>
 
-	<div class='container'>
+<div class='container'>
 
-		<div class='row'><div class='span12'>
-			<h2 id='name'><%= @profile_user.name %></h2>
+  <div class="progress progress-striped active hide" id='ajax-loader'>
+	  <div class="bar" style="width: 100%;"></div>
+  </div>
 
-			<ul id='profile-actions'>
-				<li><a class='btn' href="/logout"><i class='icon-off'></i> Logout</a></li>
-				<li><a id='edit-profile-button' href='#' class='btn'><i class='icon-wrench'></i> Settings</a></li>
-			</ul>
+  <div class='row'>
+	 <div class='span12'>
+		<h2 id='name'><%= @profile_user.name %></h2>
+		<ul id='profile-actions'>
+		  <li><a class='btn' href="/logout"><i class='icon-off'></i> Logout</a></li>
+		  <li><a class='btn toggle-profile-edit-btn' href='#'><i class='icon-wrench'></i> Settings</a></li>
+		</ul>
+	 </div>
+  </div>
 
-		</div> </div>
+  <%= erb :'forms/edit_outgoing_account' %>
 
-		<div class='profile-settings hide row'><div class='span12'>
-		
-			<form id="edit-profile" class='form-horizontal well'>
+  <div id='edit-profile' class='hide row'>
+  </div>
 
-				<p id="edit-profile-error" class='form-error'></p>
+  <div class='subscriptions drop-shadow row'>
 
-				<div class='control-group'>
-					<label class='control-label'>Name</label>
-					<div class='controls'>
-						<input type="text" name="name" value="<%= @profile_user.name %>" />
-					</div>
-				</div>
-
-				<div class='control-group'>
-					<label class='control-label'>Email</label>
-					<div class='controls'>
-						<input type="text" name="email" value="<%= @profile_user.email %>" />
-					</div>
-				</div>
-
-				<div class='modal-form-actions'>
-					<button class='btn' id="edit-profile-submit">Save</button>
-					<button class='btn' id="close-profile-settings">Cancel</button>
-					<img id='edit-profile-loader' class='loader hide' src='img/ajax-loader.gif' />
-				</div>
-			</form>
-		</div></div>
-
-		<div class='subscriptions drop-shadow row'>
+	 <div class='span12'>
 
 			<h3 id='table-title'>Subscriptions</h3>
 			<a href='#' id='table-toggler' style='float:right'>Payments</a>
@@ -162,6 +158,7 @@
 					</tr>
 				</tbody>
 			</table>
+		 </div>
 
 	</div>
 
@@ -175,35 +172,6 @@
 			<button class='btn' id="cancel-unsubscribe" data-dismiss='modal'>Cancel</button>
 		</div>
 	</div>
-
-	<div id='new-payment-method' class='modal hide'>
-		<div class='modal-body'>
-			<h4>New Payment Method</h4>
-			<p id="new-payment-method-error" class='form-error'></p>
-			<form id='new-payment-method-form'>
-				<select class='new-payment-method-type' name='pay_type'>
-					<option id='new-credit-card'>Credit Card</option>
-					<option id='new-echeck'>E-check</option>
-				</select>
-				<div class='credit-card-selected'>
-					<label>Card Number</label>
-					<input id="" type="text" name="cc_number" value=""/>
-					<label>Expiration</label>
-					<input id="" type="text" name="expiration" value=""/>
-				</div>
-				<div class='echeck-selected hide'>
-					<label>Account Number</label>
-					<input id="" type="text" name="acct_number" value=""/>
-				</div>
-
-				<div class="modal-form-actions">
-					<button class='btn' id="cancel-unsubscribe">Save</button>
-					<button class='btn' id="cancel-unsubscribe" data-dismiss='modal'>Cancel</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
 
 	<div id='footer'></div>
 

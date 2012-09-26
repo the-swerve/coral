@@ -46,4 +46,11 @@ jQuery.fn.serializeObject = function() {
   return objectData;
 };
 
-// Backbone event aggregator
+_.templateSettings = {
+	interpolate: /\{\{(.+?)\}\}/g,
+	evaluate: /\[\[(.+?)\]\]/g
+}
+
+balancedUri = 'TEST-MP761XGxjonKUa4HBnXOMoGy';
+balancedUsername = 'e9234bfacc5211e1bda6026ba7e239a9';
+balanced.init('/v1/marketplaces/' + balancedUri);

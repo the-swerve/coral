@@ -18,6 +18,7 @@ class Account
 	field :pass_hash, type: String
 	field :session_token, type: String
 	field :revenue, type: Hash
+	field :merchant_uri, type: String
 
 	# Validations
 

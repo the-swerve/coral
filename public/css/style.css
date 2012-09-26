@@ -83,5 +83,6 @@ div.form-actions {
 	z-index: 99;
 }
 
-#bank-account {
+.row {
+	margin-right: -20px;
 }

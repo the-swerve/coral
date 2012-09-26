@@ -31,16 +31,11 @@ h2#name {
 	padding-top: 0.2em;
 }
 
-h3 {
-	float:left;
-	margin-bottom: .5em;
-}
 
 .subscriptions {
-	clear: left;
-	margin: 1em auto 0 auto;
+	margin-top: 1em;
+	padding-top: 1em;
 	background-color: whiteSmoke;
-	padding: 2em;
 
 	-webkit-border-radius: 14px;
 	-moz-border-radius: 14px;
@@ -74,20 +69,23 @@ td#plan-name {
 }
 
 
-.profile-settings form {
-	margin: 0;
-
+#edit-profile {
+	padding-top: 1em;
 	border: none;
 
   -webkit-box-shadow: inset 0 0 10px #aaa;
   -moz-box-shadow: inset 0 0 10px #aaa;
   box-shadow: inset 0 0 10px #aaa;
 
-	-webkit-border-radius: 0 0 14px 14px:
-	-moz-border-radius: 0 0 14px 14px;
-	border-radius: 0 0 14px 14px;
+	-webkit-border-radius: 14px;
+	-moz-border-radius: 14px;
+	border-radius: 14px;
+
 	text-align: left;
 	background-color: #E5F0F5;
+}
+
+.profile-settings-col {
 }
 
 div#meta {
@@ -99,4 +97,8 @@ tr.new-plan-button {
 
 tr#new-plan-form td {
 	background-color: white;
+}
+
+.info-col {
+	border-right: 1px solid #ddd;
 }

@@ -1,26 +1,28 @@
 require 'mongoid'
+require 'balanced'
 
 class PaymentMethod
 
 	# Inclusions
 
 	include Mongoid::Document
+	include Mongoid::Timestamps
 
 	# Accessors
-
-	attr_accessor :cc_number, :acct_number
 
 	# Fields
 
 	field :name, type: String
-	field :active, type: Boolean
-	field :pay_type, type: String
-	field :last4, type: String
+	field :pay_type, type: String # either card or ach
+	field :last_four, type: String # last four digits of either credit card or bank account number
+	field :uri, type: String # balanced URI for this card
+
+	# Credit cards only
+
+	field :brand, type: String
 
 	# Validations
 
-	validates :pay_type, presence: {on: :create}
-	validates :last4, presence: {on: :create}
 
 	# Associations
 
@@ -31,23 +33,33 @@ class PaymentMethod
 	# Callbacks
 
 	before_validation(:on => :create) do
-		self.name ||= self.pay_type + ' *' if self.pay_type
-		n = self.cc_number != '' ? self.cc_number : self.acct_number != '' ? self.acct_number : ''
-		self.last4 = n.to_s[-4..-1]
-		self.name += self.last4 if self.last4
+		self.name ||= 'Credit card (' + self.brand + '): *' + self.last_four
+		begin
+			buyer = Balanced::Marketplace.my_marketplace.create_buyer(self.profile.email, self.uri)
 
-		if self.cc_number == '' && self.pay_type == 'Credit Card'
-			self.errors.add('', 'missing credit card number')
-		elsif self.acct_number == '' && self.pay_type == 'E-check'
-			self.errors.add('', 'missing bank account number')
+			puts '~~~~~~!!!!!!!!'
+			puts self.profile.as_hash
+			begin
+				self.profile.update_attribute('buyer_uri',buyer.uri)
+			rescue
+				errors.add('','This person has invalid data.')
+			end
+		rescue
+			if self.profile.buyer_uri
+				begin
+					x = Balanced::Account.construct_from_response({uri: self.profile.buyer_uri})
+					x.add_card(self.uri)
+				rescue
+					errors.add('','Error: invalid data.') # XXX blech. maze of exceptions
+				end
+			else
+				errors.add('','Error: invalid data')
+			end
 		end
-		errors.add('', 'invalid credit card or bank account number') if !last4
 	end
 
 	def as_hash
 		{:name => self.name,
-		:active => self.active.to_s,
-		:pay_type => self.pay_type,
 		:id => self.id.to_s}
 	end
 

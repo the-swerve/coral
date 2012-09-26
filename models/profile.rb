@@ -12,9 +12,7 @@ class Profile
 
 	# Accessors
 
-	attr_accessor :password, :plan_id,
-		:pm_pay_type, :pm_cc_number, :pm_acct_number, # Can create a nested payment method 
-		:sub_plan_id, :sub_starting, :sub_expiration  # Can create a nested subscription - XXX - maybe do this client-side
+	attr_accessor :password, :plan_id, :sub_plan_id, :sub_starting, :sub_expiration  # Can create a nested subscription - XXX - maybe do this client-side
 
 	# Data
 
@@ -26,6 +24,8 @@ class Profile
 	field :state, type: String
 	field :session_token, type: String
 	field :account_ids, type: Array
+
+	field :buyer_uri, type: String
 
 	# Validations
 
@@ -47,16 +47,11 @@ class Profile
 
   before_validation(:on => :create) do
 		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
-		if self.pm_pay_type && self.pm_pay_type != ''
-			pm = self.payment_methods.build :pay_type => pm_pay_type,
-				:cc_number => pm_cc_number,
-				:acct_number => pm_acct_number
-			errors.add('',pm.first_error) if !pm.save
-		end
 		if self.sub_plan_id && self.sub_plan_id != ''
 			sub = self.subscriptions.build :plan_id => sub_plan_id, :expiration => sub_expiration, :starting => sub_starting
 			errors.add('', sub.first_error) if !sub.save
 		end
+		self.state = 'Gray'
 	end
 
   before_validation do
@@ -69,44 +64,7 @@ class Profile
 		self.name = self.name.split.each { |x| x.capitalize!}.join(' ')
   end
 
-	# States
-
-	state_machine :state, :initial => 'Gray' do
-
-		event :subscribe do
-			transition any - 'Gray' => 'Green',
-				:if => lambda {|p| p.subscriptions.last.state == 'In trial'}
-		end
-
-		event :past_due do
-			transition any => 'Red',
-				:if => lambda {|p| p.charges.where(:state => 'Overdue').any?}
-		end
-
-		event :expire do
-			transition any - 'Red' => 'Gray',
-				:if => lambda {|p| p.subscriptions.where(:state => 'Expired').any?}
-		end
-
-		event :settle do
-			transition any => 'Green',
-				:if => lambda {|p| p.pay_all}
-		end
-
-
-		state 'Gray' do
-			# Non-subscriber and/or no payment method
-		end
-
-		state 'Green' do
-			# Subscriber with payment method and no failed transactions
-		end
-
-		state 'Red' do
-			# At least one unpaid/due charge (from a failed transaction)
-		end
-
-	end
+	after_create :generate_session_token
 
 	def balance
 		# Get the sum of all unpaid charges
@@ -157,7 +115,8 @@ class Profile
 		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},
 		 :_payment_methods => self.payment_methods.map(&:as_hash),
 		 :created_at => self.created_at.to_date.to_s,
-		 :info => self.info || ''}
+		 :info => self.info || '',
+		 :session_token => self.session_token}
 	end
 
 	def subscription_list

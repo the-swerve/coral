@@ -149,28 +149,91 @@ ProfileView = Backbone.View.extend({
 	createPM: function(e) {
 		if(e) e.preventDefault();
 		var self = this;
-		$('#new-pm-submit').hide();
-		$('#cancel-new-pm').hide();
-		$('#new-pm-loader').fadeIn();
+		$('#new-pm-submit').attr('disabled',true);
+		$('#cancel-new-pm').attr('disabled',true);
+		$('#ajax-loader').show();
 		var profile = this.collection.selected;
 		var data = $('#new-payment-method-form').serializeObject();
-		alert(JSON.stringify(balanced.creditCard.validate(data)));
-		//$.ajax({
-		//	type: 'post',
-		//	url: '/profiles/' + profile.id + '/payment_methods',
-		//	dataType: 'json',
-		//	data: $('#new-payment-method-form').serializeObject(),
-		//	success: function(d) {
-		//		profile.set(d);
-		//		self.renderProfileView();
-		//	},
-		//	error: function(d) {
-		//		$('p#new-payment-method-error').html(d.responseText);
-		//		$('#new-pm-submit').show();
-		//		$('#cancel-new-pm').show();
-		//		$('#new-pm-loader').hide();
-		//	}
-		//});
+		$('#new-payment-method-form .alert').hide(); // hide any previous errors or messages
+
+		// error checking. We'll do it manually so the messages can be more easily pretty.
+		if(!balanced.card.isCardNumberValid(data.card_number)) {
+			$('#new-payment-method-form .alert-error').show().html('Invalid credit card number.');
+			$('#new-pm-submit').attr('disabled',false); // XXX this bit is redundant 
+			$('#cancel-new-pm').attr('disabled',false);
+			$('#ajax-loader').hide();
+		} else if (!balanced.card.isSecurityCodeValid(data.card_number, data.security_code)) {
+			$('#new-payment-method-form .alert-error').show().html('Invalid security code.');
+			$('#new-pm-submit').attr('disabled',false);
+			$('#cancel-new-pm').attr('disabled',false);
+			$('#ajax-loader').hide();
+		} else if (!balanced.card.isExpiryValid(data.expiration_month, data.expiration_year)) {
+			$('#new-payment-method-form .alert-error').show().html('Invalid expiration date.');
+			$('#new-pm-submit').attr('disabled',false);
+			$('#cancel-new-pm').attr('disabled',false);
+			$('#ajax-loader').hide();
+		} else { // no client validation errors, post to balanced
+			balanced.card.create(data, this.balancedCallbackPM.call(this));
+		}
+	},
+
+	balancedCallbackPM: function() {
+		var self = this; // put self/this in the scope of our callback so we can modify its data
+		var profile = self.collection.selected;
+		return function(response) {
+			switch(response.status) {
+				case 201:
+					// balanced creation is successful, let's put a copy in coral's db
+					$.ajax({
+						type: 'post',
+						url: '/profiles/' + profile.id + '/payment_methods',
+						dataType: 'json',
+						data: response.data,
+						success: function(d) {
+							profile.set(d);
+							self.renderProfileView();
+							$('#ajax-loader').hide();
+						},
+						error: function(d) {
+							$('#new-payment-method-form .alert').hide();
+							$('#new-payment-method-form .alert-error').show().html(d.responseText);
+							$('#new-pm-submit').attr('disabled',false);
+							$('#cancel-new-pm').attr('disabled',false);
+							$('#ajax-loader').hide();
+						}
+					});
+					break;
+				case 400:
+					// missing field - details in response.error
+					$('#new-payment-method-form .alert').hide();
+					$('#new-payment-method-form .alert-error').show().html(response.error.description);
+					$('#new-pm-submit').attr('disabled',false);
+					$('#cancel-new-pm').attr('disabled',false);
+					$('#ajax-loader').hide();
+					break;
+				case 402:
+					// could not authorize buyer's credit card - details in response.error
+					alert('balanced: 402');
+					break;
+				case 404:
+					// incorrect marketplace URI
+					alert('balanced: 404');
+					break;
+				case 409:
+					// incorrect marketplace URI
+					$('#new-payment-method-form .alert').hide();
+					$('#new-payment-method-form .alert-error').show().html(response.error.description);
+					$('#new-pm-submit').attr('disabled',false);
+					$('#cancel-new-pm').attr('disabled',false);
+					$('#ajax-loader').hide();
+					break;
+					break;
+				case 500:
+					// Error on balanced's servers, try again
+					alert('balanced: 500');
+					break;
+			}
+		}
 	},
 
 	renderRemovePMForm: function(e) {
@@ -309,6 +372,7 @@ PMView = Backbone.View.extend({
 
 	renderNewForm: function(e) {
 		if(e) e.preventDefault();
+		$('#new-payment-method-form .alert').hide(); // clear any lingering alerts
 		$('#edit-profile-form').hide();
 		$('#edit-profile-button').removeClass('disabled');
 		$('#new-payment-method-form').toggle();

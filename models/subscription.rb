@@ -89,7 +89,8 @@ class Subscription
 		 :created_at => self.created_at.to_date.to_s,
 		 :plan_name => self.plan.name,
 		 :total_paid => self.total_paid.to_s,
-		 :state => self.state}
+		 :state => self.state,
+		 :id => self.id.to_s}
 	end
 
 	def balance

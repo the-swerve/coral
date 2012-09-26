@@ -43,7 +43,7 @@ a#signup-title:active {
 	opacity: 1;
 }
 
-input#share-signup-submit {
+input#share-signup-submit, #new-pm-submit {
 	width: 210px;
 	display: block;
 	height: 2.7em;
@@ -70,4 +70,15 @@ a.logo {
   width: 196px;
   height: 126px;
 	opacity: 0.4;
+}
+
+#new-pm-form {
+	text-align: left;
+}
+
+#new-pm-form .control-label {
+	width: 90px;
+}
+#new-pm-form .controls {
+	margin-left: 104px;
 }

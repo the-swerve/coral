@@ -66,10 +66,6 @@
 			Coral.account.model.set(<%= @account.as_hash.to_json %>);
 			Coral.plans.coll.reset(<%= @account.plans.map(&:as_hash).to_json %>);
 			Coral.profiles.coll.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
-
-			// tooltipize anything with .auto-tooltip as its class, using the 'title' attribute for the tip content
-			$('.auto-tooltip').tooltip({placement: 'bottom'});
-			$('.auto-tooltip-top').tooltip({placement: 'top'});
 		});
 	</script>
 

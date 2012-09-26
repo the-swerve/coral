@@ -1,0 +1,107 @@
+<script id='edit-profile-tmpl' type='text/template' class='hide'>
+
+	 <div class='span12'>
+		<a href='#' class='toggle-profile-edit-btn' style='float:right;'><i class='icon-remove'></i> Close</a>
+		<h3>Settings</h3>
+		<div style='clear:both;' class='hline'></div>
+		<div class='alert alert-error hide'></div> <div class='alert alert-success hide'></div>
+	 </div>
+
+	 <div class='span6 profile-settings-col'><div class='profile-settings-col info-col'>
+
+		<form id="edit-profile-form">
+			 <label class='control-label'>Name</label>
+			 <input type="text" name="name" value="{{ profile.get('name') }}" />
+
+			 <label class='control-label'>Email</label>
+			 <input type="text" name="email" value="{{ profile.get('email') }}" />
+		  </div>
+
+		  <div class='modal-form-actions'>
+			 <button class='btn' id="edit-profile-submit">Save</button>
+		  </div>
+
+		</form>
+
+	 </div> </div>
+
+	 <div class='span6'> <div class='profile-settings-col'>
+		<h3>Payment Methods</h3>
+		[[ if(!_.isEmpty(profile.get('_payment_methods'))) { ]]
+		  <table class='table' style='margin:1em auto 2em auto;'>
+			 <tbody>
+				[[ _.each(profile.get('_payment_methods'), function(pm) { ]]
+					 <tr data-id='{{pm.id}}'>
+						<td><strong>{{pm.name}}</strong></td>
+						<td><a style='white-space:nowrap;' class='btn remove-pm-btn'><i class='icon-remove'></i> Remove</a></td>
+					</tr>
+				[[ }) ]]
+				  <tr>
+					  <td><a id='new-pm-btn' class='btn'><i class='icon-plus'></i> New Payment Method</a></td>
+					  <td></td>
+				  </tr>
+			  </tbody>
+			</table>
+	  [[ } else {]]
+		  <p>You do not yet have a payment method.</p>
+		  <a id='new-pm-btn' class='btn'><i class='icon icon-plus'></i> Add payment method</a>	
+	  [[ } ]]
+
+		  <form id="new-pm-form" class="hide" style='float:left'>
+
+
+				  <label class='control-label'>Type</label>
+				  <select id='new-pm-type' name='pay_type'>
+					 <option id='new-credit-card'>Credit Card</option>
+					 <option id='new-echeck'>E-check</option>
+				  </select>
+
+				  <div class='credit-card-selected'>
+					 <label class='control-label'>Card Number</label>
+					 <input id="" type="text" name="card_number" />
+
+					 <label class='control-label'>Expiration</label>
+					 <select name='expiration_month' style='width:6em;'>
+						<option>Month</option>
+						[[ for(var i = 1; i < 13; i++) { ]]
+						<option>{{i}}</option>
+						[[ } ]]
+					 </select>
+					 [[ var year = (new Date).getFullYear(); ]]
+					 <select name='expiration_year' style='width:6em;'>
+						<option>Year</option>
+						[[ for(var i = year; i < year + 10; i++) { ]]
+						  <option>{{ i }}</option>
+						[[ } ]]
+					 </select>
+
+					 <label class='control-label'>Security Code</label>
+					 <input id="" type="text" name="security_code" value=""/>
+				  </div>
+
+				  <div class='echeck-selected hide'>
+					 <label class='control-label'>Account Number</label>
+					 <input id="" type="text" name="acct_number" value=""/>
+				  </div>
+
+
+				<div class="modal-form-actions">
+				  <button id='new-pm-submit' class='btn'>Save</button> &nbsp;
+				</div>
+
+			 </form>
+
+	</div></div> <!-- end span6 and profile-settings-col -->
+
+  <div class='modal hide' id='remove-pm-confirm'>
+	  <div class='modal-body'>
+		  <p>Are you sure you wish to remove this payment method? Your transaction history will remain intact.</p>
+
+		  <p>
+		  <a id='remove-pm-submit' class='btn btn-danger'><i class='icon-remove icon-white'></i> Remove</a>
+		  <a class='btn' data-dismiss='modal'>Cancel</a>
+		  </p>
+	  </div>
+  </div>
+
+</script>
