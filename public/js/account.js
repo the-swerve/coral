@@ -101,10 +101,10 @@ BAView = Backbone.View.extend({
 
 	validate: function(e) {
 		e.preventDefault();
-		var ba = $('#bank-account-form').serializeObject(); // will have {account_number: x, bank_code: x}
-		var err = balanced.bankAccount.validate(ba);
 		$('#bank-account-submit').attr('disabled',true);
 		$('#ajax-loader').show();
+		var ba = $('#bank-account-form').serializeObject(); // will have {account_number: x, bank_code: x}
+		var err = balanced.bankAccount.validate(ba);
 		if(_.isEmpty(err)) {
 			// no javascript validation error. now let's post to balanced
 			balanced.bankAccount.create(ba, this.balancedCallback.call(this));

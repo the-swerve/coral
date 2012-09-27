@@ -69,7 +69,7 @@ class Account
 	def as_hash
 		{:name => self.name.to_s,
 		 :email => self.email,
-		 :phone_number => self.phone_number,
+		 :phone_number => self.phone_number || '',
 		 :id => self.id.to_s,
 		 :session_token => self.session_token,
 		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}}

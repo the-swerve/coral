@@ -66,6 +66,10 @@
 
 		<form id="bank-account-form" class="hide form-horizontal {{ !_.isEmpty(_bank_account) ? 'hide' : '' }}" style='float:left'>
 
+			<div class="control-group"> <label class="control-label">Name</label>
+				<div class="controls"> <input type="text" name="name" value='{{name}}' /><span class='help-block'>The bank account holder's name<span></div>
+			</div>
+
 			<div class="control-group"> <label class="control-label">Account Number</label>
 				<div class="controls"> <input type="text" name="account_number" /></div>
 			</div>
@@ -79,8 +83,6 @@
 			<div class='modal-form-actions'>
 				<button id='bank-account-submit' class='btn'>Save</button>
 			</div>
-
-			<input type='hidden' name='name' value='{{name}}' />
 
 		</form>
 	</div>

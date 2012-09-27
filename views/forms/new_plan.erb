@@ -1,48 +1,50 @@
 <script id='plan-new-tmpl' type='text/template' class='hide'>
 
-	<p id='new-plan-error' class='form-error'></p>
+		<h3>Create a Plan</h3>
 
-	<form class='form-horizontal' id='new-plan-form'>
+		<p id='new-plan-error' class='form-error'></p>
 
-		<div class='control-group'>
-			<label class='control-label'>Name</label>
-			<div class='controls'>
-				<input type='text' name='name' /> 
-			</div>
-		</div>
+		<form class='form-horizontal' id='new-plan-form'>
 
-		<div class='control-group'>
-			<label class='control-label'>Recurring charge of</label>
-			<div class='controls'>
-				<div class='input-prepend'>
-					<span class='add-on'>$</span>
-					<input type='text' name='amount' style='width:4em;' />
-				</div>
-				<span>&nbsp; every &nbsp;</span>
-				<select style='width:8em;' name='cycle'>
-					<option>1 month</option>
-					<option>2 weeks</option>
-					<option>2 months</option>
-					<option>3 months</option>
-					<option>6 months</option>
-					<option>1 year</option>
-				</select>
-			</div>
-		</div>
-
-		<div class='control-group'>
-			<label class='control-label'>Initial charge</label>
-			<div class='controls'>
-				<div class='input-prepend'>
-					<span class='add-on'>$</span>
-					<input type='text' name='initial_charge' style='width:4em;' />
+			<div class='control-group'>
+				<label class='control-label'>Name</label>
+				<div class='controls'>
+					<input type='text' name='name' /> 
 				</div>
 			</div>
-		</div>
 
-		<div class='modal-form-actions'>
-			<input id='new-plan-submit' class='btn' name='commit' type='submit' value='Save' /> &nbsp;
-			<img id='new-plan-loader' class='hide' src='img/ajax-loader.gif' />
-		</div>
-	</form>
+			<div class='control-group'>
+				<label class='control-label'>Recurring charge of</label>
+				<div class='controls'>
+					<div class='input-prepend'>
+						<span class='add-on'>$</span>
+						<input type='text' name='amount' style='width:4em;' />
+					</div>
+					<span>&nbsp; every &nbsp;</span>
+					<select style='width:8em;' name='cycle'>
+						<option>1 month</option>
+						<option>2 weeks</option>
+						<option>2 months</option>
+						<option>3 months</option>
+						<option>6 months</option>
+						<option>1 year</option>
+					</select>
+				</div>
+			</div>
+
+			<div class='control-group'>
+				<label class='control-label'>Initial charge</label>
+				<div class='controls'>
+					<div class='input-prepend'>
+						<span class='add-on'>$</span>
+						<input type='text' name='initial_charge' style='width:4em;' />
+					</div>
+				</div>
+			</div>
+
+			<div class='modal-form-actions'>
+				<input id='new-plan-submit' class='btn' name='commit' type='submit' value='Save' /> &nbsp;
+				<img id='new-plan-loader' class='hide' src='img/ajax-loader.gif' />
+			</div>
+		</form>
 </script>

@@ -38,6 +38,7 @@ div.visualization {
 	-webkit-border-radius: 9px 9px 0 0;
 	-moz-border-radius: 9px 9px 0 0;
 	border-radius: 9px 9px 0 0;
+	z-index: -1;
 }
 
 a#logo-teeny {
@@ -249,4 +250,21 @@ div#account-info {
 
 #edit-profile-form, #new-payment-method-form {
 	margin: 0 1em;
+}
+
+/* Test environment notification tag */
+
+.test-tag {
+	text-align: center;
+	position: fixed;
+	top: 0; left: 0;
+	background-color: #EAF7FF;
+	padding: 1em 1em 0.5em 1em;
+	-webkit-border-radius: 0 0 9px 0;
+	-moz-border-radius: 0 0 9px 0;
+	border-radius: 0 0 9px 0;
+}
+
+.text-tag p {
+	font-size; 1.2em;
 }
