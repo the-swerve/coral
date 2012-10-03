@@ -52,7 +52,7 @@
 		$(document).ready(function() {
 
 			// Initialize backbone views
-			var account_view = new AccountView({model: Coral.account.model, el: $('div.container')});
+			var account_view = new AccountView({model: Coral.account.model, el: $('div#account')});
 			var ba_view = new BAView({model: Coral.account.model, el: $('div.container')});
 			var plan_view = new PlanView({collection: Coral.plans.coll, el: $('div.container')});
 
@@ -89,13 +89,18 @@
 	<%= erb :'modals/new_profile' %>
 	<%= erb :'modals/edit_profile' %>
 
-	<div id="account" class='row'>
-		<%= erb :'meta/nav' %>
-		<h2 id="account-name"><%= @account.name %></h2>
-	</div>
+	<div id='account'>
+		<div class='row'>
+			<div class='span12'>
+				<%= erb :'meta/nav' %>
+				<h2 id="account-name"><%= @account.name %></h2>
+			</div>
+		</div>
 
-	<div class='row'>
-		<%= erb :'modals/edit_account' %>
+		<div class='row'>
+			<%= erb :'modals/edit_account' %>
+		</div>
+
 	</div>
 
 	<div class="visualization drop-shadow row">

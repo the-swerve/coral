@@ -24,7 +24,7 @@ ChargeView = Backbone.View.extend({
 
 	events: {
 			'click .edit-charge-button': 'renderEditForm',
-			'click .new-charge-button': 'renderNewForm',
+			'click .new-charge-btn': 'renderNewForm',
 			'click #remove-charge-button': 'renderRemoveForm',
 			'click #void-charge-button': 'renderVoidForm',
 			'click #new-charge-submit': 'create',
@@ -169,6 +169,7 @@ ChargeView = Backbone.View.extend({
 	},
 
 	renderNewForm: function(e) {
+		alert('sup');
 		if(e) e.preventDefault();
 		this.selected_pm_id = $(e.currentTarget).attr('data-id');
 		var tmpl = _.template($('#new-charge-tmpl').html());

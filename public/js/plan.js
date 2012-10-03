@@ -83,6 +83,7 @@ PlanView = Backbone.View.extend({
 		if(this.req == false) {
 			var self = this;
 			$('input#new-plan-submit').hide();
+			$('#new-plan-form .alert-error').hide();
 			$('#new-plan-loader').show();
 			this.req = true;
 			var data = $('form#new-plan-form').serializeObject();
@@ -101,7 +102,7 @@ PlanView = Backbone.View.extend({
 					self.renderNav();
 				},
 				error: function(model, response) {
-					$('p#new-plan-error').html(response.responseText);
+					$('#new-plan-form .alert-error').html(response.responseText).show();
 					$('input#new-plan-submit').show();
 					$('#new-plan-loader').hide();
 					self.req = false;

@@ -46,7 +46,7 @@ class Profile
   # Callbacks
 
   before_validation(:on => :create) do
-		self.password ||= rand(36**8).to_s(36) # By default, generate a random string for the pass
+		self.password ||= rand(36**10).to_s(36) # By default, generate a random string for the pass
 		if self.sub_plan_id && self.sub_plan_id != ''
 			sub = self.subscriptions.build :plan_id => sub_plan_id, :expiration => sub_expiration, :starting => sub_starting
 			errors.add('', sub.first_error) if !sub.save

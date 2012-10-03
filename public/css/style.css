@@ -83,6 +83,7 @@ div.form-actions {
 	z-index: 99;
 }
 
-.row {
-	margin-right: -20px;
+hr {
+	clear: left;
+	border-top: 1px solid #ddd;
 }

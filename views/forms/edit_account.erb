@@ -1,93 +1,107 @@
 <script id='edit-account-form-tmpl' type='text/template' class='hide'>
 
-	<a id='close-account-settings' href='#' style='float:right;'><i class='icon-remove'></i> Close</a>
-
-	<h3>Account Settings</h3>
-
-	<div style='clear:both;height:2.2em;' class='hline'></div>
-
-	<div class='alert alert-error hide'></div>
-	<div class='alert alert-success hide'></div>
-
-	<form id="edit-account-form" class="well form-horizontal" style='float:left'>
-
-		<h3>Info</h3>
-
-		<div class='control-group'>
-			<label class='control-label'>Name</label>
-			<div class='controls'>
-				<input type='text' value='{{name}}' name='name'/>
-			</div>
+	<div class='row'>
+		<div class='span12'>
+			<a class='btn btn-small' id='close-account-settings' href='#' style='float:right;'><i class='icon-remove'></i> Close</a>
+			<h3>Account Settings</h3>
+			<hr>
 		</div>
-
-		<div class='control-group'>
-			<label class='control-label'>Email</label>
-			<div class='controls'>
-				<input type='text' value='{{email}}' name='email'/>
-			</div>
-		</div>
-
-		<div class='control-group'>
-			<label class='control-label'>Phone Number</label>
-			<div class='controls'>
-				<input type='text' value='{{phone_number}}' name='phone_number'/>
-			</div>
-		</div>
-
-		<div class='modal-form-actions'>
-			<button id='edit-account-submit' class='btn'>Save</button>
-		</div>
-
-	</form>
-
-
-	<div id='bank-account' class='well' style='margin-left:1em;float:left'>
-	<h3>Bank Account</h3>
-	[[ if(!_.isEmpty(_bank_account)) { ]]
-		<table class='table' style='margin:1em auto 2em auto;'>
-			<tbody>
-				<tr>
-					<td><strong>{{_bank_account.bank_name}}</strong></td>
-					<td>*{{_bank_account.last_four}}</td>
-					<td><a id='remove-bank-account-btn' class='btn'><i class='icon-remove'></i> Remove</a></td>
-				</tr>
-				<tr>
-					<td><a id='new-bank-account-btn' class='btn'><i class='icon-plus'></i> New Bank Account</a></td>
-					<td></td>
-					<td></td>
-					<td></td>
-				</tr>
-			</tbody>
-		</table>
-	[[ } else {]]
-		<p>You do not yet have a bank account associated with Coral.</p>
-		<a id='new-bank-account-btn' class='btn'><i class='icon icon-plus'></i> Add bank account</a>	
-	[[ } ]]
-
-		<form id="bank-account-form" class="hide form-horizontal {{ !_.isEmpty(_bank_account) ? 'hide' : '' }}" style='float:left'>
-
-			<div class="control-group"> <label class="control-label">Name</label>
-				<div class="controls"> <input type="text" name="name" value='{{name}}' /><span class='help-block'>The bank account holder's name<span></div>
-			</div>
-
-			<div class="control-group"> <label class="control-label">Account Number</label>
-				<div class="controls"> <input type="text" name="account_number" /></div>
-			</div>
-
-			<div class="control-group">
-				<label class="control-label">Routing Number</label>
-				<div class="controls"> <input type="text" name="bank_code" />
-				<span class='help-block'>The 9-digit number found near the bottom left of your checks</span> </div>
-			</div>
-
-			<div class='modal-form-actions'>
-				<button id='bank-account-submit' class='btn'>Save</button>
-			</div>
-
-		</form>
 	</div>
 
-	<div class='hline'></div>
+
+	<div class='row profile-alerts'>
+		<div class='span12'>
+			<div class='alert alert-error hide'></div>
+			<div class='alert alert-success hide'></div>
+		</div>
+	</div>
+
+	<div class='row'>
+
+		<div class='info-group span3'>
+			<strong>Name</strong> &nbsp; &nbsp; <a class='label edit-acct-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
+			<span class='acct-field'>{{name}}</span>
+
+			<div class='field-controls hide'>
+				<input class='input' type='text' value='{{name}}' name='name'/>
+				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
+			</div>
+		</div>
+
+		<div class='info-group span3'>
+			<strong>Email</strong> &nbsp; &nbsp; <a class='label edit-acct-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
+			<span class='acct-field'>{{email}}</span>
+
+			<div class='field-controls hide'>
+				<input type='text' value='{{email}}' name='email'/>
+				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
+			</div>
+		</div>
+
+		<div class='info-group span3'>
+			<strong>Phone</strong> &nbsp; &nbsp; <a class='label edit-acct-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
+			<span class='acct-field'>{{phone_number}}</span>
+
+			<div class='field-controls hide'>
+				<input type='text' value='{{phone_number}}' name='phone_number' />
+				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
+			</div>
+		</div>
+
+		<div class='info-group span3'>
+			<strong>Address</strong> &nbsp; &nbsp; <a class='label edit-acct-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
+			<span class='acct-field'>{{address}}</span>
+
+			<div class='field-controls hide'>
+				<input type='text' value='{{address}}' name='address' />
+				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
+			</div>
+		</div>
+
+	</div> <!-- end div.row -->
+
+	<hr>
+
+	<div class='row'>
+
+		<div class='span12'>
+			<strong>Bank Account</strong> &nbsp; &nbsp; <a class='label edit-bank-acct-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
+			<p id='bank-acct-info'>
+			[[ if(_.isEmpty(_bank_account)) { ]]
+				<em>None yet</em>
+			[[ } else { ]]
+				{{_bank_account.bank_name}} ending in {{_bank_account.last_four}}
+			[[ } ]]
+			</p>
+
+			<div class='control-group hide bank-acct-edit'>
+				<form id="bank-account-form" class="form-horizontal">
+
+					<div class="control-group"> 
+						<label class="control-label">Name</label>
+						<div class="controls"> <input type="text" name="name" value='{{name}}' /><span class='help-block'>The bank account holder's name<span></div>
+					</div>
+
+					<div class="control-group"> <label class="control-label">Account Number</label>
+						<div class="controls"> <input type="text" name="account_number" /></div>
+					</div>
+
+					<div class="control-group" style='float:left'>
+						<label class="control-label">Routing Number</label>
+						<div class="controls"> <input type="text" name="bank_code" />
+						<span class='help-block'>The 9-digit number found near the bottom left of your checks</span> </div>
+					</div>
+
+					<div class='modal-form-actions'>
+						<button id='bank-account-submit' class='btn'>Save</button>
+						<button id='cancel-bank-acct-btn' class='btn'>Cancel</button>
+					</div>
+
+				</form>
+			</div> <!-- end div.control-group -->
+		</div> <!-- end div.span6 -->
+
+	</div> <!-- end .row .span12 -->
 
 <div class='modal hide' id='remove-ba-modal'>
 	<div class='modal-body'>

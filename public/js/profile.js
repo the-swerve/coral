@@ -2,7 +2,8 @@
 
 Profile = Backbone.Model.extend({
 	urlRoot: '/profiles',
-	initialize: function() { }
+	initialize: function() {
+	}
 });
 
 ProfileCollection = Backbone.Collection.extend({
@@ -18,7 +19,9 @@ ProfileView = Backbone.View.extend({
 	initialize: function(options) {
 		this.collection.bind('reset', this.renderTable, this);
 		this.plans = options.plans;
+		editProfileView = new EditProfileView({collection: this.collection, el: $('#profiles-container')});
 
+		// events
 	},
 
 	events: {
@@ -37,13 +40,14 @@ ProfileView = Backbone.View.extend({
 		'click #share-plan-submit': 'invitePeople',
 
 		'click .view-profile-button': 'renderProfileView',
-		'click #edit-profile-button': 'renderEditForm',
-		'click #cancel-edit-profile': 'renderEditForm',
+//		'click #edit-profile-button': 'renderEditForm',
+//		'click #cancel-edit-profile': 'renderEditForm', // XXX trash
 
 		'click #payments-button': 'showPayments',
 		'click #new-pm-submit': 'createPM',
 		'click #remove-pm-submit': 'destroyPM',
 		'click .remove-pm-button': 'renderRemovePMForm',
+
 	},
 
 	renderEditForm: function(e) {
@@ -364,7 +368,7 @@ PMView = Backbone.View.extend({
 	},
 
 	events: {
-		'click #new-pm-button': 'renderNewForm',
+		'click #new-pm-btn': 'renderNewForm',
 		'click #cancel-new-pm': 'renderNewForm',
 		'click .back-to-profile': 'goBack',
 		'change .new-payment-method-type': 'getType',
@@ -372,11 +376,9 @@ PMView = Backbone.View.extend({
 
 	renderNewForm: function(e) {
 		if(e) e.preventDefault();
-		$('#new-payment-method-form .alert').hide(); // clear any lingering alerts
-		$('#edit-profile-form').hide();
-		$('#edit-profile-button').removeClass('disabled');
-		$('#new-payment-method-form').toggle();
-		$('#new-pm-button').toggleClass('disabled');
+		var tr = $(e.currentTarget).parents('tr');
+		var form = _.template($('#new-pm-form').html());
+		tr.after(form({}));
 	},
 
 	getType: function(e) {
@@ -399,6 +401,7 @@ PMView = Backbone.View.extend({
 		$('div#edit-profile-payments').html(payments(this.collection.selected.attributes));
 	},
 
+
 });
 
 SubView = Backbone.View.extend({
@@ -407,9 +410,114 @@ SubView = Backbone.View.extend({
 
 	events: {
 		'change #new-sub-selector': 'showStarting',
+		'change #sub-pm-select': 'newSubPM',
 	},
 
 	showStarting: function() {
 		$('#new-sub-dates').removeClass('hide');
 	},
+
+	newSubPM: function(e) {
+		$('#ajax-loader').show();
+		$(e.currentTarget).after('&nbsp; <em>Saving...</em>');
+		$(e.currentTarget).attr('disabled',true);
+	},
+
+});
+
+EditProfileView = Backbone.View.extend({
+	initialize: function(options) {
+
+		var self = this;
+		this.collection.on('change:name', function() {
+			$('#profile-name').html(self.collection.selected.get('name'));
+		});
+
+	},
+	
+	events: {
+		'click .edit-profile-field-btn': 'revealInput',
+		'click .save-field-btn': 'saveField',
+		'click .cancel-edit': 'cancelEdit',
+		'keypress .field-controls input': 'saveField',
+		'blur #profile-scratchpad': 'saveScratch',
+	},
+
+	revealInput: function(e) {
+		e.preventDefault();
+		$(e.currentTarget).hide();
+		$(e.currentTarget).siblings('.profile-field').hide();
+		$(e.currentTarget).siblings('.field-controls').show();
+	},
+
+	saveField: function(e) {
+		if(e.which && e.which == 13) { // enter key pressed
+			var inputData = $(e.currentTarget);
+			var inputBtn = $(e.currentTarget).parent().siblings('.edit-profile-field-btn');
+		} else if(e.which) {
+			return this; // enter key not pressed
+		} else { // save button pushed
+			var inputBtn = $(e.currentTarget);
+			var inputData = inputBtn.siblings('.field-controls').children('input');
+		}
+		// UI bits
+		$('#edit-profile .alert').hide();
+		$('#ajax-loader').show();
+		inputData.attr('disabled',true);
+		// AJAX bits
+		var self = this;
+		var name = inputData.attr('name'); // name of the field we're editing
+		var val = inputData.val(); // new value of the field we're editing
+		var data = {};
+		data[name] = val; // i have to initialize the data hash this way because if i do {name : val}, javascript turns name into a string
+		this.collection.selected.save(data,
+			{
+				success: function(m,r) {
+					inputData.attr('disabled',false);
+					$('#ajax-loader').hide();
+					inputBtn.show();
+					inputData.parent().siblings('.profile-field').html(val).show();
+					inputData.parent().hide();
+				},
+				error: function(m,r) {
+					inputData.attr('disabled',false);
+					$('#edit-profile .alert-error').html(r.responseText).show();
+					$('#ajax-loader').hide();
+					inputBtn.show();
+					inputData.parent().siblings('.profile-field').show();
+					inputData.parent().hide();
+				}
+			}
+		);
+	},
+
+	saveScratch: function(e) { // this may not need a separte function from saveField
+		$('#ajax-loader').show();	
+		this.collection.selected.save({'info' : $('#profile-scratchpad').val()},
+			{
+				success: function(d) {
+					$('#ajax-loader').hide();
+				},
+				error: function(d) {
+					alert(d.responseText);
+				}
+			}
+		);
+	},
+
+	successfulSave: function(d) {
+	},
+	saveError: function(d) {
+		$('#ajax-loader').hide();
+		alert(':(');
+	},
+
+	cancelEdit: function(e) {
+		e.preventDefault();
+		var p = $(e.currentTarget).parent().parent();
+		p.parent().hide();
+		p.parent().siblings('.profile-field').show();
+		p.parent().siblings('.edit-profile-field-btn').show();
+	},
+	
 });

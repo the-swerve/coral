@@ -4,7 +4,6 @@
 
 div#account {
 	margin: 14px 0 0 0;
-	height: 3.5em;
 }
 
 a.logo {
@@ -189,6 +188,7 @@ input[type="submit"], .submit-btn {
 	-webkit-border-radius: 0 0 9px 9px;
 	-moz-border-radius: 0 0 9px 9px;
 	border-radius: 0 0 9px 9px;
+	padding: 1em;
 }
 
 #plan-desc {
@@ -267,4 +267,11 @@ div#account-info {
 
 .text-tag p {
 	font-size; 1.2em;
+}
+
+.info-group {
+	border-right: 1px solid #DDD;
+}
+
+#bank-account {
 }

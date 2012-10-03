@@ -36,25 +36,20 @@ class PaymentMethod
 		self.name ||= 'Credit card (' + self.brand + '): *' + self.last_four
 		begin
 			buyer = Balanced::Marketplace.my_marketplace.create_buyer(self.profile.email, self.uri)
-
-			puts '~~~~~~!!!!!!!!'
-			puts self.profile.as_hash
-			begin
-				self.profile.update_attribute('buyer_uri',buyer.uri)
-			rescue
-				errors.add('','This person has invalid data.')
+			if !self.profile.update_attribute('buyer_uri',buyer.uri)
+				puts '!!!!!!!!!!!!!!!'
+				puts self.first_error
+				errors.add('','wootuutu')
 			end
-		rescue
+		rescue Balanced::Conflict => ex
 			if self.profile.buyer_uri
-				begin
-					x = Balanced::Account.construct_from_response({uri: self.profile.buyer_uri})
-					x.add_card(self.uri)
-				rescue
-					errors.add('','Error: invalid data.') # XXX blech. maze of exceptions
-				end
+				x = Balanced::Account.construct_from_response({uri: self.profile.buyer_uri})
+				x.add_card(self.uri)
 			else
-				errors.add('','Error: invalid data')
+				errors.add('','Error: invalid data: ' + ex.to_s)
 			end
+		rescue => ex
+			errors.add('','Error: ' + ex.to_s)
 		end
 	end
 

@@ -102,3 +102,7 @@ tr#new-plan-form td {
 .info-col {
 	border-right: 1px solid #ddd;
 }
+
+.row {
+	margin-right: -20px;
+}

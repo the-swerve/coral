@@ -13,6 +13,7 @@ class Account
 	# Fields
 
 	field :name, type: String
+	field :address, type: String
 	field :email, type: String
 	field :phone_number, type: String
 	field :pass_hash, type: String
@@ -70,6 +71,7 @@ class Account
 		{:name => self.name.to_s,
 		 :email => self.email,
 		 :phone_number => self.phone_number || '',
+		 :address => self.address || '',
 		 :id => self.id.to_s,
 		 :session_token => self.session_token,
 		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}}

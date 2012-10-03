@@ -11,12 +11,34 @@ AccountView = Backbone.View.extend({
 	req: false, // Keep track of whether we're currently making a server request.
 	settingsShown: false, // for toggling account settings box
 	events: {
-		'click #edit-account-submit': 'save',
 		'click #edit-account-button': 'renderForm',
 		'click #close-account-settings': 'renderForm',
+		'click .edit-acct-field-btn': 'revealInput',
+		'click .cancel-acct-edit': 'cancelEdit',
 	},
+
 	initialize: function() {
+		var self = this;
 		this.model.bind('change', this.render, this);
+		this.model.on('change:name', function() { // update title
+			$('#account-name').html(self.model.get('name'));
+		});
+		edit_view = new EditAccountView({el: this.el, model: this.model});
+	},
+
+	revealInput: function(e) {
+		e.preventDefault();
+		$(e.currentTarget).hide();
+		$(e.currentTarget).siblings('.acct-field').hide();
+		$(e.currentTarget).siblings('.field-controls').show();
+	},
+
+	cancelEdit: function(e) {
+		e.preventDefault();
+		var p = $(e.currentTarget).parent().parent();
+		p.parent().hide();
+		p.parent().siblings('.acct-field').show();
+		p.parent().siblings('.edit-acct-field-btn').show();
 	},
 
 	renderForm: function(e) {
@@ -35,40 +57,85 @@ AccountView = Backbone.View.extend({
 		return this;
 	},
 
-	save: function(e) {
-		e.preventDefault();
-		var self = this;
-		$('#ajax-loader').show();
-		$('#edit-account-submit').attr('disabled',true);
-		this.model.save($('#edit-account-form').serializeObject(), {
-			success: function(model, response) {
-				$('#edit-account .alert').hide(); // hide any previous alerts
-				$('#edit-account .alert-success').show();
-				$('#edit-account .alert-success').html('Saved.');
+	//	XXX TRASH
+//	save: function(e) { 
+//		e.preventDefault();
+//		var self = this;
+//		$('#ajax-loader').show();
+//		$('#edit-account-submit').attr('disabled',true);
+//		this.model.save($('#edit-account-form').serializeObject(), {
+//			success: function(model, response) {
+//				$('#edit-account .alert').hide(); // hide any previous alerts
+//				$('#edit-account .alert-success').show();
+//				$('#edit-account .alert-success').html('Saved.');
+//
+//				$('#account-name').html(model.get('name')); // immediately update the account name title (top left)
+//				$('#ajax-loader').hide();
+//				$('#edit-account-submit').attr('disabled',false); // re-enable the submit button
+//			},
+//			error: function(model, response) {
+//				$('#edit-account .alert').hide(); // hide any previous alerts
+//				$('#edit-account .alert-error').show(); // display the error option
+//				$('#edit-account .alert-error').html(response.responseText);
+//				$('#edit-account-submit').attr('disabled',false); // re-enable the submit button
+//				$('#ajax-loader').hide();
+//			}
+//		});
+//		return this;
+//	},
 
-				$('#account-name').html(model.get('name')); // immediately update the account name title (top left)
-				$('#ajax-loader').hide();
-				$('#edit-account-submit').attr('disabled',false); // re-enable the submit button
-			},
-			error: function(model, response) {
-				$('#edit-account .alert').hide(); // hide any previous alerts
-				$('#edit-account .alert-error').show(); // display the error option
-				$('#edit-account .alert-error').html(response.responseText);
-				$('#edit-account-submit').attr('disabled',false); // re-enable the submit button
-				$('#ajax-loader').hide();
-			}
-		});
-		return this;
+});
+
+EditAccountView = Backbone.View.extend({
+	events: {
+		'keypress .field-controls input': 'saveField',
 	},
 
+	saveField: function(e) {
+		if (e.which != 13) return this;
+		e.preventDefault();
+		// ui bits
+		$(e.currentTarget).attr('disabled',true);
+		$('#ajax-loader').show();
+		$('.profile-alerts .alert').hide();
+		// ajax bits
+		var self = this;
+		var name = $(e.currentTarget).attr('name');
+		var val = $(e.currentTarget).val(); // new value of the field we're editing
+		var data = {};
+		data[name] = val; // i have to initialize the data hash this way because if i do {name : val}, javascript turns name into a string
+		this.model.save(data,
+			{
+				success: function(m,r) {
+					$(e.currentTarget).attr('disabled',false);
+					$('#ajax-loader').hide();
+					$(e.currentTarget).parent().siblings('.acct-field').html(val).show();
+					$(e.currentTarget).parent().siblings('.edit-acct-field-btn').show();
+					$(e.currentTarget).parent().hide();
+				},
+				error: function(m,r) {
+					$('.profile-alerts .alert-error').html(r.responseText).show();
+					$(e.currentTarget).attr('disabled',false);
+					$('#ajax-loader').hide();
+					$(e.currentTarget).parent().siblings('.acct-field').show();
+					$(e.currentTarget).parent().siblings('.edit-acct-field-btn').show();
+					$(e.currentTarget).parent().hide();
+				}
+			}
+		);
+	},
 });
 
 // bank account updating form
 BAView = Backbone.View.extend({
 	req: false,
 	events: {
+
+		'click .edit-bank-acct-btn': 'showForm',
+		'click #cancel-bank-acct-btn': 'hideForm',
+
 		'click #bank-account-submit': 'validate',
-		'click #new-bank-account-btn': 'showForm',
+
 		'click #remove-bank-account-btn': 'confirmDelete',
 		'click #remove-bank-account-submit': 'destroy',
 	},
@@ -182,11 +249,17 @@ BAView = Backbone.View.extend({
 		});
 	},
 
+	hideForm: function(e) {
+		e.preventDefault();
+		$('#bank-acct-info').show();
+		$('.bank-acct-edit').hide();
+		return this;
+	},
+
 	showForm: function(e) {
-		if(e) e.preventDefault();
-		$('#bank-account p').hide();
-		$('#new-bank-account-btn').hide();
-		$('#bank-account-form').show();
+		e.preventDefault();
+		$('#bank-acct-info').hide();
+		$('.bank-acct-edit').show();
 		return this;
 	},
 
