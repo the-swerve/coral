@@ -24,9 +24,9 @@ class Application < Sinatra::Base
 		if @profile
 			@subscription = @profile.subscriptions.find params['subscription_id']
 			if @subscription
-				@payment_method = @subscription.payment_methods.build @params
+				@payment_method = @subscription.build_payment_method @params
 				if @payment_method.save
-					json @payment_method.as_hash
+					json @profile.as_hash
 				else ; halt 400, @payment_method.first_error ; end
 			else ; halt 400, 'subscription not found' ; end
 		else ; halt 400, 'profile not found' ; end

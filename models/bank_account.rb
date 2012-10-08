@@ -22,7 +22,7 @@ class BankAccount
 
   # Callbacks
 	
-	before_validation do
+	before_validation on: :create do
 		# Create a new merchant on balanced
 		begin
 			merchant = Balanced::Marketplace.my_marketplace.create_merchant(
@@ -42,9 +42,13 @@ class BankAccount
 				self.account.merchant_uri = merchant.uri
 				self.account.save
 		rescue Balanced::Conflict => ex
-			x = Balanced::Account.construct_from_response({uri: self.account.merchant_uri})
-			x.add_bank_account(self.uri)
-			puts x.to_s
+			if self.uri
+				x = Balanced::Account.construct_from_response({uri: self.account.merchant_uri})
+				x.add_bank_account(self.uri)
+				puts x.to_s
+			else
+				errors.add('', 'Conflicting balanced accounts')
+			end
 		rescue Balanced::BadRequest => ex
 			errors.add('', 'Bad request: ' + ex.to_s)
 			puts ex

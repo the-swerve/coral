@@ -1,116 +1,201 @@
 // The Subscription Plan 
 
-Plan = Backbone.Model.extend({
+Plan = {}; // namespace this biatch
+Plan.View = {};
+
+Plan.Model= Backbone.Model.extend({
 	urlRoot: '/plans',
 	initialize: function() {
 	}
 });
 
-PlanCollection = Backbone.Collection.extend({
-	model: Plan,
+Plan.Collection = Backbone.Collection.extend({
+	model: Plan.Model,
 	url: '/plans',
 	initialize: function() { }
 });
 
-PlanView = Backbone.View.extend({
 
-	req: false,
-
-	initialize: function() {
-		this.collection.bind('reset', this.renderInitial, this);
+Plan.View.Table = Backbone.View.extend({
+	initialize: function(options) {
+		_.bindAll(this, 'render');
+		var self = this;
+		this.plans = options.plans;
+		this.profiles = options.profiles;
+		// Initially show members of the first plan
+		this.profiles.bind('reset', function() {
+			self.plans.selected = self.plans.first();
+			self.render();
+		});
 	},
-
 	events: {
-		'click #new-plan-submit': 'create',
-		'click #edit-plan-submit': 'update',
-		'click #remove-plan-submit': 'destroy',
-		'click #cancel-edit-plan': 'hideEditForm',
-
-		'click .dropdown-item': 'selectPlan',
-
-		'click #new-plan-button': 'renderNewForm',
-		'click #edit-plan-button': 'renderEditForm',
-		'click .share-plan-button': 'renderShareForm',
-		'click #remove-plan-button': 'renderRemoveForm',
-		'click #new-subscription-button': 'renderNewSubscriptionForm',
+		'click .dropdown-item' : 'selectPlan',
+		'click #new-plan-button': 'newPlan',
+		'click #edit-plan-button': 'editPlan',
+		'click #remove-plan-button': 'removePlan',
 	},
-
-	renderInitial: function() {
-		this.collection.selected = this.collection.first();
-		this.renderNav();
+	selectPlan: function(e) {
+		e.preventDefault();
+		// The plan links will have the data-id attribute holding their id's
+		this.plans.selected = this.plans.get($(e.currentTarget).attr('data-id'));
+		this.render();
 	},
-
-	renderNav: function(e) {
-		/* This will run on page load, instantiating the selected plan and rendering the initial templates.
+	newPlan: function(e) {
+		e.preventDefault();
+		$(e.currentTarget).parent().addClass('active');
+		$(e.currentTarget).parent().siblings().removeClass('active');
+		this.plans.selected = null;
+		this.planForm = new Plan.View.New({el: this.el, collection: this.plans, tableView: this});
+	},
+	editPlan: function(e) {
+		e.preventDefault();
+		this.editPlanForm = new Plan.View.Edit(
+				{el:this.el, collection: this.plans, tableView: this, profiles: this.profiles});
+	},
+	removePlan: function(e) {
+		e.preventDefault();
+		// The plan links will have the data-id attribute holding their id's
+		this.removePlanModal = new Plan.View.Remove(
+				{el: this.el, collection: this.plans, profiles: this.profiles, tableView: this});
+	},
+	render: function() {
+		/* This will run on page load, instantiating the selected plan and
+		 * rendering the initial templates.
 		 */
-		if(e) e.preventDefault();
-		if(this.collection.isEmpty()) { // show the new plan dialog after new account creation
+		if(this.plans.isEmpty()) { // show the new plan form if they don't have any
 			this.renderNewForm();
 		} else {
 			var self = this;
+			
+			// 1. Render the list of plans on the left.
 			var list = _.template($('#plan-nav-tmpl').html());
-			this.$('#plan-nav-container').html(list({plans: this.collection, selected: this.collection.selected}));
+			this.$('#plan-nav-container').html(list({plans: this.plans, selected: this.plans.selected}));
+
+			// 2. Compile the plan description above the table.
 			var desc = _.template($('#plan-desc-tmpl').html());
-			this.$('#plan-desc-container').html(desc({plan: this.collection.selected}));
 
-			// jquery fluff (dependent on template being rendered)
-			$('.dropdown-toggle, .plan-actions').tooltip();
+			// 3. Filter out all members of the selected plan
+			var filteredProfiles = this.profiles.filter(function(p) {
+				return _.include(p.get('plan_ids'), self.plans.selected.id);
+			});
+			filteredProfiles = (new ProfileCollection(filteredProfiles)).toJSON() // wut. is this circular?
 
-			return this;
+			// Compile the table of profiles
+			var table = _.template($('#profile-table-tmpl').html());
+
+			$('#profiles-table-container').hide(); // necessary?
+			var descAndTable = desc({plan: self.plans.selected}) + table({profiles: filteredProfiles});
+			$('#profiles-container').html(descAndTable);
+			$('#profile-table-container').slideDown('slow');
+
 		}
+		return this;
 	},
+});
 
-	renderRemoveForm: function(e) {
-		if(e) e.preventDefault();
-		$('p#remove-plan-error').html(''); // clear errors
-		$('div#remove-plan').modal('show');
+// New plan form view. Self-rendering.
+Plan.View.New = Backbone.View.extend({
+	initialize: function(options) {
+		this.tableView = options.tableView;
+		this.render();
 	},
-
-	renderNewForm: function(e) {
-		if(e) e.preventDefault();
-
-		$(e.currentTarget).parent().addClass('active');
-		$(e.currentTarget).parent().siblings().removeClass('active');
-		this.collection.selected = null;
-
+	events: {
+		'click #new-plan-submit': 'create',
+	},
+	render: function() {
 		$('p#new-plan-error').html(''); // clear errors
 		var tmpl = _.template($('#plan-new-tmpl').html());
 		$('#profiles-container').html(tmpl());
+		return this;
 	},
-	
 	create: function(e) {
-		if(e) e.preventDefault();
-		if(this.req == false) {
-			var self = this;
-			$('input#new-plan-submit').hide();
-			$('#new-plan-form .alert-error').hide();
-			$('#new-plan-loader').show();
-			this.req = true;
-			var data = $('form#new-plan-form').serializeObject();
-			var plan = new Plan();
-			plan.save(data, {
-				success: function(model, response) {
+		var self = this;
+		$('input#new-plan-submit').attr('disabled',true);
+		$('#new-plan-form .alert-error').hide();
+		$('#ajax-loader').show();
+		var data = $('#new-plan-form').serializeObject();
+		var plan = new Plan.Model();
+		plan.save(data, {
+			success: function(model, response) {
 
-					// render blank tables for profiles and charges
-					var table = _.template($('#profile-table-tmpl').html());
-					var desc = _.template($('#plan-desc-tmpl').html());
-					$('#profiles-container').html(desc({plan: model}) + table({profiles: {}}));
+				$('#ajax-loader').hide();
+				self.collection.add(model);
+				self.collection.selected = model;
 
-					self.collection.add(model);
-					self.collection.selected = model;
-					self.req = false; // release the request lock
-					self.renderNav();
-				},
-				error: function(model, response) {
-					$('#new-plan-form .alert-error').html(response.responseText).show();
-					$('input#new-plan-submit').show();
-					$('#new-plan-loader').hide();
-					self.req = false;
-				}
-			});
-		}
+				// render the table view
+				self.tableView.render();
+			},
+			error: function(model, response) {
+				$('#new-plan-form .alert-error').html(response.responseText).show();
+				$('#ajax-loader').hide();
+				$('#new-plan-submit').attr('disabled',false);
+			}
+		});
+		return this;
 	},
+});
 
+Plan.View.Edit = Backbone.View.extend({
+	initialize: function(options) {
+		this.tableView = options.tableView;
+		this.profiles = options.profiles;
+		this.render();
+	},
+	events: {
+		'click #cancel-edit-plan': 'unrender',
+		'click #edit-plan-submit': 'update',
+	},
+	render: function() {
+		$('p#edit-plan-error').html(''); // Make sure form errors are blank
+		var tmpl = _.template($('#plan-edit-tmpl').html());
+		
+		$('#plan-desc').hide();
+		$('#plan-edit-container').show();
+		$('#plan-edit-container').html(tmpl({plan: this.collection.selected}));
+		return this;
+	},
+	unrender: function(e) {
+		e.preventDefault();
+		$('#plan-edit-container').hide();
+		$('#plan-desc').show();
+	},
+	update: function(e) {
+		e.preventDefault();
+		var self = this;
+		$('#edit-plan-submit').attr('disabled',true);
+		$('#edit-plan-submit').siblings().attr('disabled',true);
+		$('#ajax-loader').show();
+		var data = $('#edit-plan-form').serializeObject();
+		this.collection.selected.save(data, {
+			success: function(model, response) {
+				$('#ajax-loader').hide();
+				self.profiles.fetch();
+				self.tableView.render();
+			},
+			error: function(model, response) {
+				$('#edit-plan-submit').attr('disabled',false);
+				$('#edit-plan-submit').siblings().attr('disabled',false);
+				$('#ajax-loader').hide();
+				$('#edit-plan-form .alert-error').html(response.responseText).show();
+			}
+		});
+	},
+});
+
+Plan.View.Remove = Backbone.View.extend({
+	initialize: function(options) {
+		this.tableView = options.tableView;
+		this.profiles = options.profiles;
+		this.render();
+	},
+	events: {
+		'click #remove-plan-submit': 'destroy',
+	},
+	render: function() {
+		$('div#remove-plan .alert-error').hide(); // clear errors
+		$('div#remove-plan').modal('show');
+	},
+	req: false, // multiple request lock
 	destroy: function() {
 		if(this.req == false) { // check request lock
 			var self = this; // preserve scope
@@ -118,12 +203,10 @@ PlanView = Backbone.View.extend({
 			this.req = true; // set request lock
 			this.collection.selected.destroy({
 				success: function(model, response) {
-					window.location = '/'; // refresh page.
-					// Note: this could be dynamic, without a page reload. We'd have to:
-					// 1. Update all the profiles who subscribe to this plan.
-					// 2. Re-render nav (this.renderNav())
-					// 3. Re-render the profile table
-					// Also we'd need to remove request lock for this view, close modal, and enable button.
+					self.collection.selected = self.collection.first();
+					self.tableView.render();
+					self.profiles.fetch();
+					$('div#remove-plan').modal('hide');
 				},
 				error: function(model, response) {
 					$('a#remove-plan-submit').removeClass('disabled'); // enable button
@@ -133,65 +216,15 @@ PlanView = Backbone.View.extend({
 			});
 		}
 	},
+});
 
-	// XXX create and update are pretty redundant as separate funcs
-	update: function(e) {
-		if(e) e.preventDefault();
-		if(this.req == false) {
-			var self = this;
-			$('input#edit-plan-submit').hide();
-			$('input#edit-plan-submit').siblings().hide();
-			$('#edit-plan-loader').show();
-			this.req = true;
-			var data = $('form#edit-plan-form').serializeObject();
-			this.collection.selected.save(data, {
-				success: function(model, response) {
-					$('input#edit-plan-submit').toggleSubmit();
-					$('div#edit-plan').modal('hide');
-					self.req = false;
-					self.renderNav();
-				},
-				error: function(model, response) {
-					$('p#edit-plan-error').html(response.responseText);
-					$('input#edit-plan-submit').toggleSubmit();
-					self.req = false;
-				}
-			});
-		}
+Plan.View.Share = Backbone.View.extend({
+	initialize: function(options) {
 	},
-
-	renderEditForm: function(e) {
-		if(e) e.preventDefault();
-		$('p#edit-plan-error').html(''); // Make sure form errors are blank
-		var tmpl = _.template($('#plan-edit-tmpl').html());
-		
-		$('#plan-desc').hide();
-		$('#plan-edit-container').show();
-		$('#plan-edit-container').html(tmpl({plan: this.collection.selected}));
+	events: {
+		'click .share-plan-button': 'render',
 	},
-
-	hideEditForm: function(e) {
-		if(e) e.preventDefault();
-		$('#plan-edit-container').hide();
-		$('#plan-desc').show();
-	},
-
-	renderShareForm: function(e) {
-		if(e) e.preventDefault();
+	render: function() {
 		$('div#share-plan').modal('show');
 	},
-
-	selectPlan: function(e) {
-		e.preventDefault();
-		this.collection.selected = this.collection.get($(e.currentTarget).attr('data-id'));
-		this.renderNav();
-	},
-
-	renderNewSubscriptionForm: function(e) {
-		if(e) e.preventDefault();
-		var options = '<select>';
-		$('div#edit-profile').modal('show');
-		$('div#new-subscription').modal('show');
-	},
-
 });

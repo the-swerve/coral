@@ -3,8 +3,7 @@ require './controllers/application.rb'
 class Application < Sinatra::Base
 
 	get '/profiles', :auth => :account do
-		json :success => true,
-			:profiles => @account.profiles.all.reduce({}) {|ps,p| ps.merge({p.name => p.as_hash})}
+		json @account.profiles.map(&:as_hash)
 	end
 
 	post '/profiles', :auth => :account do

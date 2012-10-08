@@ -13,11 +13,6 @@
 	<script type="text/javascript" src="js/jquery.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>
 
-	<script type="text/javascript" src="js/jquery.jqplot.js"></script>
-	<script type="text/javascript" src="js/jqplot.barRenderer.js"></script>
-	<script type="text/javascript" src="js/jqplot.categoryAxisRenderer.min.js"></script>
-	<script type="text/javascript" src="js/jqplot.pointLabels.min.js"></script>
-
 	<script type="text/javascript" src="js/underscore.js"></script>
 	<script type="text/javascript" src="js/backbone.js"></script>
 
@@ -32,40 +27,25 @@
 	<script type="text/javascript" src="js/account.js"></script>
 	<script type="text/javascript" src="js/plan.js"></script>
 	<script type="text/javascript" src="js/profile.js"></script>
+	<script type="text/javascript" src="js/payment_method.js"></script>
+	<script type="text/javascript" src="js/bank_account.js"></script>
+	<script type="text/javascript" src="js/subscription.js"></script>
 	<script type="text/javascript" src="js/charge.js"></script>
 	<script type="text/javascript" src="js/chart.js"></script>
 
 	<script>
-		// Initialize backbone models
-		Coral = {}; // application-level namespace
-		Coral.account = {};
-		Coral.plans = {};
-		Coral.profiles = {};
-		Coral.charges = {};
 
-		Coral.account.model = new Account();
-		Coral.plans.coll = new PlanCollection();
-		Coral.profiles.coll = new ProfileCollection();
-		Coral.charges.coll = new ChargeCollection();
-		Coral.ev = _.extend({}, Backbone.Events); // app-wide event aggregator
 
 		$(document).ready(function() {
 
-			// Initialize backbone views
-			var account_view = new AccountView({model: Coral.account.model, el: $('div#account')});
-			var ba_view = new BAView({model: Coral.account.model, el: $('div.container')});
-			var plan_view = new PlanView({collection: Coral.plans.coll, el: $('div.container')});
-
-			var profile_view = new ProfileView({collection: Coral.profiles.coll, el: $('div.container'), plans: Coral.plans.coll});
-			var pm_view = new PMView({collection: Coral.profiles.coll, el: $('div.container')});
-			var sub_view = new SubView({collection: Coral.profiles.coll, el: $('div.container')});
-			var charge_view = new ChargeView({collection: Coral.charges.coll, el: $('div.container'), profiles: Coral.profiles.coll});
-			var chart_view = new ChartView({el: $('div.container'), trnsHistory: <%= @account.transaction_history.to_json %> });
+			// Initialize the master view
+			var v = new Router({el: $('div.container')});
 
 			// Load in bootstrapped data served by sinatra
-			Coral.account.model.set(<%= @account.as_hash.to_json %>);
-			Coral.plans.coll.reset(<%= @account.plans.map(&:as_hash).to_json %>);
-			Coral.profiles.coll.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
+			v.account.set(<%= @account.as_hash.to_json %>);
+			v.plans.reset(<%= @account.plans.map(&:as_hash).to_json %>);
+			v.profiles.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
+			// Payment methods, subscriptions, and charges are all loaded inside the profiles
 		});
 	</script>
 
@@ -74,6 +54,7 @@
 
 <body>
 
+<!-- the universal ajax loading indicator -->
 <div class="progress progress-striped active hide" id='ajax-loader'>
 	<div class="bar" style="width: 100%;"></div>
 </div>
@@ -83,17 +64,12 @@
 <div class="container">
 
 
-	<%= erb :'modals/new_plan' %>
-	<%= erb :'modals/edit_plan' %>
-	<%= erb :'modals/share_plan' %>
-	<%= erb :'modals/new_profile' %>
-	<%= erb :'modals/edit_profile' %>
 
 	<div id='account'>
 		<div class='row'>
 			<div class='span12'>
 				<%= erb :'meta/nav' %>
-				<h2 id="account-name"><%= @account.name %></h2>
+				<h1 id="account-name"><%= @account.name %></h1>
 			</div>
 		</div>
 
@@ -104,10 +80,16 @@
 	</div>
 
 	<div class="visualization drop-shadow row">
-		<div id="chart"></div>
+		<div id="chart">Graph goes here!</div>
 	</div>
 
 	<div class="data drop-shadow row">
+
+		<%= erb :'modals/new_plan' %>
+		<%= erb :'modals/edit_plan' %>
+		<%= erb :'modals/share_plan' %>
+		<%= erb :'modals/new_profile' %>
+		<%= erb :'modals/edit_profile' %>
 
 		<div class='row data-row'>
 			<%= erb :'meta/plans' %>

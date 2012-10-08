@@ -46,10 +46,15 @@ jQuery.fn.serializeObject = function() {
   return objectData;
 };
 
+// Underscore settings
+
 _.templateSettings = {
 	interpolate: /\{\{(.+?)\}\}/g,
 	evaluate: /\[\[(.+?)\]\]/g
 }
+
+
+// Balanced payments API settings
 
 balancedUri = 'TEST-MP761XGxjonKUa4HBnXOMoGy';
 balancedUsername = 'e9234bfacc5211e1bda6026ba7e239a9';

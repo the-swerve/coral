@@ -1,15 +1,28 @@
 // Customers/payees/subscribers/members/clients/etc
 
-Profile = Backbone.Model.extend({
+Profile = {};
+Profile.View = {};
+
+Profile.Model= Backbone.Model.extend({
 	urlRoot: '/profiles',
 	initialize: function() {
 	}
 });
 
-ProfileCollection = Backbone.Collection.extend({
+Profile.Collection = Backbone.Collection.extend({
 	model: Profile,
 	url: '/profiles',
 	initialize: function() { this.selected = null; }
+});
+
+// Initialized by Plan.View.Table when you click on a row
+Profile.View.Details = Backbone.View.extend({
+	initialize: function(options) {
+		this.plans = options.plans;
+		this.tableView = options.tableView;
+	},
+	events: {},
+	req: false,
 });
 
 ProfileView = Backbone.View.extend({
@@ -17,9 +30,13 @@ ProfileView = Backbone.View.extend({
 	req: false, // used to block simultaneous requests (prevent the form submit from being clicked repeatedly)
 
 	initialize: function(options) {
-		this.collection.bind('reset', this.renderTable, this);
 		this.plans = options.plans;
-		editProfileView = new EditProfileView({collection: this.collection, el: $('#profiles-container')});
+		var childHash = {collection: this.collection, p: this, el: $('.data-row'), plans: this.plans};
+		 
+		// child views
+		this.pmView = new PMView(childHash);
+		this.indexView = new IndexProfileView(childHash);
+		this.editView = new EditProfileView(childHash);
 
 		// events
 	},
@@ -35,16 +52,12 @@ ProfileView = Backbone.View.extend({
 		'click #new-profile-row': 'addRow',
 		'click #remove-profile-row': 'removeRow',
 
-		'click .dropdown-item': 'renderTable',
 
 		'click #share-plan-submit': 'invitePeople',
 
 		'click .view-profile-button': 'renderProfileView',
-//		'click #edit-profile-button': 'renderEditForm',
-//		'click #cancel-edit-profile': 'renderEditForm', // XXX trash
 
 		'click #payments-button': 'showPayments',
-		'click #new-pm-submit': 'createPM',
 		'click #remove-pm-submit': 'destroyPM',
 		'click .remove-pm-button': 'renderRemovePMForm',
 
@@ -80,10 +93,9 @@ ProfileView = Backbone.View.extend({
 		var profile = new Profile();
 		profile.save(data, {
 			success: function(model, response) {
-				$('input#new-profile-submit').toggleSubmit();
-				$('div#new-profile').modal('hide');
 				self.collection.add(model);
-				self.renderTable();
+				self.collection.selected = profile;
+				self.renderProfileView();
 			},
 			error: function(model, response) {
 				$(e.currentTarget).show();
@@ -147,96 +159,6 @@ ProfileView = Backbone.View.extend({
 					self.req = false;
 				}
 			});
-		}
-	},
-
-	createPM: function(e) {
-		if(e) e.preventDefault();
-		var self = this;
-		$('#new-pm-submit').attr('disabled',true);
-		$('#cancel-new-pm').attr('disabled',true);
-		$('#ajax-loader').show();
-		var profile = this.collection.selected;
-		var data = $('#new-payment-method-form').serializeObject();
-		$('#new-payment-method-form .alert').hide(); // hide any previous errors or messages
-
-		// error checking. We'll do it manually so the messages can be more easily pretty.
-		if(!balanced.card.isCardNumberValid(data.card_number)) {
-			$('#new-payment-method-form .alert-error').show().html('Invalid credit card number.');
-			$('#new-pm-submit').attr('disabled',false); // XXX this bit is redundant 
-			$('#cancel-new-pm').attr('disabled',false);
-			$('#ajax-loader').hide();
-		} else if (!balanced.card.isSecurityCodeValid(data.card_number, data.security_code)) {
-			$('#new-payment-method-form .alert-error').show().html('Invalid security code.');
-			$('#new-pm-submit').attr('disabled',false);
-			$('#cancel-new-pm').attr('disabled',false);
-			$('#ajax-loader').hide();
-		} else if (!balanced.card.isExpiryValid(data.expiration_month, data.expiration_year)) {
-			$('#new-payment-method-form .alert-error').show().html('Invalid expiration date.');
-			$('#new-pm-submit').attr('disabled',false);
-			$('#cancel-new-pm').attr('disabled',false);
-			$('#ajax-loader').hide();
-		} else { // no client validation errors, post to balanced
-			balanced.card.create(data, this.balancedCallbackPM.call(this));
-		}
-	},
-
-	balancedCallbackPM: function() {
-		var self = this; // put self/this in the scope of our callback so we can modify its data
-		var profile = self.collection.selected;
-		return function(response) {
-			switch(response.status) {
-				case 201:
-					// balanced creation is successful, let's put a copy in coral's db
-					$.ajax({
-						type: 'post',
-						url: '/profiles/' + profile.id + '/payment_methods',
-						dataType: 'json',
-						data: response.data,
-						success: function(d) {
-							profile.set(d);
-							self.renderProfileView();
-							$('#ajax-loader').hide();
-						},
-						error: function(d) {
-							$('#new-payment-method-form .alert').hide();
-							$('#new-payment-method-form .alert-error').show().html(d.responseText);
-							$('#new-pm-submit').attr('disabled',false);
-							$('#cancel-new-pm').attr('disabled',false);
-							$('#ajax-loader').hide();
-						}
-					});
-					break;
-				case 400:
-					// missing field - details in response.error
-					$('#new-payment-method-form .alert').hide();
-					$('#new-payment-method-form .alert-error').show().html(response.error.description);
-					$('#new-pm-submit').attr('disabled',false);
-					$('#cancel-new-pm').attr('disabled',false);
-					$('#ajax-loader').hide();
-					break;
-				case 402:
-					// could not authorize buyer's credit card - details in response.error
-					alert('balanced: 402');
-					break;
-				case 404:
-					// incorrect marketplace URI
-					alert('balanced: 404');
-					break;
-				case 409:
-					// incorrect marketplace URI
-					$('#new-payment-method-form .alert').hide();
-					$('#new-payment-method-form .alert-error').show().html(response.error.description);
-					$('#new-pm-submit').attr('disabled',false);
-					$('#cancel-new-pm').attr('disabled',false);
-					$('#ajax-loader').hide();
-					break;
-					break;
-				case 500:
-					// Error on balanced's servers, try again
-					alert('balanced: 500');
-					break;
-			}
 		}
 	},
 
@@ -315,22 +237,6 @@ ProfileView = Backbone.View.extend({
 		}
 	},
 
-	renderTable: function() {
-		var self = this;
-		var filtered_profiles = this.collection.filter(function(p) {
-			return _.include(p.get('plan_ids'), self.plans.selected.id);
-		});
-		filtered_profiles = (new ProfileCollection(filtered_profiles)).toJSON()
-
-		var table = _.template($('#profile-table-tmpl').html());
-		var desc = _.template($('#plan-desc-tmpl').html());
-
-		$('#profiles-table-container').hide();
-		$('#profiles-container').html(desc({plan: self.plans.selected}) + table({profiles: filtered_profiles}));
-		$('#profile-table-container').html(table({profiles: filtered_profiles}));
-		$('#profile-table-container').slideDown('slow');
-	},
-
 	renderProfileView: function(e) {
 		if(e) { // changing selection by clicking on row
 			e.preventDefault();
@@ -357,70 +263,6 @@ ProfileView = Backbone.View.extend({
 		$('div#edit-profile').modal('hide');
 		$('p#remove-profile-error').html('');
 		$('div#remove-profile').modal('show');
-	},
-
-});
-
-PMView = Backbone.View.extend({
-	req: false,
-
-	initialize: function(options) {
-	},
-
-	events: {
-		'click #new-pm-btn': 'renderNewForm',
-		'click #cancel-new-pm': 'renderNewForm',
-		'click .back-to-profile': 'goBack',
-		'change .new-payment-method-type': 'getType',
-	},
-
-	renderNewForm: function(e) {
-		if(e) e.preventDefault();
-		var tr = $(e.currentTarget).parents('tr');
-		var form = _.template($('#new-pm-form').html());
-		tr.after(form({}));
-	},
-
-	getType: function(e) {
-		var sel = $('.new-payment-method-type option:selected').text();
-		if(sel == 'Credit Card') {
-			$('.echeck-selected').hide();
-			$('.credit-card-selected').show();
-		} else if(sel == 'E-check') {
-			$('.credit-card-selected').hide();
-			$('.echeck-selected').show();
-		} else if(sel == '') {
-			$('.credit-card-selected').hide();
-			$('.echeck-selected').hide();
-		}
-	},
-
-	goBack: function(e) {
-		if(e) e.preventDefault();
-		var payments = _.template($('#edit-profile-payments-tmpl').html());
-		$('div#edit-profile-payments').html(payments(this.collection.selected.attributes));
-	},
-
-
-});
-
-SubView = Backbone.View.extend({
-	initialize: function(options) {
-	},
-
-	events: {
-		'change #new-sub-selector': 'showStarting',
-		'change #sub-pm-select': 'newSubPM',
-	},
-
-	showStarting: function() {
-		$('#new-sub-dates').removeClass('hide');
-	},
-
-	newSubPM: function(e) {
-		$('#ajax-loader').show();
-		$(e.currentTarget).after('&nbsp; <em>Saving...</em>');
-		$(e.currentTarget).attr('disabled',true);
 	},
 
 });

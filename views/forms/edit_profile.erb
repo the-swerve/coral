@@ -7,6 +7,16 @@
 	<hr>
 
 	<div id='edit-profile'>
+
+		<div class='row'>
+			<div class='span8'>
+				<p>Has paid <strong>$0</strong> since <strong>{{created_at}}</strong>. &nbsp; <a class='btn btn-small new-charge-btn' href='#'>New Charge</a></p>
+			</div>
+		</div>
+
+		<hr>
+
+
 		<div class='row'>
 			<div class='span8'>
 				<div class='alert alert-error hide'></div><div class='alert alert-success hide'></div>
@@ -91,16 +101,17 @@
 		<table class='subscriptions-table table table-striped'>
 			<tbody>
 				[[ _.each(_subscriptions, function(s) { ]]
-				<tr>
+				<tr data-id='{{s.id}}'>
 					<td style='font-size:1.1em'>{{s.plan_name}}</td>
 					<td>{{s.state}}</td>
 					<td>Since {{s.created_at}}</td>
-					<td>
-						<a id='new-pm-btn' class='btn'>Add Payment Method</a>
-					</td>
 					[[ if(s.payment_method) { ]]
 						<td>
 							<a class='btn'>New Charge</a>
+						</td>
+					[[ } else { ]]
+						<td>
+							<a id='new-pm-btn' class='btn'>Add Payment Method</a>
 						</td>
 					[[ } ]]
 				</tr>
@@ -108,60 +119,91 @@
 			</tbody>
 		</table>
 
-	<form id='new-pm-form' class='form-inline hide'>
+<div class='modal hide' id='new-pm-modal'>
+	<div class='modal-header'>
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>New Payment Method</h3>
+	</div>
+
+	<div class='modal-body'>
+	<form id='new-pm-form' class='form-horizontal'>
 
 		<div class='alert alert-error hide'></div>
 		<div class='alert alert-success hide'></div>
 
-		<div style='float:left;'>
-			<select class='new-payment-method-type' name='pay_type' style='width:9em;'>
-				<option id='new-credit-card'>Credit Card</option>
-				<option id='new-echeck'>E-check</option>
-			</select>
+		<div class='control-group'>
+			<label class='control-label'>Type</label>
+			<div class='controls'>
+				<select class='new-payment-method-type' name='pay_type' style='width:9em;'>
+					<option id='new-credit-card'>Credit Card</option>
+					<option id='new-echeck'>E-check</option>
+				</select>
+			</div>
 		</div>
 
-		<div class='credit-card-selected' style='float:left;'>
+		<div class='credit-card-selected'>
+			<div class='control-group'>
+				<label class='control-label'>Card Number</label>
+				<div class='controls'>
+					<input id="" type="text" name="card_number" value />
+				</div>
+			</div>
 
-			<input id="" type="text" name="card_number" placeholder='Credit card number' class='input-medium' />
+			<div class='control-group'>
+				<label class='control-label'>Expiration</label>
+				<div class='controls'>
+					<select name='expiration_month' style='width:6em;'>
+						<option>Month</option>
+						[[ for(var i = 1; i < 13; i++) { ]]
+							<option>{{i}}</option>
+						[[ } ]]
+					</select>
+					[[ var year = (new Date).getFullYear(); ]]
+					<select name='expiration_year' style='width:6em;'>
+						<option>Year</option>
+						[[ for(var i = year; i < year + 10; i++) { ]]
+							<option>{{ i }}</option>
+						[[ } ]]
+					</select>
+				</div>
+			</div>
 
-			<select name='expiration_month' style='width:6em;'>
-				<option>Month</option>
-				<option>01</option>
-				<option>02</option>
-				<option>03</option>
-				<option>04</option>
-				<option>05</option>
-				<option>06</option>
-				<option>07</option>
-				<option>08</option>
-				<option>09</option>
-				<option>10</option>
-				<option>11</option>
-				<option>12</option>
-			</select>
-			[[ var year = (new Date).getFullYear(); ]]
-			<select name='expiration_year' style='width:6em;'>
-				<option>Year</option>
-				[[ for(var i = year; i < year + 10; i++) { ]]
-					<option>{{ i }}</option>
-				[[ } ]]
-			</select>
-
-			<input id="" type="text" name="security_code" placeholder="CVV" class='input-mini' />
-		</div> <!-- end div.credit-card-selected -->
-
-		<div class='echeck-selected hide' style='float:left;'>
-			<input id="" type="text" name="account_number" placeholder='Account number' />
-			<input id="" type="text" name="bank_code" placeholder='Routing number'/>
+			<div class='control-group'>
+				<label class='control-label'>Security Code</label>
+				<div class='controls'>
+					<input id="" type="text" name="security_code" value=""/>
+				</div>
+			</div>
 		</div>
 
-		<div style='float:left'>
+		<div class='echeck-selected hide'>
+			<div class='control-group'>
+				<label class='control-label'>Account Number</label>
+				<div class='controls'>
+						<input id="" type="text" name="acct_number" value=""/>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal-form-actions" style='padding-bottom: 0'>
 			<button id='new-pm-submit' class='btn'>Save</button> &nbsp;
-			<button id='cancel-new-pm' class='btn'>Cancel</button>
-			<img id='new-pm-loader' class='hide' src='img/ajax-loader.gif' />
 		</div>
-
 	</form>
+
+	</div> <!-- end div.modal-body -->
+</div> <!-- end div.modal -->
+
+<div class='modal hide' id='sub-starting-modal'>
+	<div class='modal-header'>
+		<button type="button" class="close" data-dismiss="modal">x</button>
+	</div>
+	<div class='modal-body'>
+		<p>When would you like to start charging for this subscription?</p>
+		<form id='sub-starting-form'>
+			<input type='date' placeholder='Today' name='starting_date' />
+		</form>
+	</div>
+</div>
 
 	[[ if(!_.isEmpty(_payment_methods) && false) { ]]
 		<h4 style='padding-left:0.5em;'>Payment Methods</h4>

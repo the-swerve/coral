@@ -1,66 +1,54 @@
-	<form id='new-pm-form' class='form-horizontal hide'>
+		<form id='new-pm-form' class='form-inline'>
 
-		<div class='alert alert-error hide'></div>
-		<div class='alert alert-success hide'></div>
+			<div class='alert alert-error hide'></div>
+			<div class='alert alert-success hide'></div>
 
-		<div class='control-group'>
-			<label class='control-label'>Type</label>
-			<div class='controls'>
+			<div style='float:left;'>
 				<select class='new-payment-method-type' name='pay_type' style='width:9em;'>
 					<option id='new-credit-card'>Credit Card</option>
 					<option id='new-echeck'>E-check</option>
 				</select>
 			</div>
-		</div>
 
-		<div class='credit-card-selected'>
-			<div class='control-group'>
-				<label class='control-label'>Card Number</label>
-				<div class='controls'>
-					<input id="" type="text" name="card_number" value />
-				</div>
+			<div class='credit-card-selected' style='float:left;'>
+
+				<input id="" type="text" name="card_number" placeholder='Credit card number' class='input-medium' />
+
+				<select name='expiration_month' style='width:6em;'>
+					<option>Month</option>
+					<option>01</option>
+					<option>02</option>
+					<option>03</option>
+					<option>04</option>
+					<option>05</option>
+					<option>06</option>
+					<option>07</option>
+					<option>08</option>
+					<option>09</option>
+					<option>10</option>
+					<option>11</option>
+					<option>12</option>
+				</select>
+				[[ var year = (new Date).getFullYear(); ]]
+				<select name='expiration_year' style='width:6em;'>
+					<option>Year</option>
+					[[ for(var i = year; i < year + 10; i++) { ]]
+						<option>{{ i }}</option>
+					[[ } ]]
+				</select>
+
+				<input id="" type="text" name="security_code" placeholder="CVV" class='input-mini' />
+			</div> <!-- end div.credit-card-selected -->
+
+			<div class='echeck-selected hide' style='float:left;'>
+				<input id="" type="text" name="account_number" placeholder='Account number' />
+				<input id="" type="text" name="bank_code" placeholder='Routing number'/>
 			</div>
 
-			<div class='control-group'>
-				<label class='control-label'>Expiration</label>
-				<div class='controls'>
-					<select name='expiration_month' style='width:6em;'>
-						<option>Month</option>
-						[[ for(var i = 1; i < 13; i++) { ]]
-							<option>{{i}}</option>
-						[[ } ]]
-					</select>
-					[[ var year = (new Date).getFullYear(); ]]
-					<select name='expiration_year' style='width:6em;'>
-						<option>Year</option>
-						[[ for(var i = year; i < year + 10; i++) { ]]
-							<option>{{ i }}</option>
-						[[ } ]]
-					</select>
-				</div>
+			<div style='float:left'>
+				<button id='new-pm-submit' class='btn'>Save</button> &nbsp;
+				<button id='cancel-new-pm' class='btn'>Cancel</button>
+				<img id='new-pm-loader' class='hide' src='img/ajax-loader.gif' />
 			</div>
 
-			<div class='control-group'>
-				<label class='control-label'>Security Code</label>
-				<div class='controls'>
-					<input id="" type="text" name="security_code" value=""/>
-				</div>
-			</div>
-		</div>
-
-		<div class='echeck-selected hide'>
-			<div class='control-group'>
-				<label class='control-label'>Account Number</label>
-				<div class='controls'>
-						<input id="" type="text" name="acct_number" value=""/>
-				</div>
-			</div>
-		</div>
-
-		<div class="modal-form-actions">
-			<button id='new-pm-submit' class='btn'>Save</button> &nbsp;
-			<button id='cancel-new-pm' class='btn'>Cancel</button>
-			<img id='new-pm-loader' class='hide' src='img/ajax-loader.gif' />
-		</div>
-
-	</form>
+		</form>

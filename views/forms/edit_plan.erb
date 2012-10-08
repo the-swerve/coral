@@ -1,8 +1,9 @@
 <script id='plan-edit-tmpl' type='text/template' class='hide'>
 
-	<p id='edit-plan-error' class='form-error'></p>
 
 	<form class='form-horizontal' id='edit-plan-form'>
+
+		<div class='alert alert-error hide'></div>
 
 		<div class='control-group'>
 			<label class='control-label'>Name</label>
@@ -45,14 +46,13 @@
 			<input id='edit-plan-submit' class='btn' name='commit' type='submit' value='Save' />&nbsp; &nbsp;
 			<button id='cancel-edit-plan' class='btn'>Cancel</button>
 			<a id='remove-plan-button' class='btn btn-danger' style='float:right'><i class='icon-remove icon-white'></i> Remove</a>
-			<img id='edit-plan-loader' class='hide' src='img/ajax-loader.gif' />
 		</div>
 	</form>
 </script>
 
 <div class="modal hide" id="remove-plan">
 	<div class="modal-body">
-		<p id="remove-plan-error"></p>
+		<div class='alert alert-error'></div>
 		<p>Are you sure you wish to remove this plan? Note: your payment history
 		and existing customers will not be removed.</p>
 
