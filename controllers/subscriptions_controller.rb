@@ -60,6 +60,22 @@ class Application < Sinatra::Base
 		end
 	end
 
+	# Modify a subscription using the sub's plan ID
+	put '/profiles/:profile_id/plans/:plan_id', :auth => :account do
+		@profile = @account.profiles.find params['profile_id']
+		if @profile
+			@subscription = @profile.subscriptions.where(plan_id: params['plan_id']).first
+			if @subscription
+				if @subscription.update_attributes params[:subscription]
+					json @profile.as_hash
+				else; halt 400, @subscription.first_error
+				end
+			else; halt 400, 'subscription not found'
+			end
+		else; halt 400, 'profile not found'
+		end
+	end
+
 	delete '/profiles/:profile_id/subscriptions/:subscription_id', :auth => :account do
 		@profile = @user.profiles.first(:short_id => params['profile_id'].to_i)
 		if @profile

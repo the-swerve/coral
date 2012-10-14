@@ -1,6 +1,13 @@
 <script id='edit-profile-tmpl' type='text/template' class='hide'>
 
-	<h3 id='profile-name' style='padding-right:0.5em;float:left;'>{{name}}</h3>
+	<div class='row-fluid'>
+		<div class='span8'>
+			<h3 id='profile-name' style='padding-right:0.5em;float:left;'>{{name}}</h3>
+		</div>
+		<div class='span4'>
+			<a style='float:right' class='btn btn-medium'> Reset Password</a>
+		</div>
+	</div>
 
 	<!-- XXX TRASH <a id='new-pm-button' class='btn' href="#" style='margin-top:0.6em;'><i class='icon-plus'></i> Payment History</a> -->
 
@@ -19,86 +26,95 @@
 
 		<div class='row'>
 			<div class='span8'>
-				<div class='alert alert-error hide'></div><div class='alert alert-success hide'></div>
+				<div class='alert alert-error hide'></div>
+				<div class='alert alert-success hide'></div>
 			</div>
-		</div>
-		<div class='row'>
-			<div class='info-group span2'>
-				<strong>Name</strong> &nbsp;  &nbsp; &nbsp; <a class='label edit-profile-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-				<span class='profile-field'>{{name}}</span>
+		</div> <!-- end div.row -->
 
+		<div class='row-fluid'>
+
+			<div class='info-group span4'>
+				<p class='field-name'>
+					<strong>Name</strong> &nbsp; &nbsp;
+					<a class='label edit-field-btn' href='#'>
+					<i class='icon-pencil icon-white'></i> edit</a>
+					<small class='save-info hide'>Hit enter to save |
+						<a href='#' class='cancel-edit'>Cancel.</a></small>
+					<small class='save-status hide'><em>Saving...</em></small>
+				</p>
+				<p class='profile-field'>{{name}}</p>
 				<div class='field-controls hide'>
-					<input type='text' class='input-medium' value='{{name}}' name='name' />
-					<p><small>Hit enter to save | <a href='#' class='cancel-edit'>Cancel.</a></small></p>
+					<input type='text' value='{{name}}' name='name' />
 				</div>
+			</div><!-- end div.info-group -->
 
-			</div>
-			<div class='info-group span2'>
-				<strong>Email</strong> &nbsp;  &nbsp; &nbsp; <a class='label edit-profile-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-
-				<span class='profile-field'>{{email}}</span>
-
+			<div class='info-group span4'>
+				<p class='field-name'>
+					<strong>Email</strong> &nbsp; &nbsp;
+					<a class='label edit-field-btn' href='#'>
+					<i class='icon-pencil icon-white'></i> edit</a>
+					<small class='save-info hide'>Hit enter to save |
+						<a href='#' class='cancel-edit'>Cancel.</a></small>
+					<small class='save-status hide'><em>Saving...</em></small>
+				</p>
+				<p class='profile-field'>{{email}}</p>
 				<div class='field-controls hide'>
-					<input type='text' value='{{email}}' name='email' class='input-medium' />
-					<p><small>Hit enter to save | <a href='#' class='cancel-edit'>Cancel.</a></small></p>
+					<input type='text' value='{{email}}' name='email' />
 				</div>
+			</div><!-- end div.info-group -->
 
-			</div>
-			<div class='span3'>
-				<strong>Phone</strong> &nbsp;  &nbsp; &nbsp; <a class='label edit-profile-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-
-				<span class='profile-field'>{{phone}}</span>
-
+			<div class='info-group span4'>
+				<p class='field-name'>
+					<strong>Phone</strong> &nbsp; &nbsp;
+					<a class='label edit-field-btn' href='#'>
+					<i class='icon-pencil icon-white'></i> edit</a>
+					<small class='save-info hide'>Hit enter to save |
+						<a href='#' class='cancel-edit'>Cancel.</a></small>
+					<small class='save-status hide'><em>Saving...</em></small>
+				</p>
+				<p class='profile-field'>{{phone}}</p>
 				<div class='field-controls hide'>
 					<input type='text' value='{{phone}}' name='phone' />
-					<p><small>Hit enter to save | <a href='#' class='cancel-edit'>Cancel.</a></small></p>
 				</div>
+			</div><!-- end div.info-group -->
 
-			</div>
 		</div>
 		<hr>
-		<div class='row'>
-			<div class='span7'>
-				<textarea style='height:3em;width:100%' placeholder='Scratchpad: any additional details for this subscriber' id='profile-scratchpad'>{{info}}</textarea>
+		<div class='row-fluid'>
+			<div class='span12'>
+				<p><strong>Notes</strong> &nbsp; &nbsp;
+					<a id='profile-scratchpad-submit' class='btn btn-small' href='#'>
+						<i class='icon-pencil'></i> Save</a>
+					<span class='save-status hide'><small><em>Saving...</em></small></span>
+				</p>
+				<textarea style='height:3em;width:95%' placeholder='Scratchpad: any additional details for this subscriber' id='profile-scratchpad'>{{info}}</textarea>
 			</div>
 		</div>
 	</div>
 
 	<hr>
 
-	<form id='edit-profile-form' class='form-horizontal hide'>
-		<p id="edit-profile-error"></p>
-		<div class='control-group'>
-			<label class='control-label'>Name</label>
-			<div class='controls'>
-				<input id="edit-profile-name" type="text" name="name" value="{{name}}"/>
-			</div>
-		</div>
+<div class='row-fluid'>
 
-		<div class='control-group'>
-			<label class='control-label'>Email</label>
-			<div class='controls'>
-				<input id="edit-profile-email" type="text" name="email" value="{{email}}"/>
-			</div>
-		</div>
+	<div class='span10'>
+		<h4>Subscriptions
+				:
+				<small>
+					{{_.reduce(_subscriptions, function(word,sub) { return word + sub.plan_name + ', '}, '').slice(0,-2)}}
+				</small>
+		</h4>
+	</div>
 
-		<div class='control-group'>
-			<label class='control-label'>Extra Info</label>
-			<div class='controls'>
-				<textarea name='info' id="edit-profile-info" placeholder="Any additional details for this subscriber" style="height:6em;">{{info}}</textarea>
-			</div>
-		</div>
+	<div class='span2'>
+		<a data-table-id='#subscriptions-table' class='btn btn-small' href='#' id='show-subs'>
+			<i class='icon-list'></i> <span>Show</span>
+		</a>
+	</div>
+</div>
 
-		<div class='modal-form-actions'>
-			<button id='edit-profile-submit' class='btn'>Save</button> &nbsp;
-			<button id='cancel-edit-profile' class='btn'>Cancel</button>
-			<img id='edit-profile-loader' class='hide' src='img/ajax-loader.gif' />
-		</div>
-
-	</form>
-
-	<h4 style='padding:0.5em;clear:left;'>Subscriptions</h4>
-		<table class='subscriptions-table table table-striped'>
+<div class='row-fluid' style='margin-top: 0.5em'>
+	<div class='span12'>
+		<table class='table table-striped hide' id='subscriptions-table'>
 			<tbody>
 				[[ _.each(_subscriptions, function(s) { ]]
 				<tr data-id='{{s.id}}'>
@@ -118,6 +134,28 @@
 				[[ }) ]]
 			</tbody>
 		</table>
+	</div><!-- end div.span12 -->
+</div><!-- end div.row-fluid -->
+
+<div class='row-fluid' style='margin-top: 0.5em'>
+	<div class='span12'>
+		<h4>Payment History
+
+[[ if(!_.isEmpty(_transactions)) { ]]
+	<small>
+</h4>
+	<table class='table' style='padding:1em;'>
+		[[ _.each(_charges, function(c) { ]]
+			<td>{{c.name}}</td>
+			<td>{{c.amount}}</td>
+			<td>{{c.state}}</td>
+		[[ }) ]]
+		<tr>
+		</tr>
+	</table>
+[[ } else { ]]
+	<p><em>No payments have been made yet.</em></p>
+[[ } ]]
 
 <div class='modal hide' id='new-pm-modal'>
 	<div class='modal-header'>
@@ -193,69 +231,8 @@
 	</div> <!-- end div.modal-body -->
 </div> <!-- end div.modal -->
 
-<div class='modal hide' id='sub-starting-modal'>
-	<div class='modal-header'>
-		<button type="button" class="close" data-dismiss="modal">x</button>
-	</div>
-	<div class='modal-body'>
-		<p>When would you like to start charging for this subscription?</p>
-		<form id='sub-starting-form'>
-			<input type='date' placeholder='Today' name='starting_date' />
-		</form>
-	</div>
-</div>
 
-	[[ if(!_.isEmpty(_payment_methods) && false) { ]]
-		<h4 style='padding-left:0.5em;'>Payment Methods</h4>
-		[[ _.each(_payment_methods, function(p) { ]]
-			<div class='pm-block'>
-				<p>{{p.name}}</p>
-				<p>
-					<a href='#' class='unemph remove-pm-button btn' title='remove' data-id='{{p.id}}'><i class='icon-remove'></i> remove</a>
-					<a href='#' class='unemph new-charge-btn btn' data-id='{{p.id}}'><strong style='color:black'>$</strong> charge</a>
-				</p>
-		</div>
-		[[ }); ]]
-	[[ } ]]
-
-
-
-	[[ if(!_.isEmpty(_charges)) { ]]
-		<h4 style='padding:0.5em;'>Payments</h4>
-		<table class='table' style='padding:1em;'>
-			[[ _.each(_charges, function(c) { ]]
-				<td>{{c.name}}</td>
-				<td>{{c.amount}}</td>
-				<td>{{c.state}}</td>
-			[[ }) ]]
-			<tr>
-			</tr>
-		</table>
-	[[ } ]]
-
-	<div style='padding-left:0.5em' class='hide'>
-		<h4 style='clear:left'> Payment History</h4>
-		<table class='table table-stribed clickable-rows'>
-			<thead><th></th></thead>
-			<tbody>
-				[[if(_.isEmpty(_charges)) { ]]
-					<p><em>No charges yet</em></p>
-				[[ } else { ]]
-					[[_.each(_charges, function(c) { ]]
-						<tr class='edit-charge-button' data-id="{{ c.id }}">
-							<td>{{ c.name }}</td>
-							<td>{{ c._payment_method }}</td>
-							<td>${{ c.amount }}</td>
-							<td>{{ c.state }}</td>
-							<td>{{ c.created_at }}</td>
-						</tr>
-					[[ }); ]]
-				[[ } ]]
-			</tbody>
-		</table>
-	</div>
-
-</script>
+<!-- Removal modals -->
 
 <div id='remove-pm-modal' class='modal hide'>
 	<div class='modal-header'>
@@ -286,4 +263,6 @@
 		<a class='btn btn-danger' href='#' id='void-charge-submit'>Void</a>
 		<a style='float:right' href='#' class='back-to-profile btn'>Back</a>
 	</div>
+</script>
+
 </script>

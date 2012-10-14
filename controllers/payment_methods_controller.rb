@@ -18,19 +18,6 @@ class Application < Sinatra::Base
 		end
 	end
 
-	# for payment methods associated with subscriptions for accounts
-	post '/profiles/:profile_id/subscriptions/:subscription_id/payment_methods/?', :auth => :account do
-		@profile = @account.profiles.find params['profile_id']
-		if @profile
-			@subscription = @profile.subscriptions.find params['subscription_id']
-			if @subscription
-				@payment_method = @subscription.build_payment_method @params
-				if @payment_method.save
-					json @profile.as_hash
-				else ; halt 400, @payment_method.first_error ; end
-			else ; halt 400, 'subscription not found' ; end
-		else ; halt 400, 'profile not found' ; end
-	end
 
 	# for payment methods associated with subscriptions for a profile user
 	post '/account/:account_id/profiles/:profile_id/subscriptions/:sub_id/payment_methods', :auth => :profile do

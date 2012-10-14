@@ -42,11 +42,14 @@ class Profile
 	has_many :subscriptions, :dependent => :destroy
 	has_many :payment_methods, :dependent => :destroy
 	has_many :charges
+	has_many :trnsactions
 
   # Callbacks
 
   before_validation(:on => :create) do
 		self.password ||= rand(36**10).to_s(36) # By default, generate a random string for the pass
+		# Users can pass in sub_plan_id which is the plan ID for the subscription
+		# they'd like to create
 		if self.sub_plan_id && self.sub_plan_id != ''
 			sub = self.subscriptions.build :plan_id => sub_plan_id, :expiration => sub_expiration, :starting => sub_starting
 			errors.add('', sub.first_error) if !sub.save
@@ -108,14 +111,14 @@ class Profile
 		{:name => self.name,
 		 :email => self.email,
 		 :phone => self.phone,
-		 :_subscriptions => self.subscriptions.map(&:as_hash),
-		 :_charges => self.charges.map(&:as_hash),
+		 :info => self.info || '',
 		 :state => self.state,
-		 :id => self.id.to_s,
+		 :_subscriptions => self.subscriptions.map(&:as_hash),
+		 :_transactions => self.trnsactions.map(&:as_hash),
 		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},
 		 :_payment_methods => self.payment_methods.map(&:as_hash),
+		 :id => self.id.to_s,
 		 :created_at => self.created_at.to_date.to_s,
-		 :info => self.info || '',
 		 :session_token => self.session_token}
 	end
 

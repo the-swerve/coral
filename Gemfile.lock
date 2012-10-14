@@ -83,6 +83,7 @@ DEPENDENCIES
   bcrypt-ruby
   bson_ext
   colorize
+  faraday
   gemcutter
   httparty
   json

@@ -1,4 +1,23 @@
 
+PaymentMethod = {};
+
+PaymentMethod.result = {};
+
+// I abstracted out these ajaxy functions with a big ol' balanced callback so
+// that i can reuse it in three different places (incoming dashboard new
+// profile or add to existing subscription, and profile creation through the
+// share page)
+// Note: this could be built into our backbone structure such as inside the
+// PaymentMethod model.
+PaymentMethod.create = function(data) {
+	// error checking. We'll do it manually so the messages can be more easily pretty.
+	var ret = {};
+	balanced.card.create(data, function(resp) {
+		ret = resp;
+	});
+	return ret;
+};
+
 PMView = Backbone.View.extend({
 	req: false,
 
@@ -43,79 +62,7 @@ PMView = Backbone.View.extend({
 		var data = $('#new-pm-form').serializeObject();
 		$('#new-pm-form .alert').hide(); // hide any previous errors or messages
 
-		// error checking. We'll do it manually so the messages can be more easily pretty.
-		if(!balanced.card.isCardNumberValid(data.card_number)) {
-			$('#new-pm-form .alert-error').show().html('Invalid credit card number.');
-			$('#new-pm-submit').attr('disabled',false); // XXX this bit is redundant 
-			$('#ajax-loader').hide();
-		} else if (!balanced.card.isSecurityCodeValid(data.card_number, data.security_code)) {
-			$('#new-pm-form .alert-error').show().html('Invalid security code.');
-			$('#new-pm-submit').attr('disabled',false);
-			$('#ajax-loader').hide();
-		} else if (!balanced.card.isExpiryValid(data.expiration_month, data.expiration_year)) {
-			$('#new-pm-form .alert-error').show().html('Invalid expiration date.');
-			$('#new-pm-submit').attr('disabled',false);
-			$('#ajax-loader').hide();
-		} else { // no client validation errors, post to balanced
-			balanced.card.create(data, this.balancedCallback.call(this));
-		}
 	},
 
-	balancedCallback: function() {
-		var self = this; // put self/this in the scope of our callback so we can modify its data
-		var profile = self.collection.selected;
-		var subID = self.selectedSubID;
-		return function(response) {
-			switch(response.status) {
-				case 201:
-					// balanced creation is successful, let's put a copy in coral's db
-					$.ajax({
-						type: 'post',
-						url: '/profiles/' + profile.id + '/subscriptions/' + subID + '/payment_methods',
-						dataType: 'json',
-						data: response.data,
-						success: function(d) {
-							profile.set(d);
-							$('#ajax-loader').hide();
-							$('#new-pm-modal').modal('hide');
-							self.parentView.renderProfileView();
-						},
-						error: function(d) {
-							$('#new-pm-form .alert').hide();
-							$('#new-pm-form .alert-error').show().html(d.responseText);
-							$('#new-pm-submit').attr('disabled',false);
-							$('#ajax-loader').hide();
-						}
-					});
-					break;
-				case 400:
-					// missing field - details in response.error
-					$('#new-pm-form .alert').hide();
-					$('#new-pm-form .alert-error').show().html(response.error.description);
-					$('#new-pm-submit').attr('disabled',false);
-					$('#ajax-loader').hide();
-					break;
-				case 402:
-					// could not authorize buyer's credit card - details in response.error
-					alert('balanced: 402');
-					break;
-				case 404:
-					// incorrect marketplace URI
-					alert('balanced: 404');
-					break;
-				case 409:
-					// incorrect marketplace URI
-					$('#new-pm-form .alert').hide();
-					$('#new-pm-form .alert-error').show().html(response.error.description);
-					$('#new-pm-submit').attr('disabled',false);
-					$('#ajax-loader').hide();
-					break;
-				case 500:
-					// Error on balanced's servers, try again
-					alert('balanced: 500');
-					break;
-			}
-		}
-	},
 
 });

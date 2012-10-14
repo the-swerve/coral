@@ -35,30 +35,50 @@ class Subscription
 
 	before_validation(:on => :create) do
 		self.short_id = self.id
+		self.state = 'Invited'
 	end
+
+	before_save do
+		puts 'in before_save, before conditional'
+		if self.payment_method
+			puts 'has pm'
+		end
+		if self.starting
+			puts 'has starting'
+		end
+		if self.state == 'Invited' && self.starting && self.payment_method
+			puts 'in before_save, inside conditional'
+			# Starting date was given and there's a payment method. Activate!
+			self.state == 'Recurring'
+			self.create_initial_charges
+		end
+	end
+
+	def create_initial_charges
+		# Make initial charge
+		s.profile.charges.create(:name => "Initial fee (#{s.plan.name})",
+			:amount => s.plan.initial_charge,
+			:plan_id => s.plan.id)
+		# Make first recurring charge
+		s.profile.charges.create(:name => "Recurring fee (#{s.plan.name})",
+			:amount => s.plan.amount,
+			:plan_id => s.plan.id)
+		s.next_due = s.first_due
+	end
+
 
 	state_machine :state, :initial => 'Invited' do
 
 		event :check_dates do
-			transition 'In Trial' => 'Recurring',
-				:if => lambda {|s| s.trial_end && s.trial_end <= DateTime.now}
+			transition 'Invited' => 'Recurring',
+				:if => lambda {|s| s.starting }
 			transition 'Recurring' => 'Expired',
 				:if => lambda {|s| s.expiration_date && s.expiration_date > DateTime.now}
 			transition 'Recurring' => 'Recurring',
 				:if => lambda {|s| s.next_due <= DateTime.now}
 		end
 
-		after_transition 'In Trial' => 'Recurring' do |s|
-			# Make initial charge
-			s.profile.charges.create(:name => "Initial fee (#{s.plan.name})",
-				:amount => s.plan.initial_charge,
-				:plan_id => s.plan.id)
-			# Make first recurring charge
-			s.profile.charges.create(:name => "Recurring fee (#{s.plan.name})",
-				:amount => s.plan.amount,
-				:plan_id => s.plan.id)
-			s.next_due = s.first_due
-			s.save
+		after_transition 'Invited' => 'Recurring' do |s|
 		end
 
 		after_transition 'Recurring' => 'Recurring' do |s|
@@ -99,10 +119,6 @@ class Subscription
 
 	def total_paid
 		charges.where(state: 'paid').map(&:amount).sum
-	end
-
-	def trial_end
-		self.starting + Subscription.parse_date_interval(plan.trial_length, plan.trial_type)
 	end
 
 	def cycle_period

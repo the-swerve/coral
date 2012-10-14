@@ -12,6 +12,7 @@ gem 'sinatra-resources'
 gem 'state_machine'
 
 # transactions
+gem 'faraday'
 gem 'balanced'
 
 #server

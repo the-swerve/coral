@@ -11,7 +11,7 @@ Account.Model = Backbone.Model.extend({
 
 Account.View = {};
 // Updates account name in h1 title
-Account.View.title = Backbone.View.extend({
+Account.View.Title = Backbone.View.extend({
 
 	initialize: function(options) {
 		_.bindAll(this, 'render');
@@ -26,7 +26,7 @@ Account.View.title = Backbone.View.extend({
 });
 
 // The account settings panel
-Account.View.settings = Backbone.View.extend({
+Account.View.Settings = Backbone.View.extend({
 	initialize: function(options) {
 		this.settingsShown = false;
 	},
@@ -51,7 +51,8 @@ Account.View.settings = Backbone.View.extend({
 	},
 });
 
-Account.View.help = Backbone.View.extend({
+// TODO
+Account.View.Help = Backbone.View.extend({
 	initialize: function(options) {
 	},
 	events: {
@@ -62,54 +63,68 @@ Account.View.help = Backbone.View.extend({
 	},
 });
 
-Account.View.edit = Backbone.View.extend({
+Account.View.Edit = Backbone.View.extend({
 	events: {
-		'click .edit-field-btn': 'revealInput',
-		'click .cancel-acct-edit': 'hideInput',
+		'click .edit-field-btn': 'showField',
+		'click .cancel-edit': 'hideField',
 		'keypress .field-controls input': 'saveField',
 	},
-	revealInput: function(e) {
-		e.preventDefault();
-		$(e.currentTarget).hide();
-		$(e.currentTarget).siblings('.acct-field').hide();
-		$(e.currentTarget).siblings('.field-controls').show();
+	// XXX this is redundant with Profile.View.Edit.showField
+	// see profile.js for more notes on these redundant functions
+	showField: function(e) {
+		if(e) { // if a click event, get the selected field
+			e.preventDefault();
+			this.infoGroup = $(e.currentTarget).parents('.info-group');
+		}
+		this.infoGroup.children('.field-name').children('.edit-field-btn').hide();
+		this.infoGroup.children('.profile-field').hide();
+		this.infoGroup.children('.field-name').children('.save-info').show();
+		this.infoGroup.children('.field-controls').show();
+		return this;
 	},
-	hideInput: function(e) {
-		e.preventDefault();
-		var p = $(e.currentTarget).parent().parent();
-		p.parent().hide();
-		p.parent().siblings('.acct-field').show();
-		p.parent().siblings('.edit-field-btn').show();
+	hideField: function(e) {
+		if(e) e.preventDefault();
+		this.infoGroup.children('.field-name').children('.edit-field-btn').show();
+		this.infoGroup.children('.profile-field').show();
+		this.infoGroup.children('.field-name').children('.save-info').hide();
+		this.infoGroup.children('.field-name').children('.save-status').hide();
+		this.infoGroup.children('.field-controls').hide();
+		return this;
 	},
+	// XXX very redundant with Profile.View.Edit.saveField()
 	saveField: function(e) {
 		if (e.which != 13) return this;
-		e.preventDefault();
+		// this.infoGroup will be the selected div.info-group
+		var input = this.infoGroup.children('.field-controls').children('input');
+		var btn = this.infoGroup.children('.field-controls')
 		// ui bits
-		$(e.currentTarget).attr('disabled',true);
-		$('#ajax-loader').show();
+		this.infoGroup.children('.field-name').children('.save-info').hide();
+		this.infoGroup.children('.field-name').children('.save-status').show();
+		input.attr('disabled',true);
 		$('.profile-alerts .alert').hide();
+		$('#ajax-loader').show();
 		// ajax bits
 		var self = this;
-		var name = $(e.currentTarget).attr('name');
-		var val = $(e.currentTarget).val(); // new value of the field we're editing
+		var name = input.attr('name');
+		var val = input.val(); // new value of the field we're editing
 		var data = {};
 		data[name] = val; // i have to initialize the data hash this way because if i do {name : val}, javascript turns name into a string
+		var previous = this.model.get(name);
 		this.model.save(data,
 			{
 				success: function(m,r) {
-					$(e.currentTarget).attr('disabled',false);
+					input.attr('disabled',false);
 					$('#ajax-loader').hide();
-					$(e.currentTarget).parent().siblings('.acct-field').html(val).show();
-					$(e.currentTarget).parent().siblings('.edit-field-btn').show();
-					$(e.currentTarget).parent().hide();
+					self.infoGroup.children('.profile-field').html(val);
+					self.hideField();
 				},
 				error: function(m,r) {
-					$('.profile-alerts .alert-error').html(r.responseText).show();
-					$(e.currentTarget).attr('disabled',false);
+					input.attr('disabled',false);
+					m.set(name,previous); // roll back field
+					input.val(m.get(name)); // reset input
 					$('#ajax-loader').hide();
-					$(e.currentTarget).parent().siblings('.acct-field').show();
-					$(e.currentTarget).parent().siblings('.edit-field-btn').show();
-					$(e.currentTarget).parent().hide();
+					$('.profile-alerts .alert-error').html(r.responseText + ' - ' + val).show();
+					self.hideField();
 				}
 			}
 		); // end save()

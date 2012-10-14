@@ -1,103 +1,137 @@
-
 <script id='new-profile-tmpl' type='text/template' class='hide'>
-	<tr id='new-profile-form'>
-		<td>
-			<form id='new-profile-form' class='form-inline' style='margin:0'>
-				<input type='text' name='name' placeholder='Name' style='width:12em;margin:0;' />
-				<input type='text' name='email' placeholder='Email' style='width:12em;margin: 0 1em 0 1em;' />
-				<input type='hidden' name='sub_plan_id' class='sub-plan-id' val='none' />
-				<img class='loader hide' src='img/ajax-loader.gif' />
-				<button type='submit' id='new-profile-row' class='btn'>Save</button>
-				<a class='btn' id='remove-profile-row' href='#'>Cancel </a>
-				<span class='form-error'></span>
-			</form>
-		</td>
-	</tr>
-</script>
 
-
-<p id="new-profile-error" class='form-error'></p>
-<form method="post" action="/profiles" id="wat-profile-form" class='form-horizontal'>
-	<div class='control-group'>
-		<label class='control-label'>Name</label>
-		<div class='controls'><input type="text" name="name" /></div>
-	</div>
-	<div class='control-group'>
-		<label class='control-label'>Email</label>
-		<div class='controls'><input type="text" name="email" /></div>
-	</div>
-
-	<div class='control-group'>
-		<label class='control-label'></label>
-		<div class='controls'>
-			<select class='new-payment-method-type' name='pm_pay_type'>
-				<option label='Payment Method'></option>
-				<option id='new-credit-card'>Credit Card</option>
-				<option id='new-echeck'>E-check</option>
-			</select>
-		</div>
-	</div>
-
-	<div class='credit-card-selected hide'>
-		<div class='control-group'>
-			<label class='control-label'>Card Number</label>
-			<div class='controls'>
-				<input id="" type="text" name='pm_cc_number' value=''/>
+			<div style='text-align: center; margin-bottom: 2em'>
+				<h4 id='new-prof-progress'>
+					<span id='enter-info-title'>Basic Info</span>
+					&nbsp; &middot; &nbsp;
+					<span class='deemph' id='payment-method-title'>Payment Method</span>
+					&nbsp; &middot; &nbsp;
+					<span class='deemph' id='starting-date-title'>Starting Date</span>
+				</h4>
 			</div>
-		</div>
-		<div class='control-group'>
-			<label class='control-label'>Expiration</label>
-			<div class='controls'>
-				<input id="" type="text" name='' value=""/>
-			</div>
-		</div>
-	</div>
 
-	<div class='echeck-selected control-group hide'>
-		<label class='control-label'>Account Number</label>
-		<div class='controls'>
-			<input id="" type="text" name="pm_acct_number" value=""/>
-		</div>
-	</div>
+			<form id='new-profile-form' class='form-horizontal' style='margin:0'>
 
-	<div id='new-profile-sub'> </div>
+				<div class='alert alert-error hide'></div>
 
-	<div class='modal-form-actions'>
-		<input id="new-profile-submit" class="btn" name="commit" type="submit" value="Save" />
-	</div>
-</form>
+					<div class='control-group'>
+						<label class='control-label'>Email</label>
+						<div class='controls'>
+							<input type='text' name='email' />
+						</div>
+					</div>
 
-<script id='new-profile-sub-tmpl' type='text/template' class='hide'>
-<div class='control-group'>
-	<div class='controls'>
-		<select id='new-sub-selector' name='sub_plan_id'>
-			[[ if(selected) { ]]
-				<option label="{{ selected.get('name') }}">{{ selected.id }}</option>
-			[[ } else { ]]
-				<option label="Subscription"></option>
-			[[ } ]]
-			[[ _.each(plans, function(p) { ]]
-				<option label='{{p.get('name')}}'>{{p.id}}</option>
-			[[ }); ]]
-		</select>
-	</div>
-</div>
-<div id='new-sub-dates' class={{ selected ? '' : 'hide'}}>
-	<div class='control-group'>
-		<label class='control-label'>Starting on</label>
-		<div class='controls'>
-			<input type="date" name='sub_starting' />
-		</div>
-	</div>
-	<div class='control-group'>
-		<label class='control-label'>Ending on</label>
-		<div class='controls'>
-			<input type="date" name='sub_expiration' />
-		</div>
-	</div>
-</div>
-</script>
+					<div class='control-group'>
+						<label class='control-label'>Name</label>
+						<div class='controls'>
+							<input type='text' name='name' />
+						</div>
+					</div>
 
-<script id='profile-payments-tmpl' type='text/template' class='hide'>
-	hi
+					<div class='control-group'>
+						<label class='control-label'>Phone</label>
+						<div class='controls'>
+							<input type='text' name='phone' placeholder='(optional)' />
+						</div>
+					</div>
+
+					<div class='modal-form-actions'>
+						<button type='submit' id='new-profile-submit' class='btn btn-large btn-block'>Save</button>
+					</div>
+
+			</form><!-- end #new-profile-form -->
+
+			<form id='new-profile-pm-form' class='form-horizontal hide'>
+
+					<div class='alert alert-error hide'></div>
+
+					<div class='control-group'>
+						<label class='control-label'>Type</label>
+						<div class='controls'>
+							<select class='new-payment-method-type' name='pay_type' style='width:9em;'>
+								<option id='new-credit-card'>Credit Card</option>
+								<option id='new-echeck'>E-check</option>
+							</select>
+						</div>
+					</div>
+
+					<div class='credit-card-selected'>
+						<div class='control-group'>
+							<label class='control-label'>Card Number</label>
+							<div class='controls'>
+								<input id="" type="text" name="card_number" value />
+							</div>
+						</div>
+
+						<div class='control-group'>
+							<label class='control-label'>Expiration</label>
+							<div class='controls'>
+								<select name='expiration_month' style='width:6em;'>
+									<option>Month</option>
+									[[ for(var i = 1; i < 13; i++) { ]]
+										<option>{{i}}</option>
+									[[ } ]]
+								</select>
+								[[ var year = (new Date).getFullYear(); ]]
+								<select name='expiration_year' style='width:6em;'>
+									<option>Year</option>
+									[[ for(var i = year; i < year + 10; i++) { ]]
+										<option>{{ i }}</option>
+									[[ } ]]
+								</select>
+							</div>
+						</div>
+
+						<div class='control-group'>
+							<label class='control-label'>Security Code</label>
+							<div class='controls'>
+								<input id="" type="text" name="security_code" value=""/>
+							</div>
+						</div>
+					</div>
+
+					<div class='echeck-selected hide'>
+						<div class='control-group'>
+							<label class='control-label'>Account Number</label>
+							<div class='controls'>
+									<input id="" type="text" name="acct_number" value=""/>
+							</div>
+						</div>
+					</div><!-- end div.echeck-selected -->
+
+					<div class='modal-form-actions'>
+						<button type='submit' id='new-profile-pm-submit' class='btn btn-large btn-block'>
+							Save</button> &nbsp;
+
+						<button id='skip-pm-form' class='btn btn-large btn-block' style='opacity:0.7'>
+							Skip</button> &nbsp;
+					</div>
+			</form><!-- end #new-profile-pm-form -->
+
+			<form id='new-profile-starting-form' class='form-horizontal hide'>
+				<div class='alert alert-error hide'></div>
+				<div class='control-group'>
+					<label class='control-label'>Starting Date</label>
+					<div class='controls'>
+						[[ var today = new Date();
+							 var year = today.getFullYear();
+							 var month = today.getMonth() + 1;
+							 var day   = today.getDate();
+							 if(month < 10) month = '0' + month;
+							 if(day < 10) day = '0' + day;
+							 today = year + '-' + month + '-' + day;
+						 ]]
+						<input type='date' name='starting' value='{{today}}'/>
+						<span class='help-inline'>
+							Choose the date you want this subscription to take effect.
+							Charges will be applied starting on that day.
+						</span>
+					</div>
+				</div>
+
+					<div class='modal-form-actions'>
+						<button type='submit' id='new-profile-starting-submit' class='btn btn-large btn-block'>Save</button>
+					</div>
+			</form><!-- end #new-profile-starting-form -->
+
 </script>

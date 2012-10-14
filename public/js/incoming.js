@@ -1,21 +1,23 @@
 
-// Highest level view, encompassing the whole app.
+// Highest level router, encompassing the whole app.
+// initializes all the views
+// TODO get some routes workin
 Router = Backbone.Router.extend({
 	initialize: function() {
 
 		// Instatiate models
 		this.account = new Account.Model();
 		this.plans = new Plan.Collection();
-		this.profiles = new ProfileCollection();
+		this.profiles = new Profile.Collection();
 		this.charges = new ChargeCollection();
 
 		// Initialize child views
 		// Top bar -- account.js
-		this.titleView = new Account.View.title({model: this.account, el: $('h1#account-name')});
-		this.settingsView = new Account.View.settings({model: this.account, el: $('div#account')});
-		this.editAcctView = new Account.View.edit({model: this.account, el: $('div#edit-account')});
-		this.helpView = new Account.View.help({model: this.account, el: $('div.container')});
-		this.baView = new BAView({model: this.account, el: $('div#edit-account')});
+		this.titleView = new Account.View.Title({model: this.account, el: $('h1#account-name')});
+		this.settingsView = new Account.View.Settings({model: this.account, el: $('div#account')});
+		this.editAcctView = new Account.View.Edit({model: this.account, el: $('div#edit-account')});
+		this.helpView = new Account.View.Help({model: this.account, el: $('div.container')});
+		this.baView = new Account.View.Bank({model: this.account, el: $('div#edit-account')});
 
 		// Data visualization -- chart.js
 		this.chartView = new ChartView({el: $('div.visualization')});

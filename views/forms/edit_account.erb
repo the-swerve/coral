@@ -1,6 +1,6 @@
 <script id='edit-account-form-tmpl' type='text/template' class='hide'>
 
-	<div class='row'>
+	<div class='row-fluid'>
 		<div class='span12'>
 			<a class='btn btn-small' id='close-account-settings' href='#' style='float:right;'><i class='icon-remove'></i> Close</a>
 			<h3>Account Settings</h3>
@@ -16,61 +16,84 @@
 		</div>
 	</div>
 
-	<div class='row'>
+	<div class='row-fluid'>
 
-		<div class='info-group span3'>
-			<strong>Name</strong> &nbsp; &nbsp; <a class='label edit-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-			<span class='acct-field'>{{name}}</span>
-
+		<div class='info-group span4'>
+			<p class='field-name'>
+				<strong>Name</strong> &nbsp; &nbsp;
+				<a class='label edit-field-btn' href='#'>
+				<i class='icon-pencil icon-white'></i> edit</a>
+				<small class='save-info hide'>Hit enter to save |
+					<a href='#' class='cancel-edit'>Cancel.</a></small>
+				<small class='save-status hide'><em>Saving...</em></small>
+			</p>
+			<p class='profile-field'>{{name}}</p>
 			<div class='field-controls hide'>
-				<input class='input' type='text' value='{{name}}' name='name'/>
-				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
+				<input type='text' value='{{name}}' name='name' />
 			</div>
-		</div>
+		</div><!-- end div.info-group -->
 
-		<div class='info-group span3'>
-			<strong>Email</strong> &nbsp; &nbsp; <a class='label edit-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-			<span class='acct-field'>{{email}}</span>
-
+		<div class='info-group span4'>
+			<p class='field-name'>
+				<strong>Email</strong> &nbsp; &nbsp;
+				<a class='label edit-field-btn' href='#'>
+				<i class='icon-pencil icon-white'></i> edit</a>
+				<small class='save-info hide'>Hit enter to save |
+					<a href='#' class='cancel-edit'>Cancel.</a></small>
+				<small class='save-status hide'><em>Saving...</em></small>
+			</p>
+			<p class='profile-field'>{{email}}</p>
 			<div class='field-controls hide'>
-				<input type='text' value='{{email}}' name='email'/>
-				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
+				<input type='text' value='{{email}}' name='email' />
 			</div>
-		</div>
+		</div><!-- end div.info-group -->
 
-		<div class='info-group span3'>
-			<strong>Phone</strong> &nbsp; &nbsp; <a class='label edit-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-			<span class='acct-field'>{{phone_number}}</span>
-
+		<div class='info-group span4'>
+			<p class='field-name'>
+				<strong>Phone</strong> &nbsp; &nbsp;
+				<a class='label edit-field-btn' href='#'>
+				<i class='icon-pencil icon-white'></i> edit</a>
+				<small class='save-info hide'>Hit enter to save |
+					<a href='#' class='cancel-edit'>Cancel.</a></small>
+				<small class='save-status hide'><em>Saving...</em></small>
+			</p>
+			<p class='profile-field'>{{phone_number}}</p>
 			<div class='field-controls hide'>
 				<input type='text' value='{{phone_number}}' name='phone_number' />
-				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
 			</div>
-		</div>
+		</div><!-- end div.info-group -->
 
-		<div class='info-group span3'>
-			<strong>Address</strong> &nbsp; &nbsp; <a class='label edit-field-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-			<span class='acct-field'>{{address}}</span>
+	</div> <!-- end div.row-fluid -->
 
-			<div class='field-controls hide'>
-				<input type='text' value='{{address}}' name='address' />
-				<p><small>Hit enter to save | <a href='#' class='cancel-acct-edit'>Cancel.</a></small></p>
-			</div>
-		</div>
-
-	</div> <!-- end div.row -->
-
-	<hr>
-
-	<div class='row edit-bank-account'>
+	<div class='row-fluid edit-bank-account'>
 
 		<div class='span12'>
-			<strong>Bank Account</strong> &nbsp; &nbsp; <a class='label edit-bank-acct-btn' href='#'><i class='icon-pencil icon-white'></i> edit</a> <br /><br />
-			<p id='bank-acct-info'>
 			[[ if(_.isEmpty(_bank_account)) { ]]
-				<em>None yet</em>
+				<p>
+					<em>No bank account yet. </em>
+					<a class='btn edit-bank-acct-btn' href='#'>New Bank Account</a>
+				</p>
 			[[ } else { ]]
-				{{_bank_account.bank_name}} ending in {{_bank_account.last_four}}
+			<table ed='bank-acct-info' class='table'>
+				<thead>
+					<tr>
+						<th>Bank Account Name</th>
+						<th>Account Number</th>
+						<th>In Transfer</th>
+						<th>Total Received</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{{_bank_account.bank_name}}</td>
+						<td>*{{_bank_account.last_four}}</td>
+						<td>$0.00</td>
+						<td>$0.00</td>
+						<td><a class='btn btn-small edit-bank-acct-btn' href='#'>Replace</a></td>
+						<td><a class='btn btn-small btn-danger' id='remove-bank-account-btn' href='#'>Remove</a></td>
+					</tr>
+				</tbody>
+			</table>
 			[[ } ]]
 			</p>
 

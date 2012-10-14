@@ -33,6 +33,10 @@ Plan.View.Table = Backbone.View.extend({
 		'click #new-plan-button': 'newPlan',
 		'click #edit-plan-button': 'editPlan',
 		'click #remove-plan-button': 'removePlan',
+
+		// profile dispatching
+		'click .view-profile-button': 'viewProfile',
+		'click #new-profile-btn': 'newProfile',
 	},
 	selectPlan: function(e) {
 		e.preventDefault();
@@ -58,6 +62,20 @@ Plan.View.Table = Backbone.View.extend({
 		this.removePlanModal = new Plan.View.Remove(
 				{el: this.el, collection: this.plans, profiles: this.profiles, tableView: this});
 	},
+	viewProfile: function(e) {
+		e.preventDefault();
+		var sid = $(e.currentTarget).data('id'); // get id of clicked profile, which is in the <tr>
+		this.profiles.selected = this.profiles.get($(e.currentTarget).data('id'));
+		this.profileDetails =  new Profile.View.Details({
+			el: this.el, collection: this.profiles, plans: this.plans, tableView: this
+		});
+	},
+	newProfile: function(e) {
+		e.preventDefault();
+		this.newProfileModal = new Profile.View.New({
+			el: this.el, collection: this.profiles, plans: this.plans, tableView: this
+		});
+	},
 	render: function() {
 		/* This will run on page load, instantiating the selected plan and
 		 * rendering the initial templates.
@@ -78,7 +96,7 @@ Plan.View.Table = Backbone.View.extend({
 			var filteredProfiles = this.profiles.filter(function(p) {
 				return _.include(p.get('plan_ids'), self.plans.selected.id);
 			});
-			filteredProfiles = (new ProfileCollection(filteredProfiles)).toJSON() // wut. is this circular?
+			filteredProfiles = (new Profile.Collection(filteredProfiles)).toJSON() // wut. is this circular?
 
 			// Compile the table of profiles
 			var table = _.template($('#profile-table-tmpl').html());

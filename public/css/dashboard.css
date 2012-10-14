@@ -44,6 +44,11 @@ div.visualization {
 	z-index: -1;
 }
 
+div#chart {
+	width: 100%;
+	height: 200px;
+}
+
 a#logo-teeny {
   line-height: 0;
   font-size: 0;
@@ -203,6 +208,10 @@ input[type="submit"], .submit-btn {
 .edit-profile {
 }
 
+#edit-plan-form {
+	margin-top: 1.2em;
+}
+
 table.table tr.edit-profile {
 	cursor: default;
 }
@@ -280,7 +289,17 @@ div#account-info {
 
 .info-group {
 	border-right: 1px solid #DDD;
+	margin-bottom: 1.2em; 
+}
+
+.info-group input {
+	width: 90%;
 }
 
 #bank-account {
+}
+
+/* De-emphasized text */
+.deemph {
+	color: #b3b3b3;
 }

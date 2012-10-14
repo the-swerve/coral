@@ -1,6 +1,6 @@
 
 // bank account updating form
-BAView = Backbone.View.extend({
+Account.View.Bank = Backbone.View.extend({
 	events: {
 		'click .edit-bank-acct-btn': 'showForm',
 		'click #cancel-bank-acct-btn': 'hideForm',
@@ -116,6 +116,7 @@ BAView = Backbone.View.extend({
 				$('#edit-account .alert-error').show();
 				$('#edit-account .alert-error').html(d.responseText);
 				$('#bank-account-submit').attr('disabled',false);
+				$('#bank-account-submit').siblings().attr('disabled',false);
 				$('#ajax-loader').hide();
 			}
 		});

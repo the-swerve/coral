@@ -1,12 +1,13 @@
 require 'mongoid'
 require 'bcrypt'
-require 'balanced'
+require './lib/balanced'
 
 class Account
 
 	include Mongoid::Document
 	include Mongoid::Timestamps
 	include BCrypt
+	include BalancedAPI
 
 	attr_accessor :password
 
@@ -31,6 +32,8 @@ class Account
 		presence: true
 	validates :password,
 		length: {minimum: 6, on: :create}
+	validates :merchant_uri,
+		presence: true
 
   # Associations
 
@@ -40,9 +43,42 @@ class Account
 
   # Callbacks
 
-  before_validation do
+  before_validation(on: :create) do
+		# Generate password hash using bcrypt
 		self.pass_hash = Password.create(self.password) if self.password
 
+		# Create merchant account on balancedpayments.com for payments.
+		response = BalancedAPI.create_account({
+			email_address: self.email,
+			name: self.name,
+			merchant: {
+				type: 'person',
+				name: self.name,
+				dob: '1842-01',
+				phone_number: '000 000 0000',
+				street_address: '',
+				postal_code: '',
+				region: 'EX',
+				country: 'USA',
+			}
+		})
+		if response['uri']
+			self.merchant_uri = response['uri']
+		else # If there was an error in the balanced request, commit seppuku
+			if response['description']
+				errors.add('', 'Account creation error: ' + response['description'])
+			else 
+				errors.add('', 'Account creation error :/')
+			end
+		end
+	end
+
+	before_save(on: :update) do
+		# Update the corresponding merchant account on balancedpayments.com
+		response = BalancedAPI.update_account(self.merchant_uri, {
+			email_address: self.email,
+			name: self.name
+		})
 	end
 
 	after_create :generate_session_token
@@ -68,13 +104,15 @@ class Account
 	end
 
 	def as_hash
-		{:name => self.name.to_s,
+		{
+			:name => self.name.to_s,
 		 :email => self.email,
 		 :phone_number => self.phone_number || '',
 		 :address => self.address || '',
 		 :id => self.id.to_s,
 		 :session_token => self.session_token,
-		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}}
+		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}
+		}
 	end
 
 	def first_error

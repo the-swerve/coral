@@ -10,7 +10,7 @@ Profile.Model= Backbone.Model.extend({
 });
 
 Profile.Collection = Backbone.Collection.extend({
-	model: Profile,
+	model: Profile.Model,
 	url: '/profiles',
 	initialize: function() { this.selected = null; }
 });
@@ -20,92 +20,284 @@ Profile.View.Details = Backbone.View.extend({
 	initialize: function(options) {
 		this.plans = options.plans;
 		this.tableView = options.tableView;
+		// When instantiating Profile.View.Details, pass in the ID of the selected profile as selectedID
+		this.plans.selected = null; // deselect any plan
+		$('#plan-nav li').removeClass('active'); // deselect plan visually
+		this.render();
+
+		// Initialize the field editing view. We could also initiate this view for
+		// every field being edited upon clicking 'edit', but bleh.
+		this.editView = new Profile.View.Edit({
+			el: this.el, collection: this.collection, parentView: this
+		});
 	},
-	events: {},
+	events: {
+		'click #show-subs' : 'toggleSubTable',
+	},
+	toggleSubTable: function(e) {
+		e.preventDefault();
+		var btn = $(e.currentTarget);
+		var tableID = btn.data('table-id');
+		if(btn.text() == 'Show') btn.text('Hide');
+		else if(btn.text() == 'Hide') btn.text('Show');
+		$(tableID).slideToggle('slow');
+	},
+	editField: function(e) {
+		e.preventDefault();
+		// get the div parent of the 'edit' button
+		// this way we can scope our view within the edit field box
+	},
 	req: false,
+	render: function() {
+		// Compile and render form template
+		var self = this;
+		var tmpl = _.template($('#edit-profile-tmpl').html());
+		$('#profiles-container').html(tmpl(self.collection.selected.attributes));
+	},
 });
 
-ProfileView = Backbone.View.extend({
-
-	req: false, // used to block simultaneous requests (prevent the form submit from being clicked repeatedly)
-
+Profile.View.Edit = Backbone.View.extend({
 	initialize: function(options) {
-		this.plans = options.plans;
-		var childHash = {collection: this.collection, p: this, el: $('.data-row'), plans: this.plans};
-		 
-		// child views
-		this.pmView = new PMView(childHash);
-		this.indexView = new IndexProfileView(childHash);
-		this.editView = new EditProfileView(childHash);
-
 		// events
-	},
-
-	events: {
-		'click #new-profile-button': 'renderNewForm',
-		'click #new-profile-submit': 'create',
-
-		'click #edit-profile-submit': 'update',
-		'click #remove-profile-button': 'renderRemoveForm',
-		'click #remove-profile-submit': 'destroy',
-
-		'click #new-profile-row': 'addRow',
-		'click #remove-profile-row': 'removeRow',
-
-
-		'click #share-plan-submit': 'invitePeople',
-
-		'click .view-profile-button': 'renderProfileView',
-
-		'click #payments-button': 'showPayments',
-		'click #remove-pm-submit': 'destroyPM',
-		'click .remove-pm-button': 'renderRemovePMForm',
-
-	},
-
-	renderEditForm: function(e) {
-		e.preventDefault();
-		$('#new-payment-method-form').hide();
-		$('#new-pm-button').removeClass('disabled');
-		$('#edit-profile-button').toggleClass('disabled');
-		$('#edit-profile-form').toggle();
-	},
-
-	showPayments: function(e) {
-		e.preventDefault();
-		var tmp = _.template($('#profile-payments-tmpl').html());
-		$(e.currentTarget).parent().parent().after(tmp());
-	},
-
-	removeRow: function(e) {
-		e.preventDefault();
-		$(e.currentTarget).parent().parent().remove();
-	},
-
-	addRow: function(e) {
-		e.preventDefault();
-		$(e.currentTarget).hide();
-		$(e.currentTarget).siblings('#remove-profile-row').hide();
-		$(e.currentTarget).siblings('.loader').fadeIn();
 		var self = this;
-		$('input#new-profile-submit').toggleSubmit();
-		var data = $(e.currentTarget).parent().serializeObject();
-		var profile = new Profile();
-		profile.save(data, {
+		this.collection.on('change:name', function() {
+			$('#profile-name').html(self.collection.selected.get('name'));
+		});
+	},
+	events: {
+		'click .edit-field-btn': 'showField',
+		'click .cancel-edit': 'hideField',
+		'keypress .field-controls input': 'saveField',
+		'click #profile-scratchpad-submit': 'saveScratch',
+	},
+	// Note: you can eliminate the redundancy of the following two functions by
+	// using the toggle() method, but I was having problems with it
+	// double-toggling when you hit the edit link. I have no idea why.
+	showField: function(e) {
+		// infoGroup is the div element that holds the input and buttons and whatnot
+		// it is set in this.getField()
+		if(e) { // if a click event, get the selected field
+			e.preventDefault();
+			this.infoGroup = $(e.currentTarget).parents('.info-group');
+		}
+		this.infoGroup.children('.field-name').children('.edit-field-btn').hide();
+		this.infoGroup.children('.profile-field').hide();
+		this.infoGroup.children('.field-name').children('.save-info').show();
+		this.infoGroup.children('.field-controls').show();
+		return this;
+	},
+	hideField: function(e) {
+		if(e) e.preventDefault();
+		this.infoGroup.children('.field-name').children('.edit-field-btn').show();
+		this.infoGroup.children('.profile-field').show();
+		this.infoGroup.children('.field-name').children('.save-info').hide();
+		this.infoGroup.children('.field-name').children('.save-status').hide();
+		this.infoGroup.children('.field-controls').hide();
+		return this;
+	},
+	saveField: function(e) {
+		if(e.which != 13) return this;
+		// this.infoGroup will be the selected div.info-group
+		var input = this.infoGroup.children('.field-controls').children('input');
+		var btn = this.infoGroup.children('.field-controls')
+		// UI bits
+		this.infoGroup.children('.field-name').children('.save-info').hide();
+		this.infoGroup.children('.field-name').children('.save-status').show();
+		$('#edit-profile .alert').hide();
+		$('#ajax-loader').show();
+		input.attr('disabled',true);
+		// AJAX bits
+		var self = this;
+		var name = input.attr('name');
+		var val = input.val();
+		var data = {};
+		data[name] = val; // i have to initialize the data hash this way because if i do {name : val}, javascript turns 'name' into a string
+		var previous = this.collection.selected.get(name); // for rolling back 
+		this.collection.selected.save(data,
+			{
+				success: function(m,r) {
+					input.attr('disabled',false);
+					$('#ajax-loader').hide();
+					self.infoGroup.children('.profile-field').html(val);
+					self.hideField();
+				},
+				error: function(m,r) {
+					input.attr('disabled',false);
+					m.set(name, previous); // roll back field
+					input.val(m.get(name)); // reset input
+					$('#ajax-loader').hide();
+					$('#edit-profile .alert-error').html(r.responseText + ' - ' + val).show();
+					self.hideField();
+				}
+			}
+		);
+	},
+	saveScratch: function(e) {
+		// this may not need a separate function from saveField
+		e.preventDefault();
+		$('#ajax-loader').show();
+		$(e.currentTarget).hide();
+		$(e.currentTarget).siblings('.save-status').show();
+		this.collection.selected.save({'info' : $('#profile-scratchpad').val()},
+			{
+				success: function(d) {
+					$('#ajax-loader').hide();
+					$(e.currentTarget).show();
+					$(e.currentTarget).siblings('.save-status').hide();
+				},
+				error: function(d) {
+					alert(d.responseText);
+					$(e.currentTarget).show();
+					$(e.currentTarget).siblings('.save-status').hide();
+				}
+			}
+		);
+	},
+});
+
+Profile.View.New = Backbone.View.extend({
+	initialize: function(options) {
+		this.render();
+		this.plans = options.plans;
+	},
+	events: {
+		'click #new-profile-submit' : 'saveInfo',
+		'click #new-profile-pm-submit' : 'savePM',
+		'click #new-profile-starting-submit' : 'setStarting',
+		'click #skip-pm-form' : 'skipPM',
+	},
+	render: function() {
+		// display the modal
+		$('#new-profile-modal').modal('show');
+		var tmpl = _.template($('#new-profile-tmpl').html());
+		$('#new-profile-modal .modal-body').html(tmpl({}));
+	},
+	saveInfo: function(e) {
+		e.preventDefault();
+		// ui stuff
+		$('#new-profile-submit').attr('disabled',true);
+		$('#ajax-loader').show();
+		// ajaxy nonsense. summon the internet
+		var self = this;
+		var data = $('#new-profile-form').serializeObject();
+		data['sub_plan_id'] = this.plans.selected.id;
+		(new Profile.Model()).save(data, {
 			success: function(model, response) {
 				self.collection.add(model);
-				self.collection.selected = profile;
-				self.renderProfileView();
+				self.collection.selected = model;
+				$('#new-profile-form').hide();
+				$('#new-profile-pm-form').show();
+				$('#new-prof-progress').children().addClass('deemph');
+				$('#payment-method-title').removeClass('deemph');
+				$('#ajax-loader').hide();
 			},
 			error: function(model, response) {
-				$(e.currentTarget).show();
-				$(e.currentTarget).siblings('#remove-profile-row').show();
-				$(e.currentTarget).siblings('.loader').hide();
+				$('#new-profile-form .alert-error').html(response.responseText).show();
+				$('#new-profile-submit').attr('disabled',false);
+				$('#ajax-loader').hide();
+			}
+		});
+		return this;
+	},
+	savePM: function(e) {
+		e.preventDefault();
 
-				$(e.currentTarget).siblings('.form-error').html(response.responseText);
+		$('#new-profile-pm-submit').attr('disabled',true);
+		$('#ajax-loader').show();
+		$('#new-profile-pm-form .alert-error').hide();
+
+		var self = this;
+		var pid = this.collection.selected.id;
+		var sid = this.plans.selected.id;
+		var data = $('#new-profile-pm-form').serializeObject();
+		var subs = this.collection.selected.get('_subscriptions');
+		data['subscription_id'] = sid;
+
+		// XXX we should do all this jazz in a PaymentMethod model. definitely.
+		var errs = balanced.card.validate(data);
+		if(!_.isEmpty(errs)) {
+			$('#ajax-loader').hide();
+			$('#new-profile-pm-submit').attr('disabled',false);
+			// print out the first error message
+			$('#new-profile-pm-form .alert-error').html(_.values(err)[0]).show();
+			return this;
+		}
+
+		balanced.card.create(data, function(response) {
+			if(response.status == 201) { // you aight
+				// get some of them data tidbits on coral 
+				$.ajax({
+					type: 'post',
+					url: '/profiles/' + pid + '/payment_methods',
+					dataType: 'json',
+					data: response.data,
+					success: function(d) {
+						// the data response will be the profile hash
+						self.collection.selected.set(d);
+						$('#ajax-loader').hide();
+						self.skipPM(); // move to next step
+					},
+					// coral error.
+					// this shouldn't happen since it was ok on balanced. bro you got nerve
+					error: function(d) {
+						$('#ajax-loader').hide();
+						$('#new-profile-pm-form .alert-error').html(d.responseText).show();
+						$('#new-profile-pm-submit').attr('disabled',false);
+					}
+				});
+			} else {  // balanced error
+				$('#ajax-loader').hide();
+				$('#new-profile-pm-submit').attr('disabled',false);
+				$('#new-profile-pm-form .alert-error').html(response.error).show();
+			}
+		});
+	}, // end savePM
+	setStarting: function(e) {
+		e.preventDefault();
+		$('#ajax-loader').show();
+		$('#new-profile-starting-submit').attr('disabled',true);
+		var self = this;
+		data = $('#new-profile-starting-form').serializeObject();
+		$.ajax({
+			type: 'put',
+			url: '/profiles/' + self.collection.selected.id + '/plans/' + self.plans.selected.id,
+			dataType: 'json',
+			data: data,
+			success: function(d) {
+				$("#ajax-loader").hide();
+				$('#new-profile-modal').modal('hide');
+				self.collection.selected.set(d);
+				// draw the details view for this new person
+				self.detailsView = new Profile.View.Details({
+					el: self.el, collection: self.collection,
+					plans: self.plans, tableView: self.tableView
+				});
+			},
+			error: function(d) {
+				$('#ajax-loader').hide();
+				$('#new-profile-starting-submit').attr('disabled',false);
+				$('#new-profile-starting-form .alert-error').html(d.responseText).show();
 			}
 		});
 	},
+	skipPM: function(e) {
+		if(e) e.preventDefault();
+		// form ui - have a glass of my kombucha
+		$('#new-profile-pm-form').hide();
+		$('#new-profile-starting-form').show();
+		// title progress thing ui
+		// The x.fadeOut(function() { y.fadeIn()}); sequencing was not working at
+		// all. I couldn't figure out why. Some fadey shit would be nicer.
+		$('#new-prof-progress').children().addClass('deemph');
+		$('#starting-date-title').removeClass('deemph');
+	},
+});
+
+
+// you can tell me anything if it makes you feel cool
+// all of the below code is saved in case i need to re-implement it, which i will.
+/*
+ProfileView = Backbone.View.extend({
 
 	invitePeople: function(e) {
 		e.preventDefault();
@@ -137,30 +329,6 @@ ProfileView = Backbone.View.extend({
 		}
 	},
 
-	create: function(e) {
-		e.preventDefault();
-		if(this.req == false) {
-			var self = this;
-			$('input#new-profile-submit').toggleSubmit();
-			this.req = true;
-			var data = $('form#new-profile-form').serializeObject();
-			var profile = new Profile();
-			profile.save(data, {
-				success: function(model, response) {
-					$('input#new-profile-submit').toggleSubmit();
-					$('div#new-profile').modal('hide');
-					self.collection.add(model);
-					self.req = false;
-					self.renderTable();
-				},
-				error: function(model, response) {
-					$('p#new-profile-error').html(response.responseText);
-					$('input#new-profile-submit').toggleSubmit();
-					self.req = false;
-				}
-			});
-		}
-	},
 
 	renderRemovePMForm: function(e) {
 		e.preventDefault();
@@ -194,26 +362,6 @@ ProfileView = Backbone.View.extend({
 		}
 	},
 
-	update: function(e) {
-		e.preventDefault();
-		$('#edit-profile-submit').hide();
-		$('#cancel-edit-profile').hide();
-		$('#edit-profile-loader').fadeIn();
-		$(e.currentTarget).siblings('.loader').fadeIn();
-		var self = this;
-		var data = $('#edit-profile-form').serializeObject();
-		this.collection.selected.save(data, {
-			success: function(model, response) {
-				self.renderProfileView(); // toggle it off
-			},
-			error: function(model, response) {
-				$('p#edit-profile-error').html(response.responseText);
-				$('input#edit-profile-submit').toggleSubmit();
-				self.req = false;
-			}
-		});
-	},
-
 	destroy: function() {
 		if(this.req == false) { // check request lock
 			var self = this; // preserve scope
@@ -237,18 +385,6 @@ ProfileView = Backbone.View.extend({
 		}
 	},
 
-	renderProfileView: function(e) {
-		if(e) { // changing selection by clicking on row
-			e.preventDefault();
-			this.collection.selected = this.collection.get($(e.currentTarget).attr('id'));
-			this.plans.selected = null;
-			$('#plan-nav li').removeClass('active');
-		}
-		// Compile and render form template
-		var tmpl = _.template($('#edit-profile-tmpl').html());
-		$('#profiles-container').html(tmpl(this.collection.selected.attributes));
-	},
-
 	renderNewForm: function(e) {
 		if(e) e.preventDefault();
 		var self = this;
@@ -266,100 +402,4 @@ ProfileView = Backbone.View.extend({
 	},
 
 });
-
-EditProfileView = Backbone.View.extend({
-	initialize: function(options) {
-
-		var self = this;
-		this.collection.on('change:name', function() {
-			$('#profile-name').html(self.collection.selected.get('name'));
-		});
-
-	},
-	
-	events: {
-		'click .edit-profile-field-btn': 'revealInput',
-		'click .save-field-btn': 'saveField',
-		'click .cancel-edit': 'cancelEdit',
-		'keypress .field-controls input': 'saveField',
-		'blur #profile-scratchpad': 'saveScratch',
-	},
-
-	revealInput: function(e) {
-		e.preventDefault();
-		$(e.currentTarget).hide();
-		$(e.currentTarget).siblings('.profile-field').hide();
-		$(e.currentTarget).siblings('.field-controls').show();
-	},
-
-	saveField: function(e) {
-		if(e.which && e.which == 13) { // enter key pressed
-			var inputData = $(e.currentTarget);
-			var inputBtn = $(e.currentTarget).parent().siblings('.edit-profile-field-btn');
-		} else if(e.which) {
-			return this; // enter key not pressed
-		} else { // save button pushed
-			var inputBtn = $(e.currentTarget);
-			var inputData = inputBtn.siblings('.field-controls').children('input');
-		}
-		// UI bits
-		$('#edit-profile .alert').hide();
-		$('#ajax-loader').show();
-		inputData.attr('disabled',true);
-		// AJAX bits
-		var self = this;
-		var name = inputData.attr('name'); // name of the field we're editing
-		var val = inputData.val(); // new value of the field we're editing
-		var data = {};
-		data[name] = val; // i have to initialize the data hash this way because if i do {name : val}, javascript turns name into a string
-		this.collection.selected.save(data,
-			{
-				success: function(m,r) {
-					inputData.attr('disabled',false);
-					$('#ajax-loader').hide();
-					inputBtn.show();
-					inputData.parent().siblings('.profile-field').html(val).show();
-					inputData.parent().hide();
-				},
-				error: function(m,r) {
-					inputData.attr('disabled',false);
-					$('#edit-profile .alert-error').html(r.responseText).show();
-					$('#ajax-loader').hide();
-					inputBtn.show();
-					inputData.parent().siblings('.profile-field').show();
-					inputData.parent().hide();
-				}
-			}
-		);
-	},
-
-	saveScratch: function(e) { // this may not need a separte function from saveField
-		$('#ajax-loader').show();	
-		this.collection.selected.save({'info' : $('#profile-scratchpad').val()},
-			{
-				success: function(d) {
-					$('#ajax-loader').hide();
-				},
-				error: function(d) {
-					alert(d.responseText);
-				}
-			}
-		);
-	},
-
-	successfulSave: function(d) {
-	},
-	saveError: function(d) {
-		$('#ajax-loader').hide();
-		alert(':(');
-	},
-
-	cancelEdit: function(e) {
-		e.preventDefault();
-		var p = $(e.currentTarget).parent().parent();
-		p.parent().hide();
-		p.parent().siblings('.profile-field').show();
-		p.parent().siblings('.edit-profile-field-btn').show();
-	},
-	
-});
+*/

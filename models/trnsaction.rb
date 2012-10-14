@@ -28,6 +28,7 @@ class Trnsaction
 	# Associations
 
   belongs_to :charge
+  belongs_to :profile
 
 	# Callbacks
 

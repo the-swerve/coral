@@ -37,9 +37,7 @@ class PaymentMethod
 		begin
 			buyer = Balanced::Marketplace.my_marketplace.create_buyer(self.profile.email, self.uri)
 			if !self.profile.update_attribute('buyer_uri',buyer.uri)
-				puts '!!!!!!!!!!!!!!!'
-				puts self.first_error
-				errors.add('','wootuutu')
+				errors.add('','Invalid data.')
 			end
 		rescue Balanced::Conflict => ex
 			if self.profile.buyer_uri
