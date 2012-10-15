@@ -9,14 +9,14 @@
 
 <script id='plan-desc-tmpl' type='text/template' class='hide'>
 	<p id='plan-desc'>
-	Charging <strong>${{Number(plan.get('amount')).toFixed(2)}}</strong> every <strong>{{plan.get('cycle')}}</strong>
+	Charging <strong>${{format_cents(plan.get('amount'))}}</strong> every <strong>{{plan.get('cycle')}}</strong>
 	[[if(plan.get('initial_charge') != 0) { ]]
-		with an initial charge of <strong>${{Number(plan.get('initial_charge')).toFixed(2)}}</strong>
+		with an initial charge of <strong>${{format_cents(plan.get('initial_charge'))}}</strong>
 	[[ } ]]
 	&nbsp; <a href="#" id='edit-plan-button' class='btn btn-small'><i class="icon-pencil"></i> Edit</a>
 	&nbsp; <a href="{{plan.get('url')}}" class='btn btn-small share-plan-button' target='_blank'><i class="icon-globe"></i> Invite people</a>
 	<br />
-	<a href="{{plan.get('url')}}" class='' target='_blank'><strong>Share page.</strong></a>
+	<a href="{{plan.get('url')}}" class='' target='_blank'><strong>Sharing link</strong></a>
 	</p>
 	<div id='plan-edit-container' class='hide'></div>
 </script>

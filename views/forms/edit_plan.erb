@@ -19,7 +19,7 @@
 			<div class='controls'>
 				<div class='input-prepend'>
 					<span class='add-on'>$</span>
-					<input type='text' name='amount' style='width:4em;' value='{{ plan.get("amount") }}'/>
+					<input type='text' name='amount' style='width:4em;' value='{{ format_cents(plan.get("amount")) }}'/>
 				</div>
 				<span>&nbsp; every &nbsp;</span>
 				<select style='width:8em;' name='cycle'>
@@ -39,7 +39,7 @@
 			<div class='controls'>
 				<div class='input-prepend'>
 					<span class='add-on'>$</span>
-					<input type='text' name='initial_charge' style='width:4em;' value='{{ plan.get("initial_charge") }}' />
+					<input type='text' name='initial_charge' style='width:4em;' value='{{ format_cents(plan.get("initial_charge")) }}' />
 				</div>
 			</div>
 		</div>

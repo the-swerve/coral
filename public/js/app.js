@@ -46,6 +46,11 @@ jQuery.fn.serializeObject = function() {
   return objectData;
 };
 
+function format_cents(cents) {
+	dollars = cents / 100; 
+	return dollars.toFixed(2);
+}
+
 // Underscore settings
 
 _.templateSettings = {

@@ -80,7 +80,7 @@ class Application < Sinatra::Base
 		if @profile
 			@payment_method = @profile.payment_methods.find params['pm_id']
 			if @payment_method
-				@payment_method.destroy
+				@payment_method.delete
 				json @profile.as_hash
 			else ; halt 400, 'payment method not found' ; end
 		else ; halt 400, 'profile not found' ; end

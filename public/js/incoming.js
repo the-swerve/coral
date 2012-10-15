@@ -9,7 +9,6 @@ Router = Backbone.Router.extend({
 		this.account = new Account.Model();
 		this.plans = new Plan.Collection();
 		this.profiles = new Profile.Collection();
-		this.charges = new ChargeCollection();
 
 		// Initialize child views
 		// Top bar -- account.js

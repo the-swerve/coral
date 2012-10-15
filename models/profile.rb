@@ -1,6 +1,7 @@
 require 'mongoid'
 require 'bcrypt'
 require 'state_machine'
+require './lib/balanced'
 
 class Profile
 
@@ -9,6 +10,7 @@ class Profile
 	include Mongoid::Document
 	include Mongoid::Timestamps
 	include BCrypt
+	include BalancedAPI
 
 	# Accessors
 
@@ -35,6 +37,8 @@ class Profile
 		presence: true,
 		uniqueness: true,
 		format: {with: /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/}
+	validates :buyer_uri,
+		presence: true
 
   # Associations
 
@@ -48,6 +52,8 @@ class Profile
 
   before_validation(:on => :create) do
 		self.password ||= rand(36**10).to_s(36) # By default, generate a random string for the pass
+		# Use bcrypt to generate the pass hash/salt
+		self.pass_hash = Password.create(self.password) if self.password
 		# Users can pass in sub_plan_id which is the plan ID for the subscription
 		# they'd like to create
 		if self.sub_plan_id && self.sub_plan_id != ''
@@ -55,11 +61,30 @@ class Profile
 			errors.add('', sub.first_error) if !sub.save
 		end
 		self.state = 'Gray'
+
+		# Create a buyer account on balancedpayments.com
+		# Almost a duplicate with the code inside Account.before_validation
+		response = BalancedAPI.create_account({
+			email_address: self.email,
+			name: self.name,
+		})
+		if response['uri']
+			self.buyer_uri = response['uri']
+		else # If there was an error in the balanced request, commit seppuku
+			if response['description']
+				errors.add('', 'Account creation error: ' + response['description'])
+			else 
+				errors.add('', 'Account creation error :/')
+			end
+		end
 	end
 
-  before_validation do
-		# Use bcrypt to generate the pass hash/salt
-		self.pass_hash = Password.create(self.password) if self.password
+	before_validation(:on => :update) do
+		# Update the corresponding merchant account on balancedpayments.com
+		response = BalancedAPI.update_account(self.buyer_uri, {
+			email_address: self.email,
+			name: self.name
+		})
 	end
 
   before_save do
@@ -69,9 +94,13 @@ class Profile
 
 	after_create :generate_session_token
 
+	def total_paid
+		charges.where(:state => 'Paid').map(&:amount).sum || 0
+	end
+
 	def balance
 		# Get the sum of all unpaid charges
-		charges.where(:state => 'Unpaid').map(&:amount).sum || 0
+		charges.where(:state => 'Pending').map(&:amount).sum || 0
 	end
 
 	def pay_all
@@ -104,7 +133,7 @@ class Profile
 	def destroy_session_token
 		# Nullify the authentication token at the end of a session
 		self.session_token = nil
-		self.save
+		self.save!
 	end
 
 	def as_hash
@@ -113,13 +142,25 @@ class Profile
 		 :phone => self.phone,
 		 :info => self.info || '',
 		 :state => self.state,
+		 :total_paid => self.total_paid,
 		 :_subscriptions => self.subscriptions.map(&:as_hash),
-		 :_transactions => self.trnsactions.map(&:as_hash),
+		 :_charges => self.charges.map(&:as_hash),
 		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},
 		 :_payment_methods => self.payment_methods.map(&:as_hash),
 		 :id => self.id.to_s,
 		 :created_at => self.created_at.to_date.to_s,
 		 :session_token => self.session_token}
+	end
+
+	def update_state
+		if self.charges.where(:state => 'Overdue').any?
+			self.state = 'Red'
+		elsif self.subscriptions.where(:state => 'Recurring').any?
+			self.state = 'Green'
+		else
+			self.state = 'Gray'
+		end
+		self.save!
 	end
 
 	def subscription_list

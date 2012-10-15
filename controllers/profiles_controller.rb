@@ -44,12 +44,10 @@ class Application < Sinatra::Base
 	end
 
 	get '/profiles/:profile_id', :auth => :account do
-		@profile = @account.profiles.first(:short_id => params['profile_id'].to_i)
+		@profile = @account.profiles.find(params['profile_id'])
 		if @profile
-			json :success => true, :profile => @profile.as_hash
-		else
-			json :success => false, :error => 'profile not found'
-		end
+			json @profile.as_hash
+		else ; halt 400, 'profile not found' ; end
 	end
 
 	# Profile management

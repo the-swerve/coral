@@ -23,36 +23,35 @@ Profile.View.Details = Backbone.View.extend({
 		// When instantiating Profile.View.Details, pass in the ID of the selected profile as selectedID
 		this.plans.selected = null; // deselect any plan
 		$('#plan-nav li').removeClass('active'); // deselect plan visually
-		this.render();
 
-		// Initialize the field editing view. We could also initiate this view for
-		// every field being edited upon clicking 'edit', but bleh.
-		this.editView = new Profile.View.Edit({
-			el: this.el, collection: this.collection, parentView: this
-		});
+		// Instantiate child views (views that are embedded inside the profile details view)
+		this.editView = new Profile.View.Edit({ el: this.el, collection: this.collection, parentView: this});
+		this.newPMModal = new PaymentMethod.View.New({el: this.el, parentView: this});
+		this.remPMModal = new PaymentMethod.View.Remove({el: this.el, parentView: this});
+		this.newCharge = new Charge.View.New({el: this.el, parentView: this});
+		this.remCharge = new Charge.View.Remove({el: this.el, parentView: this});
+		this.newProfileModal = new Profile.View.New({el: this.el, parentView: this, collection: this.collection, plans: this.plans});
 	},
 	events: {
-		'click #show-subs' : 'toggleSubTable',
-	},
-	toggleSubTable: function(e) {
-		e.preventDefault();
-		var btn = $(e.currentTarget);
-		var tableID = btn.data('table-id');
-		if(btn.text() == 'Show') btn.text('Hide');
-		else if(btn.text() == 'Hide') btn.text('Show');
-		$(tableID).slideToggle('slow');
+		'click .view-profile-button': 'viewProfile',
 	},
 	editField: function(e) {
 		e.preventDefault();
 		// get the div parent of the 'edit' button
 		// this way we can scope our view within the edit field box
 	},
+	viewProfile: function(e) {
+		e.preventDefault();
+		var sid = $(e.currentTarget).data('id'); // get id of clicked profile, which is in the <tr>
+		this.collection.selected = this.collection.get($(e.currentTarget).data('id'));
+		$('ul#plan-nav').children('li').removeClass('active');
+		this.render();
+	},
 	req: false,
 	render: function() {
 		// Compile and render form template
-		var self = this;
 		var tmpl = _.template($('#edit-profile-tmpl').html());
-		$('#profiles-container').html(tmpl(self.collection.selected.attributes));
+		$('#profiles-container').html(tmpl(this.collection.selected.attributes));
 	},
 });
 
@@ -157,14 +156,19 @@ Profile.View.Edit = Backbone.View.extend({
 
 Profile.View.New = Backbone.View.extend({
 	initialize: function(options) {
-		this.render();
+		this.parentView = options.parentView;
 		this.plans = options.plans;
 	},
 	events: {
+		'click #new-profile-btn': 'newProfile',
 		'click #new-profile-submit' : 'saveInfo',
 		'click #new-profile-pm-submit' : 'savePM',
 		'click #new-profile-starting-submit' : 'setStarting',
 		'click #skip-pm-form' : 'skipPM',
+	},
+	newProfile: function(e) {
+		e.preventDefault();
+		this.render();
 	},
 	render: function() {
 		// display the modal
@@ -211,7 +215,6 @@ Profile.View.New = Backbone.View.extend({
 		var sid = this.plans.selected.id;
 		var data = $('#new-profile-pm-form').serializeObject();
 		var subs = this.collection.selected.get('_subscriptions');
-		data['subscription_id'] = sid;
 
 		// XXX we should do all this jazz in a PaymentMethod model. definitely.
 		var errs = balanced.card.validate(data);
@@ -226,6 +229,7 @@ Profile.View.New = Backbone.View.extend({
 		balanced.card.create(data, function(response) {
 			if(response.status == 201) { // you aight
 				// get some of them data tidbits on coral 
+				response.data['sub_plan_id'] = sid;
 				$.ajax({
 					type: 'post',
 					url: '/profiles/' + pid + '/payment_methods',
@@ -235,7 +239,7 @@ Profile.View.New = Backbone.View.extend({
 						// the data response will be the profile hash
 						self.collection.selected.set(d);
 						$('#ajax-loader').hide();
-						self.skipPM(); // move to next step
+						self.startingForm(); // move to next step
 					},
 					// coral error.
 					// this shouldn't happen since it was ok on balanced. bro you got nerve
@@ -267,11 +271,7 @@ Profile.View.New = Backbone.View.extend({
 				$("#ajax-loader").hide();
 				$('#new-profile-modal').modal('hide');
 				self.collection.selected.set(d);
-				// draw the details view for this new person
-				self.detailsView = new Profile.View.Details({
-					el: self.el, collection: self.collection,
-					plans: self.plans, tableView: self.tableView
-				});
+				self.parentView.render();
 			},
 			error: function(d) {
 				$('#ajax-loader').hide();
@@ -281,6 +281,11 @@ Profile.View.New = Backbone.View.extend({
 		});
 	},
 	skipPM: function(e) {
+		e.preventDefault();
+		$('#new-profile-modal').modal('hide');
+		this.parentView.render();
+	},
+	startingForm: function(e) {
 		if(e) e.preventDefault();
 		// form ui - have a glass of my kombucha
 		$('#new-profile-pm-form').hide();
@@ -294,10 +299,7 @@ Profile.View.New = Backbone.View.extend({
 });
 
 
-// you can tell me anything if it makes you feel cool
-// all of the below code is saved in case i need to re-implement it, which i will.
 /*
-ProfileView = Backbone.View.extend({
 
 	invitePeople: function(e) {
 		e.preventDefault();
@@ -328,78 +330,4 @@ ProfileView = Backbone.View.extend({
 			});
 		}
 	},
-
-
-	renderRemovePMForm: function(e) {
-		e.preventDefault();
-		this.selected_id = $(e.currentTarget).attr('data-id');
-		$('#remove-pm-modal').modal('show');
-	},
-
-	destroyPM: function(e) {
-		if(e) e.preventDefault();
-		if(this.req == false) { // check request lock
-			var self = this; // preserve scope
-			$('a#remove-pm-submit').addClass('disabled'); // disable button
-			this.req = true; // set request lock
-			$.ajax({
-				type: 'delete',
-				url: '/profiles/' + self.collection.selected.id + '/payment_methods/' + self.selected_id,
-				dataType: 'json',
-				success: function(d) {
-					self.req = false;
-					self.collection.selected.set(d);
-					$('a#remove-pm-submit').removeClass('disabled');
-					$('#remove-pm-modal').modal('hide');
-					self.renderProfileView();
-				},
-				error: function(d) {
-					$('p#remove-pm-error').html(d.responseText);
-					$('a#remove-pm-submit').removeClass('disabled');
-					self.req = false;
-				}
-			});
-		}
-	},
-
-	destroy: function() {
-		if(this.req == false) { // check request lock
-			var self = this; // preserve scope
-			$('a#remove-profile-submit').addClass('disabled'); // disable button
-			this.req = true; // set request lock
-			var profile = this.collection.get($('input#edit-profile-id').val());
-			profile.destroy({
-				success: function(model, response) {
-					this.$('#remove-profile').modal('hide');
-					$('a#remove-profile-submit').removeClass('disabled'); // disable button
-					self.collection.remove(profile);
-					self.req = false;
-					self.renderTable();
-				},
-				error: function(model, response) {
-					$('a#remove-profile-submit').removeClass('disabled'); // enable button
-					$('p#remove-profile-error').html(response.responseText); // print error
-					self.req = false; // release request lock
-				}
-			});
-		}
-	},
-
-	renderNewForm: function(e) {
-		if(e) e.preventDefault();
-		var self = this;
-
-		var tmpl = _.template($('#new-profile-tmpl').html());
-		$('#profiles-table tr:last').before(tmpl());
-		$('input.sub-plan-id').val(this.plans.selected.id);
-	},
-
-	renderRemoveForm: function(e) {
-		e.preventDefault();
-		$('div#edit-profile').modal('hide');
-		$('p#remove-profile-error').html('');
-		$('div#remove-profile').modal('show');
-	},
-
-});
 */

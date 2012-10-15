@@ -87,8 +87,8 @@
 					<tr>
 						<td>{{_bank_account.bank_name}}</td>
 						<td>*{{_bank_account.last_four}}</td>
-						<td>$0.00</td>
-						<td>$0.00</td>
+						<td>${{format_cents(transferring)}}</td>
+						<td>${{format_cents(received)}}</td>
 						<td><a class='btn btn-small edit-bank-acct-btn' href='#'>Replace</a></td>
 						<td><a class='btn btn-small btn-danger' id='remove-bank-account-btn' href='#'>Remove</a></td>
 					</tr>

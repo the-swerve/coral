@@ -1,6 +1,5 @@
 require 'mongoid'
 require 'active_support/core_ext' # for date operations
-require 'state_machine'
 
 class Subscription
 
@@ -39,86 +38,54 @@ class Subscription
 	end
 
 	before_save do
-		puts 'in before_save, before conditional'
+		puts 'in after_create, before conditional'
 		if self.payment_method
 			puts 'has pm'
 		end
 		if self.starting
 			puts 'has starting'
 		end
-		if self.state == 'Invited' && self.starting && self.payment_method
+		if self.payment_method && self.starting && self.starting <= Date.today
 			puts 'in before_save, inside conditional'
 			# Starting date was given and there's a payment method. Activate!
-			self.state == 'Recurring'
+			self.state = 'Recurring'
 			self.create_initial_charges
 		end
 	end
 
 	def create_initial_charges
 		# Make initial charge
-		s.profile.charges.create(:name => "Initial fee (#{s.plan.name})",
-			:amount => s.plan.initial_charge,
-			:plan_id => s.plan.id)
+		self.profile.charges.create(:name => "Initial fee (#{self.plan.name})",
+			amount: self.plan.initial_charge,
+			plan_id: self.plan.id,
+			account_id: self.plan.account.id,
+			payment_method_id: self.payment_method.id)
 		# Make first recurring charge
-		s.profile.charges.create(:name => "Recurring fee (#{s.plan.name})",
-			:amount => s.plan.amount,
-			:plan_id => s.plan.id)
-		s.next_due = s.first_due
-	end
-
-
-	state_machine :state, :initial => 'Invited' do
-
-		event :check_dates do
-			transition 'Invited' => 'Recurring',
-				:if => lambda {|s| s.starting }
-			transition 'Recurring' => 'Expired',
-				:if => lambda {|s| s.expiration_date && s.expiration_date > DateTime.now}
-			transition 'Recurring' => 'Recurring',
-				:if => lambda {|s| s.next_due <= DateTime.now}
-		end
-
-		after_transition 'Invited' => 'Recurring' do |s|
-		end
-
-		after_transition 'Recurring' => 'Recurring' do |s|
-			# Continue the recurring billing cycle...
-			s.profile.charges.create(:name => "#{s.plan.name} recurring fee",
-				:amount => s.plan.amount,
-				:plan_id => s.plan.id)
-			s.next_due = s.next_due + s.cycle_period
-			s.save
-		end
-
-		state 'Unpaid' do
-		end
-
-		state 'In Trial' do
-		end
-
-		state 'Recurring' do
-		end
-
-		state 'Expired' do
-		end
-
+		self.profile.charges.create(:name => "Recurring fee (#{self.plan.name})",
+			amount: self.plan.amount,
+			plan_id: self.plan.id,
+			account_id: self.plan.account.id,
+			payment_method_id: self.payment_method.id)
+		self.next_due = self.first_due
 	end
 
 	def as_hash
 		{:expiration_date => self.expiration_date.to_s,
 		 :created_at => self.created_at.to_date.to_s,
 		 :plan_name => self.plan.name,
+		 :plan_amount => self.plan.amount,
+		 :plan_cycle => self.plan.cycle_length.to_s + ' ' + self.plan.cycle_type,
 		 :total_paid => self.total_paid.to_s,
 		 :state => self.state,
 		 :id => self.id.to_s}
 	end
 
 	def balance
-		charges.where(:state => 'unpaid').map(&:amount).sum
+		charges.where(:state => 'Pending').map(&:amount).sum
 	end
 
 	def total_paid
-		charges.where(state: 'paid').map(&:amount).sum
+		charges.where(state: 'Paid').map(&:amount).sum
 	end
 
 	def cycle_period
@@ -154,7 +121,7 @@ class Subscription
 	# Callbacks
 
 	def destroy_unpaid_charges
-		self.charges.where(:state => ['unpaid']).map(&:destroy)
+		self.charges.where(:state => ['Pending']).map(&:destroy)
 		self.profile.settle
 	end
 

@@ -1,38 +1,55 @@
-<script id='new-charge-tmpl' type='text/template' class='hide'>
 
-	<h4>New Charge</h4>
-	<p id="new-charge-error"></p>
+<div class='modal hide' id='new-charge-modal'>
 
-	<form method="post" action="/charges" id="new-charge-form" class='form-horizontal'>
-		<div class='control-group'>
-			<label class='control-label'>Label</label>
-			<div class='controls'>
-				<input rel="tooltip" title="What is this charge for?" type="text" name="name" class='charge-form-tt' />
-			</div>
-		</div>
+	<div class='modal-header'>
+		<button type="button" class="close" data-dismiss="modal">x</button>
+		<h3>New Charge</h3>
+	</div>
 
-		<div class='control-group'>
-			<label class='control-label'>Amount</label>
-			<div class='controls'>
-				<div class="input-prepend">
-					<span class="add-on">$</span>
-					<input type="text" name="amount" style="width:4em;" />
+	<div class='modal-body'>
+
+		<form method="post" action="/charges" id="new-charge-form" class='form-horizontal'>
+
+			<div class='alert alert-error hide'></div>
+
+			<div class='control-group'>
+				<label class='control-label'>Description</label>
+				<div class='controls'>
+					<input placeholder="What is this charge for?" type="text" name="name" />
 				</div>
 			</div>
-		</div>
 
-		<div class='control-group'>
-			<label class='control-label'>Pay Date</label>
-			<div class='controls'>
-				<input type="date" name="due_date" title="Delay this charge to a future date (optional)." class='charge-form-tt' /> 
+			<div class='control-group'>
+				<label class='control-label'>Amount</label>
+				<div class='controls'>
+					<div class='input-prepend'>
+						<span class='add-on'>$</span>
+						<input type='text' name='amount' class='input-small' />
+					</div>
+				</div>
 			</div>
-		</div>
 
+			<div class='modal-form-actions'>
+				<button id='new-charge-submit' class='btn'>Create</button>
+			</div>
+
+		</form>
+
+	</div><!-- end div.modal-body -->
+
+</div> <!-- end div.modal#new-charge-modal -->
+
+<div class='modal hide' id='remove-charge-modal'>
+	<div class='modal-header'>
+		<button type='button' class='close' data-dismiss='modal'>x</button>
+		<h3>Cancel Charge</h3>
+	</div>
+	<div class='modal-body'>
+		<p>Are you sure you wish to cancel this charge? </p>
 		<div class='modal-form-actions'>
-			<input class="btn" id="new-charge-submit" name="commit" type="submit" value="Save" />
-			<a class='btn back-to-profile' style='float:right'>Back</a>
+			<a class='btn btn-danger' href='#' id='remove-charge-submit'>Cancel Charge</a>
+			&nbsp; <a href='#' data-dismiss='modal'>Cancel</a>
 		</div>
+	</div>
+</div>
 
-	</form>
-
-</script>

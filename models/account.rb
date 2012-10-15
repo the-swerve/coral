@@ -19,8 +19,11 @@ class Account
 	field :phone_number, type: String
 	field :pass_hash, type: String
 	field :session_token, type: String
+	field :transferring, type: Integer # amount of money (in cents) in transfer to this merchant
+	field :received, type: Integer # amount of money (in cents) received by this merchant
 	field :revenue, type: Hash
 	field :merchant_uri, type: String
+	field :alerts, type: Array
 
 	# Validations
 
@@ -46,6 +49,8 @@ class Account
   before_validation(on: :create) do
 		# Generate password hash using bcrypt
 		self.pass_hash = Password.create(self.password) if self.password
+		self.transferring = 0
+		self.received = 0
 
 		# Create merchant account on balancedpayments.com for payments.
 		response = BalancedAPI.create_account({
@@ -105,14 +110,31 @@ class Account
 
 	def as_hash
 		{
-			:name => self.name.to_s,
+		 :name => self.name.to_s,
 		 :email => self.email,
 		 :phone_number => self.phone_number || '',
 		 :address => self.address || '',
+		 :transferring => self.transferring,
+		 :received => self.received,
 		 :id => self.id.to_s,
 		 :session_token => self.session_token,
 		 :_bank_account => self.bank_account ? self.bank_account.as_hash : {}
 		}
+	end
+
+	def credit amount
+		self.transferring = self.transferring + amount
+		response = BalancedAPI.credit_account({
+			account_uri: self.merchant_uri,
+			amount: amount
+		})
+		if response['amount']
+			self.transferring = self.transferring - amount
+			self.received = self.received + amount
+		else
+			puts 'Crediting account failed : ' + response.to_s
+		end
+		self.save
 	end
 
 	def first_error

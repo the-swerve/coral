@@ -1,12 +1,15 @@
 require 'mongoid'
-require 'balanced'
+require './lib/balanced'
 
 class PaymentMethod
+
+	attr_accessor :sub_plan_id
 
 	# Inclusions
 
 	include Mongoid::Document
 	include Mongoid::Timestamps
+	include BalancedAPI
 
 	# Accessors
 
@@ -33,22 +36,19 @@ class PaymentMethod
 	# Callbacks
 
 	before_validation(:on => :create) do
-		self.name ||= 'Credit card (' + self.brand + '): *' + self.last_four
-		begin
-			buyer = Balanced::Marketplace.my_marketplace.create_buyer(self.profile.email, self.uri)
-			if !self.profile.update_attribute('buyer_uri',buyer.uri)
-				errors.add('','Invalid data.')
-			end
-		rescue Balanced::Conflict => ex
-			if self.profile.buyer_uri
-				x = Balanced::Account.construct_from_response({uri: self.profile.buyer_uri})
-				x.add_card(self.uri)
-			else
-				errors.add('','Error: invalid data: ' + ex.to_s)
-			end
-		rescue => ex
-			errors.add('','Error: ' + ex.to_s)
+		if self.sub_plan_id && self.sub_plan_id != ''
+			self.subscription_id = self.profile.subscriptions.where(plan_id: self.sub_plan_id).first.id
 		end
+		# Create a readable name for this card
+		self.name ||= 'Credit card (' + self.brand + '): *' + self.last_four
+		# Attach the card to the buyer on balancedpayments.com
+		response = BalancedAPI.update_account(self.profile.buyer_uri, {
+			card_uri: self.uri
+		})
+		puts response
+	end
+
+	before_destroy do
 	end
 
 	def as_hash

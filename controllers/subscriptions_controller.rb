@@ -66,7 +66,7 @@ class Application < Sinatra::Base
 		if @profile
 			@subscription = @profile.subscriptions.where(plan_id: params['plan_id']).first
 			if @subscription
-				if @subscription.update_attributes params[:subscription]
+				if @subscription.update_attributes @params
 					json @profile.as_hash
 				else; halt 400, @subscription.first_error
 				end

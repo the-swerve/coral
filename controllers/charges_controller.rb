@@ -9,8 +9,8 @@ class Application < Sinatra::Base
 			@payment_method = @profile.payment_methods.find params['pm_id']
 			if @payment_method
 				@charge = @payment_method.charges.build @params.merge(account_id: @account.id)
-				if @charge.save
-					json @charge.as_hash
+				if @charge.save 
+					json @profile.as_hash
 				else ; halt 400, @charge.first_error ; end
 			else ; halt 400, 'payment method not found' ; end
 		else ; halt 400, 'profile not found' ; end
@@ -68,7 +68,7 @@ class Application < Sinatra::Base
 		if @profile
 			@charge = @profile.charges.find params['charge_id']
 			if @charge
-				@charge.destroy
+				@charge.void
 				json @profile.as_hash
 			else ; halt 400, 'charge not found' ; end
 		else ; halt 400, 'profile not found' ; end

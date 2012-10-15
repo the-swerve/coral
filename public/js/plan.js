@@ -27,6 +27,9 @@ Plan.View.Table = Backbone.View.extend({
 			self.plans.selected = self.plans.first();
 			self.render();
 		});
+		this.profileDetails =  new Profile.View.Details({
+			el: this.el, collection: this.profiles, plans: this.plans, tableView: this
+		});
 	},
 	events: {
 		'click .dropdown-item' : 'selectPlan',
@@ -35,8 +38,6 @@ Plan.View.Table = Backbone.View.extend({
 		'click #remove-plan-button': 'removePlan',
 
 		// profile dispatching
-		'click .view-profile-button': 'viewProfile',
-		'click #new-profile-btn': 'newProfile',
 	},
 	selectPlan: function(e) {
 		e.preventDefault();
@@ -61,20 +62,6 @@ Plan.View.Table = Backbone.View.extend({
 		// The plan links will have the data-id attribute holding their id's
 		this.removePlanModal = new Plan.View.Remove(
 				{el: this.el, collection: this.plans, profiles: this.profiles, tableView: this});
-	},
-	viewProfile: function(e) {
-		e.preventDefault();
-		var sid = $(e.currentTarget).data('id'); // get id of clicked profile, which is in the <tr>
-		this.profiles.selected = this.profiles.get($(e.currentTarget).data('id'));
-		this.profileDetails =  new Profile.View.Details({
-			el: this.el, collection: this.profiles, plans: this.plans, tableView: this
-		});
-	},
-	newProfile: function(e) {
-		e.preventDefault();
-		this.newProfileModal = new Profile.View.New({
-			el: this.el, collection: this.profiles, plans: this.plans, tableView: this
-		});
 	},
 	render: function() {
 		/* This will run on page load, instantiating the selected plan and
@@ -132,6 +119,8 @@ Plan.View.New = Backbone.View.extend({
 		$('#new-plan-form .alert-error').hide();
 		$('#ajax-loader').show();
 		var data = $('#new-plan-form').serializeObject();
+		data['amount'] = data['amount'] * 100; // coral only accepts cents, not dollars
+		data['initial_charge'] = data['initial_charge'] * 100; // coral only accepts cents, not dollars
 		var plan = new Plan.Model();
 		plan.save(data, {
 			success: function(model, response) {
@@ -184,6 +173,8 @@ Plan.View.Edit = Backbone.View.extend({
 		$('#edit-plan-submit').siblings().attr('disabled',true);
 		$('#ajax-loader').show();
 		var data = $('#edit-plan-form').serializeObject();
+		data['amount'] = data['amount'] * 100; // coral only accepts cents, not dollars
+		data['initial_charge'] = data['initial_charge'] * 100; // coral only accepts cents, not dollars
 		this.collection.selected.save(data, {
 			success: function(model, response) {
 				$('#ajax-loader').hide();
