@@ -98,6 +98,7 @@ $(document).ready(function() {
 		e.preventDefault();
 		$(this).hide();
 		$('#first-plan-loader').show();
+		var data = $('#first-plan-form').serializeObject();
 		$.ajax({
 			type: 'post',
 			url: '/plans',
