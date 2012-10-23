@@ -1,3 +1,17 @@
+
+# Profiles
+# ########
+#
+# Profiles are customer/subscriber accounts that send money to Accounts (merchant accounts)
+#
+# Profiles may have many payment methods.
+#
+# Profiles can only send money.
+#
+# Profiles are editable by accounts if the account created them or if the profile joined the account.
+#
+# Profiles that are editable by accounts  have their profile_id in the account's profile_ids field.
+
 require 'mongoid'
 require 'bcrypt'
 require 'state_machine'
@@ -14,7 +28,7 @@ class Profile
 
 	# Accessors
 
-	attr_accessor :password, :plan_id, :sub_plan_id, :sub_starting, :sub_expiration  # Can create a nested subscription - XXX - maybe do this client-side
+	attr_accessor :password
 
 	# Data
 
@@ -37,7 +51,7 @@ class Profile
 		presence: true,
 		uniqueness: true,
 		format: {with: /^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/}
-	validates :buyer_uri,
+	validates :buyer_uri, # The BalancedPayments uri for the corresponding buyer account
 		presence: true
 
   # Associations
@@ -50,20 +64,14 @@ class Profile
 
   # Callbacks
 
-  before_validation(:on => :create) do
+  before_validation(on: :create) do
 		self.password ||= rand(36**10).to_s(36) # By default, generate a random string for the pass
 		# Use bcrypt to generate the pass hash/salt
 		self.pass_hash = Password.create(self.password) if self.password
-		# Users can pass in sub_plan_id which is the plan ID for the subscription
-		# they'd like to create
-		if self.sub_plan_id && self.sub_plan_id != ''
-			sub = self.subscriptions.build :plan_id => sub_plan_id, :expiration => sub_expiration, :starting => sub_starting
-			errors.add('', sub.first_error) if !sub.save
-		end
-		self.state = 'Gray'
+
+		self.state = 'Good'
 
 		# Create a buyer account on balancedpayments.com
-		# Almost a duplicate with the code inside Account.before_validation
 		response = BalancedAPI.create_account({
 			email_address: self.email,
 			name: self.name,
@@ -73,15 +81,15 @@ class Profile
 		else # If there was an error in the balanced request, commit seppuku
 			if response['description']
 				errors.add('', 'Account creation error: ' + response['description'])
-			else 
+			else
 				errors.add('', 'Account creation error :/')
 			end
 		end
 	end
 
-	before_validation(:on => :update) do
+	before_validation(on: :update) do
 		# Update the corresponding merchant account on balancedpayments.com
-		response = BalancedAPI.update_account(self.buyer_uri, {
+		response = BalanceAPI.update_account(self.buyer_uri, {
 			email_address: self.email,
 			name: self.name
 		})
@@ -95,28 +103,18 @@ class Profile
 	after_create :generate_session_token
 
 	def total_paid
-		charges.where(:state => 'Paid').map(&:amount).sum || 0
+		charges.where(state: 'Paid').map(&:amount).sum || 0
 	end
 
 	def balance
-		# Get the sum of all unpaid charges
-		charges.where(:state => 'Pending').map(&:amount).sum || 0
+		charges.where(state: 'Pending').map(&:amount).sum || 0
 	end
 
-	def pay_all
+	def settle
 		# 1. Update all the subscriptions, which may cause them to create new charges
 		# 2. Find all unpaid charges and pay them all. If any payments fail, return false.
-		subscriptions.all.each do |s|
-			until s.next_due > DateTime.now
-				s.check_dates
-			end
-		end
-		result = true
-		charges.where(:state => 'Unpaid').each do |c|
-			c.pay
-			result = false unless c.state == 'Paid'
-		end
-		return result
+		subscriptions.all.map(&:settle)
+		charges.where(state: 'Pending').map(&:pay)
 	end
 
 	def authenticate pass
@@ -126,8 +124,8 @@ class Profile
 
 	def generate_session_token
 		# To begin a new authentication session, we generate a fresh token
-		self.session_token = rand(36**8).to_s(36)
-		self.save
+		self.session_token = rand(36**16).to_s(36)
+		self.save!
 		return self.session_token
 	end
 	def destroy_session_token
@@ -143,33 +141,12 @@ class Profile
 		 :info => self.info || '',
 		 :state => self.state,
 		 :total_paid => self.total_paid,
-		 :_subscriptions => self.subscriptions.map(&:as_hash),
-		 :_charges => self.charges.map(&:as_hash),
-		 :plan_ids => self.subscriptions.map {|s| s.plan.id.to_s},
-		 :_payment_methods => self.payment_methods.map(&:as_hash),
 		 :id => self.id.to_s,
 		 :created_at => self.created_at.to_date.to_s,
-		 :session_token => self.session_token}
-	end
-
-	def update_state
-		if self.charges.where(:state => 'Overdue').any?
-			self.state = 'Red'
-		elsif self.subscriptions.where(:state => 'Recurring').any?
-			self.state = 'Green'
-		else
-			self.state = 'Gray'
-		end
-		self.save!
-	end
-
-	def subscription_list
-		# Return a readable string of this person's subscription names
-		if subscriptions.empty?
-			'none'
-		else
-			subscriptions.collect {|s| s.plan.name + ' &#x2012; <em>' + s.state + '</em>'}.join ', '
-		end
+		 :session_token => self.session_token,
+		 :_subscriptions => self.subscriptions.map(&:as_hash),
+		 :_charges => self.charges.map(&:as_hash),
+		 :_payment_methods => self.payment_methods.map(&:as_hash)}
 	end
 
 	def first_error

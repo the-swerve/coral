@@ -1,3 +1,13 @@
+
+# Bank Accounts
+# #############
+#
+# Bank accounts represent an ACH token that can receive funds.
+#
+# Bank accounts may not send funds.
+#
+# Bank accounts are only tied to Accounts (merchant accounts)
+
 require 'mongoid'
 require 'bcrypt'
 require './lib/balanced'
@@ -21,17 +31,17 @@ class BankAccount
 	belongs_to :account
 
   # Callbacks
-	
+
 	before_validation do
 		# Put this new bank account into our balanced merchant account
 		response = BalancedAPI.update_account(self.account.merchant_uri, {
 			bank_account_uri: self.uri
 		})
+		# XXX add error checking
 	end
 
 	before_destroy do
 		response = BalancedAPI.invalidate_bank_account(self.uri)
-		puts response
 	end
 
 	def as_hash

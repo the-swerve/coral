@@ -10,30 +10,21 @@
 
 ChartView = Backbone.View.extend({
 	initialize: function(options) {
-		var d1 = [[0, 200],[1,220],[2,240],[3,260]];
-		var d2 = [[0, 100],[1,110],[2,130],[3,150]];
+		var d1 = [[0, 200],[1,220],[2,240],[3,260],[4,270],[5,285],[6,300]];
+		var months = ['January','February','March','April','May','June','July','August','September','October','November','December']
 		$.plot(
-			$('#chart'),
+			$('#chart-revenue'),
 			// data
 			[{
 				data: d1,
+				color: '#cadf72',
 				bars: {
 					show:true,
 					barWidth: 0.3,
 					align: 'center',
 					fillColor: { colors: [ { opacity: 0.8 }, {opacity: 0.1 } ] },
 				}
-			},
-			{
-				data: d2,
-				bars: {
-					show:true,
-					barWidth: 0.3,
-					align: 'center',
-					fillColor: { colors: [ { opacity: 0.8 }, {opacity: 0.1 } ] },
-				}
-			},
-				],
+			},],
 			// options
 			{
 				yaxis: {
@@ -41,9 +32,48 @@ ChartView = Backbone.View.extend({
 					tickLength: 0,
 				},
 				xaxis: {
-					tickSize: 1,
+					tickFormatter: function(n,obj) {
+						return months[n];
+					},
+					timeformat: '%Y/%m/%d',
 					tickDecimals: 0,
 					tickLength: 0,
+				},
+				grid: {
+					backgroundColor: { colors: ['#fff', '#eee'] }
+				},
+			}
+		);
+
+		$.plot(
+			$('#chart-signups'),
+			// data
+			[{
+				data: d1,
+				color: '#bdd9e6',
+				bars: {
+					show:true,
+					barWidth: 0.3,
+					align: 'center',
+					fillColor: { colors: [ { opacity: 0.8 }, {opacity: 0.1 } ] },
+				}
+			},],
+			// options
+			{
+				yaxis: {
+					max: 300,
+					tickLength: 0,
+				},
+				xaxis: {
+					tickFormatter: function(n,obj) {
+						return months[n];
+					},
+					timeformat: '%Y/%m/%d',
+					tickDecimals: 0,
+					tickLength: 0,
+				},
+				grid: {
+					backgroundColor: { colors: ['#fff', '#eee'] }
 				},
 			}
 		);

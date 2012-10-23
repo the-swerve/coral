@@ -15,10 +15,24 @@ Profile.Collection = Backbone.Collection.extend({
 	initialize: function() { this.selected = null; }
 });
 
+Profile.View.Table = Backbone.View.extend({
+	initialize: function(options) {
+		var self = this;
+		this.collection.bind('reset', function() {
+			self.render();
+		});
+	},
+
+	render: function() {
+		var table = _.template($('#profile-table-tmpl').html());
+		$('#profiles-container').html(table({profiles: this.collection}));
+		$('#profiles-container').slideDown('slow');
+	}
+});
+
 // Initialized by Plan.View.Table when you click on a row
 Profile.View.Details = Backbone.View.extend({
 	initialize: function(options) {
-		this.plans = options.plans;
 		this.tableView = options.tableView;
 		// When instantiating Profile.View.Details, pass in the ID of the selected profile as selectedID
 		this.plans.selected = null; // deselect any plan

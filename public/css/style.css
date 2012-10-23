@@ -62,9 +62,9 @@ div.form-actions {
 }
 
 .drop-shadow {
-  -webkit-box-shadow: 0 0 14px 3px #aaa;
-  -moz-box-shadow: 0 0 14px 3px #aaa;
-  box-shadow: 0 0 14px 3px #aaa;
+  box-shadow: 0 0 7px 2px #999;
+  -moz-shadow: 0 0 7px 2px #999;
+  -webkit-shadow: 0 0 7px 2px #999;
 }
 
 .sunk {

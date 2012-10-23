@@ -1,3 +1,17 @@
+
+# Account
+# #######
+#
+# Accounts can also be referred to as 'merchant accounts' and process incoming transactions.
+#
+# They are contrasted with Profiles, which give outgoing transactions.
+#
+# They have permission to edit profiles that they create or that have joined their account.
+#
+# sign here on the line
+#   your revenue is secure
+#     don't mind the fine print
+
 require 'mongoid'
 require 'bcrypt'
 require './lib/balanced'
@@ -13,17 +27,22 @@ class Account
 
 	# Fields
 
+	# info
 	field :name, type: String
 	field :address, type: String
 	field :email, type: String
 	field :phone_number, type: String
+	field :alerts, type: Array
+
+	# auth stuff
 	field :pass_hash, type: String
 	field :session_token, type: String
+
+	# transactional stuff
 	field :transferring, type: Integer # amount of money (in cents) in transfer to this merchant
 	field :received, type: Integer # amount of money (in cents) received by this merchant
 	field :revenue, type: Hash
 	field :merchant_uri, type: String
-	field :alerts, type: Array
 
 	# Validations
 
@@ -40,7 +59,6 @@ class Account
 
   # Associations
 
-	has_many :plans, :dependent => :destroy
 	has_one :bank_account, :dependent => :destroy
   has_and_belongs_to_many :profiles
 
@@ -54,7 +72,7 @@ class Account
 
 		# Create merchant account on balancedpayments.com for payments.
 		response = BalancedAPI.create_account({
-			email_address: self.email,
+			email: self.email,
 			name: self.name,
 			merchant: {
 				type: 'person',
@@ -72,7 +90,7 @@ class Account
 		else # If there was an error in the balanced request, commit seppuku
 			if response['description']
 				errors.add('', 'Account creation error: ' + response['description'])
-			else 
+			else
 				errors.add('', 'Account creation error :/')
 			end
 		end
@@ -80,15 +98,18 @@ class Account
 
 	before_save(on: :update) do
 		# Update the corresponding merchant account on balancedpayments.com
-		response = BalancedAPI.update_account(self.merchant_uri, {
-			email_address: self.email,
-			name: self.name
-		})
+		if self.name_changed?  || self.email_changed?
+			response = BalancedAPI.update_account(self.merchant_uri, {
+				email: self.email,
+				name: self.name
+			})
+		end
 	end
 
 	after_create :generate_session_token
 
 	def transaction_history
+		## Create an array of [transaction date, transaction amount] for the entire account
 		[self.profiles.reduce([]) {|ps, p| ps + p.charges.reduce([]) {|cs, c| cs + c.trnsactions.map {|t| [t.created_at.to_s, t.amount]}}}]
 	end
 
@@ -97,15 +118,13 @@ class Account
 	end
 
 	def generate_session_token
-		self.session_token = rand(36**8).to_s(36)
+		self.session_token = rand(36**16).to_s(36)
 		self.save!
-		puts self.attributes
-		puts self.errors.to_hash
 		return self.session_token
 	end
 	def destroy_session_token
 		self.session_token = nil
-		self.save
+		self.save!
 	end
 
 	def as_hash
@@ -123,7 +142,9 @@ class Account
 	end
 
 	def credit amount
-		self.transferring = self.transferring + amount
+		# Transfer 'amount' to this merchant's bank account
+		self.transferring = self.transferring + amount # Amount is immediately in transfer
+		# Credit the merchant account on balancedpayments.com
 		response = BalancedAPI.credit_account({
 			account_uri: self.merchant_uri,
 			amount: amount
@@ -132,9 +153,13 @@ class Account
 			self.transferring = self.transferring - amount
 			self.received = self.received + amount
 		else
-			puts 'Crediting account failed : ' + response.to_s
+			self.alerts << 'Crediting of account failed : ' + response.to_s
 		end
-		self.save
+		self.save!
+	end
+
+	def settle
+		self.profiles.all.map(&:settle)
 	end
 
 	def first_error
@@ -144,12 +169,5 @@ class Account
 		self.errors.to_hash.first.first.to_s +
 			' ' + self.errors.to_hash.first.second.first.to_s
 	end
-
-	private
-
-# def filter_url
-#   self.url = self.url.downcase.gsub(/ +/,'-').gsub(/[^a-z0-9_\-]+/i, '')
-# 	self.url = self.id.to_s if self.url == ""
-# end
 
 end

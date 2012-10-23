@@ -1,3 +1,13 @@
+
+# Payment Methods
+# ###############
+#
+# Profiles can have one or more payment methods, which represents credit cards or bank accounts.
+#
+# A charge may be created using a payment method.
+#
+# Payment methods may only give money, not receive.
+
 require 'mongoid'
 require './lib/balanced'
 
@@ -26,33 +36,32 @@ class PaymentMethod
 
 	# Validations
 
-
 	# Associations
 
 	belongs_to :profile
-	belongs_to :subscription
+	has_many :subscriptions
 	has_many :charges
 
 	# Callbacks
 
 	before_validation(:on => :create) do
-		if self.sub_plan_id && self.sub_plan_id != ''
-			self.subscription_id = self.profile.subscriptions.where(plan_id: self.sub_plan_id).first.id
-		end
 		# Create a readable name for this card
 		self.name ||= 'Credit card (' + self.brand + '): *' + self.last_four
 		# Attach the card to the buyer on balancedpayments.com
 		response = BalancedAPI.update_account(self.profile.buyer_uri, {
 			card_uri: self.uri
 		})
-		puts response
+		# TODO add error checking
 	end
 
 	before_destroy do
+		# TODO invalidate payment method on balancedpayments.com
 	end
 
 	def as_hash
 		{:name => self.name,
+		 :last_four => self.last_four,
+		 :brand => self.brand,
 		:id => self.id.to_s}
 	end
 

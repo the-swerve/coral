@@ -10,19 +10,19 @@
 	<link rel="stylesheet" media="screen,projection" href="css/style.css">
 	<link rel="stylesheet" media="screen,projection" href="css/dashboard.css">
 
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.js"></script>
+	<script type="text/javascript" src="js/lib/jquery.cookie.js"></script>
 
-	<script type="text/javascript" src="js/flot/jquery.flot.js"></script>
+	<script type="text/javascript" src="js/lib/flot/jquery.flot.js"></script>
 
-	<script type="text/javascript" src="js/underscore.js"></script>
-	<script type="text/javascript" src="js/backbone.js"></script>
+	<script type="text/javascript" src="js/lib/underscore.js"></script>
+	<script type="text/javascript" src="js/lib/backbone.js"></script>
 
 	<script type="text/javascript" src="https://js.balancedpayments.com/v1/balanced.js"></script>
 
-	<script type="text/javascript" src="js/bootstrap.js"></script>
-	<script type="text/javascript" src="js/bootstrap-modal.js"></script>
-	<script type="text/javascript" src="js/bootstrap-tooltip.js"></script>
+	<script type="text/javascript" src="js/lib/bootstrap.js"></script>
+	<script type="text/javascript" src="js/lib/bootstrap-modal.js"></script>
+	<script type="text/javascript" src="js/lib/bootstrap-tooltip.js"></script>
 
 
 	<script type="text/javascript" src="js/app.js"></script>
@@ -46,7 +46,6 @@
 
 			// Load in bootstrapped data served by sinatra
 			v.account.set(<%= @account.as_hash.to_json %>);
-			v.plans.reset(<%= @account.plans.map(&:as_hash).to_json %>);
 			v.profiles.reset(<%= @account.profiles.map(&:as_hash).to_json %>);
 			// Payment methods, subscriptions, and charges are all loaded inside the profiles
 		});
@@ -66,44 +65,46 @@
 
 <div class="container">
 
-
-
 	<div id='account'>
 		<div class='row'>
-			<div class='span12'>
-				<%= erb :'meta/nav' %>
+			<div class='span9'>
 				<h1 id="account-name"><%= @account.name %></h1>
 			</div>
+			<div class='span3'>
+				<%= erb :'meta/nav' %>
+			</div>
 		</div>
+	</div>
 
-		<div class='row'>
-			<%= erb :'modals/edit_account' %>
-		</div>
-
+	<div class='row'>
+		<%= erb :'forms/edit_account' %>
 	</div>
 
 	<div class="visualization drop-shadow row">
-		<div id="chart">Graph goes here!</div>
+		<div class='row-fluid'>
+			<div class='span6'>
+				<h3>Revenue</h2>
+				<div id="chart-revenue">Graph goes here!</div>
+			</div>
+			<div class='span6'>
+				<h3>Members</h2>
+				<div id="chart-signups">Graph goes here!</div>
+			</div>
+		</div>
 	</div>
 
 	<div class="data drop-shadow row">
 
-		<%= erb :'modals/new_plan' %>
-		<%= erb :'modals/edit_plan' %>
-		<%= erb :'modals/share_plan' %>
 		<%= erb :'forms/edit_profile' %>
 
 		<div class='row data-row'>
-			<%= erb :'meta/plans' %>
 			<%= erb :'tables/profiles' %>
-			<div class='span3'>
-				<div id='plan-nav-container'> </div>
-			</div>
-			<div class='span9'>
-				<div id='profiles-container'>
+			<div class='span12'>
+				<div id='profiles-container' class='hide'>
 				</div>
 			</div>
 		</div>
+
 	</div>
 
 		<div id='charge' class='hide'>
@@ -117,6 +118,11 @@
 
 	<div id='footer'>
 		<!-- <a class="logo" href="/">coral</a> -->
+
+		<i class='fish fish1'></i>
+		<i class='fish fish-school'></i>
+		<i class='fish fish-skinny'></i>
+		<i class='fish fish-floppy'></i>
 	</div>
 
 </body>

@@ -7,7 +7,6 @@ Router = Backbone.Router.extend({
 
 		// Instatiate models
 		this.account = new Account.Model();
-		this.plans = new Plan.Collection();
 		this.profiles = new Profile.Collection();
 
 		// Initialize child views
@@ -22,7 +21,7 @@ Router = Backbone.Router.extend({
 		this.chartView = new ChartView({el: $('div.visualization')});
 
 		// Member table -- table.js
-		this.tableView = new Plan.View.Table({el: $('div.data'), plans: this.plans, profiles: this.profiles});
+		this.tableView = new Profile.View.Table({el: $('div.data'), collection: this.profiles});
 	},
 
 	routes: {

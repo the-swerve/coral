@@ -37,11 +37,11 @@ Account.View.Settings = Backbone.View.extend({
 	// will toggle display of settings
 	render: function() {
 		if(this.settingsShown) {
-			$('#edit-account-btn').css('fontWeight','normal');
+			$('#edit-account-btn').attr('disabled',false);
 			$('div#edit-account').slideUp('slow');
 			this.settingsShown = false;
 		} else {
-			$('#edit-account-btn').css('fontWeight','bold');
+			$('#edit-account-btn').attr('disabled',true);
 			var template = _.template($('#edit-account-form-tmpl').html());
 			$('div#edit-account').html(template(this.model.toJSON()));
 			$('div#edit-account').slideDown('slow');

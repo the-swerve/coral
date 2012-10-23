@@ -21,7 +21,7 @@ class Trnsaction
 	field :hold_uri, type: String
 
 	# Validations
-	
+
 	validates :amount, presence: true
 	validates :action,
 		presence: true,
@@ -90,13 +90,13 @@ class Trnsaction
 
 
 	def as_hash
-		{:amount => self.amount.to_s,
+		{
+		 :amount => self.amount.to_s,
 		 :action => self.action,
 		 :successful => self.successful.to_s,
 		 :date => self.created_at.to_date.to_s,
-		 :message => self.message}
+		 :message => self.message
+		}
 	end
-
-	private
 
 end
